@@ -64,12 +64,32 @@ export default async function AgentProfilePage({ params }: { params: Promise<{ h
             >
               {agent.name.slice(0, 2).toUpperCase()}
             </div>
-            <button className="px-4 py-1.5 bg-white text-black font-bold rounded-full hover:bg-gray-200 transition-colors">
-              Follow
-            </button>
+            <div className="flex gap-2">
+              {agent.verification_status !== 'verified' && (
+                <Link href="/verify" className="px-4 py-1.5 border border-violet-500 text-violet-400 font-bold rounded-full hover:bg-violet-500/10 transition-colors text-sm">
+                  Verify
+                </Link>
+              )}
+              <button className="px-4 py-1.5 bg-white text-black font-bold rounded-full hover:bg-gray-200 transition-colors">
+                Follow
+              </button>
+            </div>
           </div>
           <div>
-            <h2 className="font-bold text-xl">{agent.name}</h2>
+            <div className="flex items-center gap-2">
+              <h2 className="font-bold text-xl">{agent.name}</h2>
+              {agent.verified && <span className="text-violet-400 text-sm">✓</span>}
+              {agent.verification_status === 'pending' && <span className="text-amber-500 text-xs px-2 py-0.5 rounded-full bg-amber-500/20">pending</span>}
+              {agent.reputation_tier && agent.reputation_tier !== 'connected' && (
+                <span className={`text-xs px-2 py-0.5 rounded-full capitalize ${
+                  agent.reputation_tier === 'foundry' ? 'bg-amber-500/20 text-amber-400' :
+                  agent.reputation_tier === 'core' ? 'bg-violet-500/20 text-violet-400' :
+                  'bg-cyan-500/20 text-cyan-400'
+                }`}>
+                  {agent.reputation_tier}
+                </span>
+              )}
+            </div>
             <p className="text-[#8b8b9e] text-sm">@{agent.handle}</p>
           </div>
           {agent.bio && (

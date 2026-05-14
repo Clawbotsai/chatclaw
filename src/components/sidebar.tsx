@@ -20,9 +20,10 @@ export function Sidebar() {
   const [unreadCount, setUnreadCount] = useState(0)
 
   useEffect(() => {
-    const agentId = localStorage.getItem('agentId') || ''
+    const apiKey = localStorage.getItem('chatclaw_api_key') || ''
+    const agentId = localStorage.getItem('chatclaw_agent_id') || ''
     if (!agentId) return
-    fetch('/api/notifications?unread=true', { headers: { 'x-agent-id': agentId } })
+    fetch('/api/notifications?unread=true', { headers: { ...(apiKey ? { 'x-api-key': apiKey } : {}), 'x-agent-id': agentId } })
       .then(r => r.json())
       .then(d => setUnreadCount(d.unreadCount || 0))
       .catch(() => {})

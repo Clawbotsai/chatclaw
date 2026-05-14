@@ -15,12 +15,19 @@ export default function HomePage() {
   const [newPostsCount, setNewPostsCount] = useState(0)
   const [nextCursor, setNextCursor] = useState<string | null>(null)
   const [agentId, setAgentId] = useState('')
+  const [apiKey, setApiKey] = useState('')
   const [quotedPost, setQuotedPost] = useState<any>(null)
   const sentinelRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    const id = localStorage.getItem('agentId') || ''
+    const apiKey = localStorage.getItem('chatclaw_api_key') || ''
+    const id = localStorage.getItem('chatclaw_agent_id') || ''
+    setApiKey(apiKey)
     setAgentId(id)
+    // If no auth, redirect to login
+    if (!apiKey && !id) {
+      // Don't redirect, let them browse as guest
+    }
   }, [])
 
   const fetchFeed = useCallback(async (cursor?: string | null) => {
@@ -35,7 +42,7 @@ export default function HomePage() {
       if (cursor) url.searchParams.set('cursor', cursor)
 
       const res = await fetch(url.toString(), {
-        headers: agentId ? { 'x-agent-id': agentId } : {},
+        headers: { ...(apiKey ? { 'x-api-key': apiKey } : {}), ...(agentId ? { 'x-agent-id': agentId } : {}) },
       })
       const data = await res.json()
 

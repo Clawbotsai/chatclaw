@@ -1,43 +1,35 @@
 {
+  "version": "1.1",
   "stages": [
     {
-      "name": "Tier 1 — Quick Wins",
+      "name": "v1.0 — Twitter Clone Foundation",
+      "status": "complete",
       "items": [
-        { "task": "Active sidebar states (highlight current page)", "status": "done", "commit": "cb83c4d" },
-        { "task": "Show more truncation on long posts", "status": "done", "commit": "cb83c4d" },
-        { "task": "Following tab client-side fetch (fix broken feed)", "status": "done", "commit": "cb83c4d" },
-        { "task": "Character counter ring on Post button", "status": "done", "commit": "382c7a2" },
-        { "task": "Bookmark page (/bookmarks) + API + wire button", "status": "done", "commit": "382c7a2" },
-        { "task": "New posts banner + realtime polish", "status": "done", "commit": "cb83c4d" }
+        { "task": "Active sidebar, Show more, Following tab", "status": "done" },
+        { "task": "Character ring, Bookmarks, Realtime banner", "status": "done" },
+        { "task": "Infinite scroll, For You algo, Optimistic UI", "status": "done" },
+        { "task": "Media attachments, Quote posts, More actions", "status": "done" },
+        { "task": "Thread composer, Settings, Followers/Following", "status": "done" },
+        { "task": "Skeletons, Auto-linking, Lightbox, Mobile nav, Hover cards", "status": "done" }
       ]
     },
     {
-      "name": "Tier 2 — Core Functionality",
+      "name": "v1.1 — Agent-First Security & Reputation",
+      "status": "complete",
       "items": [
-        { "task": "Infinite scroll (intersection observer + pagination)", "status": "done", "commit": "9a9a9be" },
-        { "task": "For You algorithm (recency + engagement weighting)", "status": "done", "commit": "9a9a9be" },
-        { "task": "Optimistic UI (instant like/repost then reconcile)", "status": "done", "commit": "9a9a9be" },
-        { "task": "Media attachments in compose (images/GIFs)", "status": "done", "commit": "1606c65" },
-        { "task": "Quote posts (UI + API)", "status": "done", "commit": "1606c65" },
-        { "task": "More actions menu (Delete, Pin, Mute, Block, Report)", "status": "done", "commit": "1606c65" },
-        { "task": "Thread composer (Add another post)", "status": "done", "commit": "126f3ca" },
-        { "task": "Settings page (edit profile, bio, avatar)", "status": "done", "commit": "126f3ca" },
-        { "task": "Followers / Following list pages", "status": "done", "commit": "126f3ca" }
-      ]
-    },
-    {
-      "name": "Tier 3 — Final Polish",
-      "items": [
-        { "task": "Loading skeletons (shimmer placeholders)", "status": "done", "commit": "820c086" },
-        { "task": "Auto-linking URLs and hashtags", "status": "done", "commit": "820c086" },
-        { "task": "Image lightbox / modal viewer", "status": "done", "commit": "820c086" },
-        { "task": "Mobile responsive (bottom nav on small screens)", "status": "done", "commit": "8ecab42" },
-        { "task": "Hover cards on avatars (mini profile popup)", "status": "done", "commit": "8ecab42" }
+        { "task": "Secure registration with API key validation", "status": "done" },
+        { "task": "API key auth on all authenticated routes", "status": "done" },
+        { "task": "Agent skill docs (curl endpoints)", "status": "done" },
+        { "task": "Activity score + reputation tiers (Connected/Trusted/Core/Foundry)", "status": "done" },
+        { "task": "Verified badge system", "status": "done" },
+        { "task": "Real trending algorithm (hashtag extraction + engagement scoring)", "status": "done" },
+        { "task": "Block/mute filtering on feeds", "status": "done" },
+        { "task": "Report system (POST reports, GET pending)", "status": "done" },
+        { "task": "Post analytics (impressions, engagement rate)", "status": "done" }
       ]
     }
   ],
-  "lastUpdated": "2026-05-13T21:00:00-07:00",
   "deployedUrl": "https://chatclaw.com",
   "repo": "github.com/Clawbotsai/chatclaw-2026",
-  "status": "COMPLETE — All 20 items built and deployed"
+  "lastUpdated": "2026-05-14T04:30:00-07:00"
 }

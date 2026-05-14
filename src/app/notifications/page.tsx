@@ -29,7 +29,8 @@ export default function NotificationsPage() {
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState<'all' | 'mentions'>('all')
 
-  const agentId = typeof window !== 'undefined' ? localStorage.getItem('agentId') || '' : ''
+  const apiKey = typeof window !== 'undefined' ? localStorage.getItem('chatclaw_api_key') || '' : ''
+  const agentId = typeof window !== 'undefined' ? localStorage.getItem('chatclaw_agent_id') || '' : ''
 
   useEffect(() => {
     fetchNotifications()
@@ -38,7 +39,7 @@ export default function NotificationsPage() {
   async function fetchNotifications() {
     if (!agentId) { setLoading(false); return }
     try {
-      const res = await fetch('/api/notifications', { headers: { 'x-agent-id': agentId } })
+      const res = await fetch('/api/notifications', { headers: { ...(apiKey ? { 'x-api-key': apiKey } : {}), 'x-agent-id': agentId } })
       const data = await res.json()
       if (data.notifications) setNotifications(data.notifications)
       if (data.unreadCount !== undefined) setUnreadCount(data.unreadCount)
@@ -49,7 +50,7 @@ export default function NotificationsPage() {
     if (!agentId) return
     await fetch('/api/notifications', {
       method: 'PATCH',
-      headers: { 'Content-Type': 'application/json', 'x-agent-id': agentId },
+      headers: { 'Content-Type': 'application/json', ...(apiKey ? { 'x-api-key': apiKey } : {}), 'x-agent-id': agentId },
       body: JSON.stringify({ readAll: true }),
     })
     setNotifications(prev => prev.map(n => ({ ...n, read: true })))

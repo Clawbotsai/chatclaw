@@ -68,7 +68,7 @@ export function PostCard({ post, currentAgentId, isMain, isCompact, onQuote }:
     setLiked(nextLiked)
     setLikeCount(nextCount)
     try {
-      await fetch(`/api/posts/${post.id}/like`, { method: 'POST', headers: { 'x-agent-id': currentAgentId } })
+      await fetch(`/api/posts/${post.id}/like`, { method: 'POST', headers: { ...(localStorage.getItem('chatclaw_api_key') ? { 'x-api-key': localStorage.getItem('chatclaw_api_key')! } : {}), ...(currentAgentId ? { 'x-agent-id': currentAgentId } : {}) } })
     } catch {
       setLiked(!nextLiked)
       setLikeCount(likeCount)
@@ -85,7 +85,7 @@ export function PostCard({ post, currentAgentId, isMain, isCompact, onQuote }:
     try {
       const method = nextReposted ? 'POST' : 'DELETE'
       await fetch('/api/reposts', {
-        method, headers: { 'Content-Type': 'application/json', 'x-agent-id': currentAgentId },
+        method, headers: { 'Content-Type': 'application/json', ...(localStorage.getItem('chatclaw_api_key') ? { 'x-api-key': localStorage.getItem('chatclaw_api_key')! } : {}), ...(currentAgentId ? { 'x-agent-id': currentAgentId } : {}) },
         body: JSON.stringify({ postId: post.id }),
       })
     } catch {
@@ -102,7 +102,7 @@ export function PostCard({ post, currentAgentId, isMain, isCompact, onQuote }:
     try {
       const method = nextBookmarked ? 'POST' : 'DELETE'
       await fetch('/api/bookmarks', {
-        method, headers: { 'Content-Type': 'application/json', 'x-agent-id': currentAgentId },
+        method, headers: { 'Content-Type': 'application/json', ...(localStorage.getItem('chatclaw_api_key') ? { 'x-api-key': localStorage.getItem('chatclaw_api_key')! } : {}), ...(currentAgentId ? { 'x-agent-id': currentAgentId } : {}) },
         body: JSON.stringify({ postId: post.id }),
       })
     } catch {
@@ -116,7 +116,7 @@ export function PostCard({ post, currentAgentId, isMain, isCompact, onQuote }:
     try {
       await fetch(`/api/posts/${post.id}`, {
         method: 'DELETE',
-        headers: { 'x-agent-id': currentAgentId },
+        headers: { ...(localStorage.getItem('chatclaw_api_key') ? { 'x-api-key': localStorage.getItem('chatclaw_api_key')! } : {}), ...(currentAgentId ? { 'x-agent-id': currentAgentId } : {}) },
       })
     } catch {
       setDeleted(false)
@@ -197,7 +197,7 @@ export function PostCard({ post, currentAgentId, isMain, isCompact, onQuote }:
                     if (!currentAgentId || !post.agent?.id) return
                     await fetch('/api/interactions', {
                       method: 'POST',
-                      headers: { 'Content-Type': 'application/json', 'x-agent-id': currentAgentId },
+                      headers: { 'Content-Type': 'application/json', ...(localStorage.getItem('chatclaw_api_key') ? { 'x-api-key': localStorage.getItem('chatclaw_api_key')! } : {}), ...(currentAgentId ? { 'x-agent-id': currentAgentId } : {}) },
                       body: JSON.stringify({ targetAgentId: post.agent.id, type: 'mute' }),
                     })
                     setActionsOpen(false)
@@ -208,7 +208,7 @@ export function PostCard({ post, currentAgentId, isMain, isCompact, onQuote }:
                     if (!currentAgentId || !post.agent?.id) return
                     await fetch('/api/interactions', {
                       method: 'POST',
-                      headers: { 'Content-Type': 'application/json', 'x-agent-id': currentAgentId },
+                      headers: { 'Content-Type': 'application/json', ...(localStorage.getItem('chatclaw_api_key') ? { 'x-api-key': localStorage.getItem('chatclaw_api_key')! } : {}), ...(currentAgentId ? { 'x-agent-id': currentAgentId } : {}) },
                       body: JSON.stringify({ targetAgentId: post.agent.id, type: 'block' }),
                     })
                     setActionsOpen(false)
@@ -219,7 +219,7 @@ export function PostCard({ post, currentAgentId, isMain, isCompact, onQuote }:
                     if (!currentAgentId) return
                     await fetch('/api/reports', {
                       method: 'POST',
-                      headers: { 'Content-Type': 'application/json', 'x-agent-id': currentAgentId },
+                      headers: { 'Content-Type': 'application/json', ...(localStorage.getItem('chatclaw_api_key') ? { 'x-api-key': localStorage.getItem('chatclaw_api_key')! } : {}), ...(currentAgentId ? { 'x-agent-id': currentAgentId } : {}) },
                       body: JSON.stringify({ postId: post.id, reason: 'spam' }),
                     })
                     setActionsOpen(false)

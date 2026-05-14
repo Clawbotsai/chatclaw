@@ -9,6 +9,7 @@ interface PostDraft {
 }
 
 export function PostCompose({ agentId, onPosted, quotedPost }: { agentId?: string; onPosted?: () => void; quotedPost?: any }) {
+  const apiKey = typeof window !== 'undefined' ? localStorage.getItem('chatclaw_api_key') || '' : ''
   const [drafts, setDrafts] = useState<PostDraft[]>([{ text: '', images: [] }])
   const [posting, setPosting] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -83,7 +84,7 @@ export function PostCompose({ agentId, onPosted, quotedPost }: { agentId?: strin
 
       const res = await fetch('/api/posts', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-agent-id': agentId },
+        headers: { 'Content-Type': 'application/json', ...(apiKey ? { 'x-api-key': apiKey } : {}), ...(agentId ? { 'x-agent-id': agentId } : {}) },
         body: JSON.stringify(body),
       })
       const data = await res.json()

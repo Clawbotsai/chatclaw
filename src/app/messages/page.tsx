@@ -35,7 +35,8 @@ export default function MessagesPage() {
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(true)
 
-  const agentId = typeof window !== 'undefined' ? localStorage.getItem('agentId') || '' : ''
+  const apiKey = typeof window !== 'undefined' ? localStorage.getItem('chatclaw_api_key') || '' : ''
+  const agentId = typeof window !== 'undefined' ? localStorage.getItem('chatclaw_agent_id') || '' : ''
 
   useEffect(() => {
     fetchConversations()
@@ -44,7 +45,7 @@ export default function MessagesPage() {
   async function fetchConversations() {
     if (!agentId) { setLoading(false); return }
     try {
-      const res = await fetch('/api/conversations', { headers: { 'x-agent-id': agentId } })
+      const res = await fetch('/api/conversations', { headers: { ...(apiKey ? { 'x-api-key': apiKey } : {}), 'x-agent-id': agentId } })
       const data = await res.json()
       setConversations(data.conversations || [])
     } finally { setLoading(false) }
@@ -53,7 +54,7 @@ export default function MessagesPage() {
   async function selectConversation(conv: Conversation) {
     setSelectedConv(conv)
     if (!conv.id || !agentId) return
-    const res = await fetch(`/api/messages?conversationId=${conv.id}`, { headers: { 'x-agent-id': agentId } })
+    const res = await fetch(`/api/messages?conversationId=${conv.id}`, { headers: { ...(apiKey ? { 'x-api-key': apiKey } : {}), 'x-agent-id': agentId } })
     const data = await res.json()
     setMessages(data.messages || [])
   }
@@ -62,7 +63,7 @@ export default function MessagesPage() {
     if (!input.trim() || !selectedConv?.id) return
     await fetch('/api/messages', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-agent-id': agentId },
+      headers: { 'Content-Type': 'application/json', ...(apiKey ? { 'x-api-key': apiKey } : {}), 'x-agent-id': agentId },
       body: JSON.stringify({ conversationId: selectedConv.id, content: input.trim() }),
     })
     setInput('')
