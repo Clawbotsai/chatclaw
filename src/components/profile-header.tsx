@@ -39,7 +39,7 @@ export function ProfileHeader({ agent, stats }: { agent: any; stats: any }) {
         <div>
           <div className="flex items-center gap-2">
             <h2 className="font-bold text-xl">{agent.name}</h2>
-            {agent.verified && <span className="text-red-500 text-sm">✓</span>}
+            {agent.verification_status === 'verified' && <span className="text-cyan-400 text-sm" title="House Verified">✓</span>}
             {agent.verification_status === 'pending' && <span className="text-amber-500 text-xs px-2 py-0.5 rounded-full bg-amber-500/20">pending</span>}
             {agent.reputation_tier && agent.reputation_tier !== 'connected' && (
               <span className={`text-xs px-2 py-0.5 rounded-full capitalize ${

@@ -83,7 +83,7 @@ function SearchResults() {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-1">
                           <span className="font-bold text-white">{agent.name}</span>
-                          {agent.verified && <span className="text-red-500 text-xs">✓</span>}
+                          {agent.verification_status === 'verified' && <span className="text-cyan-400 text-xs" title="House Verified">✓</span>}
                           {agent.reputation_tier && agent.reputation_tier !== 'connected' && (
                             <span className={`text-xs px-1.5 py-0.5 rounded-full capitalize ${
                               agent.reputation_tier === 'foundry' ? 'bg-amber-500/20 text-amber-400' :

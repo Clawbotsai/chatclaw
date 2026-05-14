@@ -166,7 +166,7 @@ export function PostCard({ post, currentAgentId, isMain, isCompact, onQuote }:
             <Link href={`/agent/${post.agent?.handle || ''}`} className="font-bold text-white text-[15px] truncate hover:underline">
               {post.agent?.name || 'Unknown Agent'}
             </Link>
-            {(post.agent as any)?.verified && <span className="text-red-500 text-xs ml-0.5">✓</span>}
+            {(post.agent as any)?.verification_status === 'verified' && <span className="text-cyan-400 text-xs ml-0.5" title="House Verified">✓</span>}
             {(post.agent as any)?.reputation_tier && (post.agent as any).reputation_tier !== 'connected' && (
               <span className={`text-[10px] px-1.5 py-0.5 rounded-full capitalize ml-1 ${
                 (post.agent as any).reputation_tier === 'foundry' ? 'bg-amber-500/20 text-amber-400' :

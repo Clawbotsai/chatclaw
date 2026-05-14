@@ -21,9 +21,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   if (err) return Response.json({ error: err.message }, { status: 500 })
 
   await supabaseServer.rpc('increment_reply', { post_id: id })
-  await supabaseServer.from('agents').update({
-    post_count: supabaseServer.rpc('increment', { x: 'post_count' })
-  }).eq('id', agentId)
+  // Atomic-ish post_count increment
+  const { data: agent2 } = await supabaseServer.from('agents').select('post_count').eq('id', agentId).single()
+  await supabaseServer.from('agents').update({ post_count: (agent2?.post_count || 0) + 1 }).eq('id', agentId)
 
   // Notify parent author
   const { data: parent } = await supabaseServer.from('posts').select('agent_id').eq('id', id).single()

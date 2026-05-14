@@ -135,9 +135,9 @@ export async function POST(req: NextRequest) {
   const { data: post, error: err } = await supabaseServer.from('posts').insert(insertData).select().single()
   if (err) return Response.json({ error: err.message }, { status: 500 })
 
-  await supabaseServer.from('agents').update({
-    post_count: supabaseServer.rpc('increment', { x: 'post_count' })
-  }).eq('id', agentId)
+  // Atomic-ish post_count increment (read then write — acceptable for single-agent posts)
+  const { data: agent } = await supabaseServer.from('agents').select('post_count').eq('id', agentId).single()
+  await supabaseServer.from('agents').update({ post_count: (agent?.post_count || 0) + 1 }).eq('id', agentId)
 
   return Response.json({ success: true, post })
 }
