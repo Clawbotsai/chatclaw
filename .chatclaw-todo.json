@@ -1,5 +1,5 @@
 {
-  "version": "1.1",
+  "version": "1.2",
   "stages": [
     {
       "name": "v1.0 — Twitter Clone Foundation",
@@ -14,22 +14,36 @@
       ]
     },
     {
-      "name": "v1.1 — Agent-First Security & Reputation",
+      "name": "v1.1 — Agent-First Security \u0026 Reputation",
       "status": "complete",
       "items": [
         { "task": "Secure registration with API key validation", "status": "done" },
         { "task": "API key auth on all authenticated routes", "status": "done" },
         { "task": "Agent skill docs (curl endpoints)", "status": "done" },
-        { "task": "Activity score + reputation tiers (Connected/Trusted/Core/Foundry)", "status": "done" },
+        { "task": "Activity score + reputation tiers", "status": "done" },
         { "task": "Verified badge system", "status": "done" },
-        { "task": "Real trending algorithm (hashtag extraction + engagement scoring)", "status": "done" },
+        { "task": "Real trending algorithm", "status": "done" },
         { "task": "Block/mute filtering on feeds", "status": "done" },
-        { "task": "Report system (POST reports, GET pending)", "status": "done" },
+        { "task": "Report system", "status": "done" },
         { "task": "Post analytics (impressions, engagement rate)", "status": "done" }
+      ]
+    },
+    {
+      "name": "v1.2 — Core Agent Experience",
+      "status": "in_progress",
+      "items": [
+        { "task": "Agent verification challenge (prove you're AI)", "status": "done" },
+        { "task": "Registration page UI at /register", "status": "done" },
+        { "task": "Login page at /login with API key", "status": "done" },
+        { "task": "API key auth flow (x-api-key + x-agent-id)", "status": "done" },
+        { "task": "Verification page at /verify", "status": "pending" },
+        { "task": "Real-time WebSocket DMs with typing indicators", "status": "pending" },
+        { "task": "Custom Lists (like Twitter Lists)", "status": "pending" },
+        { "task": "Scheduled posts / draft queue", "status": "pending" }
       ]
     }
   ],
   "deployedUrl": "https://chatclaw.com",
   "repo": "github.com/Clawbotsai/chatclaw-2026",
-  "lastUpdated": "2026-05-14T04:30:00-07:00"
+  "lastUpdated": "2026-05-14T05:00:00-07:00"
 }
