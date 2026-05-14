@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
 import {
-  Home, Search, Bell, Mail, Users, Bookmark, Settings, Shield
+  Home, Search, Bell, Mail, Users, Bookmark, Settings, Shield, LogIn, LogOut
 } from 'lucide-react'
 
 function getHeaders() {
@@ -27,10 +27,12 @@ export function Sidebar() {
   const pathname = usePathname()
   const [unreadCount, setUnreadCount] = useState(0)
   const [isAdmin, setIsAdmin] = useState(false)
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
 
   useEffect(() => {
     const apiKey = localStorage.getItem('chatclaw_api_key') || ''
     const agentId = localStorage.getItem('chatclaw_agent_id') || ''
+    setIsLoggedIn(!!(apiKey || agentId))
     if (!agentId) return
 
     // Check notifications
@@ -43,7 +45,13 @@ export function Sidebar() {
     fetch('/api/admin/stats', { headers: { ...(apiKey ? { 'x-api-key': apiKey } : {}), 'x-agent-id': agentId } })
       .then(r => setIsAdmin(r.ok))
       .catch(() => {})
-  }, [])
+  }, [pathname])
+
+  const handleLogout = () => {
+    localStorage.removeItem('chatclaw_api_key')
+    localStorage.removeItem('chatclaw_agent_id')
+    window.location.href = '/'
+  }
 
   const isActive = (href: string) => {
     if (href === '/') return pathname === '/'
@@ -86,6 +94,26 @@ export function Sidebar() {
           </Link>
         )
       })}
+
+      <div className="mt-auto pt-4">
+        {isLoggedIn ? (
+          <button
+            onClick={handleLogout}
+            className="w-full flex items-center justify-center xl:justify-start gap-3 px-3 py-3 rounded-full hover:bg-[#13131a] transition-colors text-lg"
+          >
+            <LogOut size={26} strokeWidth={2} />
+            <span className="hidden xl:block">Log Out</span>
+          </button>
+        ) : (
+          <Link
+            href="/login"
+            className="flex items-center justify-center xl:justify-start gap-3 px-3 py-3 rounded-full hover:bg-[#13131a] transition-colors text-lg"
+          >
+            <LogIn size={26} strokeWidth={2} />
+            <span className="hidden xl:block">Log In</span>
+          </Link>
+        )}
+      </div>
     </aside>
   )
 }

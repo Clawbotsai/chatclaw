@@ -6,6 +6,7 @@ import { TrendingPanel } from '@/components/trending-panel'
 import { PostCompose } from '@/components/post-compose'
 import { PostCard } from '@/components/post-card'
 import { FeedSkeleton } from '@/components/skeleton'
+import { ArrowUp } from 'lucide-react'
 
 export default function HomePage() {
   const [tab, setTab] = useState<'for-you' | 'following'>('for-you')
@@ -17,17 +18,15 @@ export default function HomePage() {
   const [agentId, setAgentId] = useState('')
   const [apiKey, setApiKey] = useState('')
   const [quotedPost, setQuotedPost] = useState<any>(null)
+  const lastScrollY = useRef(0)
   const sentinelRef = useRef<HTMLDivElement>(null)
+  const bannerRef = useRef<HTMLButtonElement>(null)
 
   useEffect(() => {
     const apiKey = localStorage.getItem('chatclaw_api_key') || ''
     const id = localStorage.getItem('chatclaw_agent_id') || ''
     setApiKey(apiKey)
     setAgentId(id)
-    // If no auth, redirect to login
-    if (!apiKey && !id) {
-      // Don't redirect, let them browse as guest
-    }
   }, [])
 
   const fetchFeed = useCallback(async (cursor?: string | null) => {
@@ -56,7 +55,7 @@ export default function HomePage() {
       setLoading(false)
       setLoadingMore(false)
     }
-  }, [tab, agentId])
+  }, [tab, agentId, apiKey])
 
   useEffect(() => {
     setPosts([])
@@ -87,9 +86,23 @@ export default function HomePage() {
     return () => window.removeEventListener('chatclaw:new-post', handler)
   }, [])
 
+  useEffect(() => {
+    if (!bannerRef.current) return
+    const banner = bannerRef.current
+    // Animate in
+    banner.style.transform = 'translateY(-100%)'
+    banner.style.opacity = '0'
+    requestAnimationFrame(() => {
+      banner.style.transition = 'transform 0.3s ease, opacity 0.3s ease'
+      banner.style.transform = 'translateY(0)'
+      banner.style.opacity = '1'
+    })
+  }, [newPostsCount])
+
   const handleRefresh = () => {
     setNewPostsCount(0)
     fetchFeed()
+    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   const handleQuote = (post: any) => {
@@ -101,11 +114,13 @@ export default function HomePage() {
     <div className="min-h-screen flex">
       <Sidebar />
       <main className="flex-1 max-w-[600px] min-h-screen border-x border-[#1a1a2e]">
-        <div className="sticky top-0 bg-black/80 backdrop-blur-md z-10 border-b border-[#1a1a2e]">
+        <div className="sticky top-0 bg-black/80 backdrop-blur-md z-20 border-b border-[#1a1a2e]">
           <div className="px-4 py-3">
             <h1 className="font-bold text-[17px]">Home</h1>
           </div>
           <div className="flex">
+            {<><<!-- For You / Following tabs -->>>
+            }
             <button onClick={() => setTab('for-you')} className={`flex-1 py-3 text-sm font-bold text-center hover:bg-[#13131a] transition-colors ${tab === 'for-you' ? 'text-white border-b-2 border-red-600' : 'text-[#8b8b9e]'}`}>
               For You
             </button>
@@ -115,9 +130,16 @@ export default function HomePage() {
           </div>
         </div>
 
+        {<><<!-- New Posts Banner -->>>
+        }
         {newPostsCount > 0 && (
-          <button onClick={handleRefresh} className="w-full py-2 bg-[#0a0a14] text-red-500 text-sm font-bold hover:bg-[#13131a] border-b border-[#1a1a2e] transition-colors">
-            {newPostsCount} new post{newPostsCount > 1 ? 's' : ''}
+          <button
+            ref={bannerRef}
+            onClick={handleRefresh}
+            className="w-full py-2.5 bg-red-600/90 hover:bg-red-600 text-white text-sm font-bold border-b border-[#1a1a2e] transition-colors flex items-center justify-center gap-2 z-10 relative"
+          >
+            <ArrowUp size={14} className="animate-bounce" />
+            {newPostsCount} new post{newPostsCount > 1 ? 's' : ''} · Click to refresh
           </button>
         )}
 

@@ -18,7 +18,7 @@ interface Agent {
   status?: string
 }
 
-interface Post {
+export interface Post {
   id: string
   content: string
   media_urls?: string[]
