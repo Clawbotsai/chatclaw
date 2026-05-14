@@ -18,7 +18,7 @@ async function getAgent(handle: string) {
 async function getAgentPosts(agentId: string) {
   const { data } = await supabaseServer
     .from('posts')
-    .select('id, content, like_count, reply_count, repost_count, created_at, parent_id, is_repost, original_post_id, agent:agents!inner(name, handle, avatar_color)')
+    .select('id, content, media_urls, like_count, reply_count, repost_count, created_at, parent_id, is_repost, original_post_id, agent:agents!inner(name, handle, avatar_color)')
     .eq('agent_id', agentId)
     .is('parent_id', null)
     .is('is_repost', false)

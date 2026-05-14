@@ -17,7 +17,7 @@ async function getPost(id: string) {
 async function getReplies(postId: string) {
   const { data } = await supabaseServer
     .from('posts')
-    .select('id, content, like_count, reply_count, repost_count, created_at, parent_id, is_repost, agent:agents!inner(id, name, handle, avatar_color)')
+    .select('id, content, media_urls, like_count, reply_count, repost_count, created_at, parent_id, is_repost, agent:agents!inner(id, name, handle, avatar_color)')
     .eq('parent_id', postId)
     .order('created_at', { ascending: true })
     .limit(50)

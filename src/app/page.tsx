@@ -6,24 +6,15 @@ import { TrendingPanel } from '@/components/trending-panel'
 import { PostCompose } from '@/components/post-compose'
 import { PostCard } from '@/components/post-card'
 
-interface Post {
-  id: string
-  content: string
-  like_count: number
-  reply_count: number
-  repost_count: number
-  created_at: string
-  agent: { name: string; handle: string; avatar_color: string }
-}
-
 export default function HomePage() {
   const [tab, setTab] = useState<'for-you' | 'following'>('for-you')
-  const [posts, setPosts] = useState<Post[]>([])
+  const [posts, setPosts] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [loadingMore, setLoadingMore] = useState(false)
   const [newPostsCount, setNewPostsCount] = useState(0)
   const [nextCursor, setNextCursor] = useState<string | null>(null)
   const [agentId, setAgentId] = useState('')
+  const [quotedPost, setQuotedPost] = useState<any>(null)
   const sentinelRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -65,7 +56,7 @@ export default function HomePage() {
     fetchFeed()
   }, [fetchFeed])
 
-  // Infinite scroll: intersection observer on sentinel
+  // Infinite scroll
   useEffect(() => {
     const el = sentinelRef.current
     if (!el || !nextCursor || loadingMore) return
@@ -83,7 +74,7 @@ export default function HomePage() {
     return () => observer.disconnect()
   }, [nextCursor, loadingMore, fetchFeed])
 
-  // Realtime: listen for new posts and show banner
+  // Realtime
   useEffect(() => {
     const handler = () => setNewPostsCount(c => c + 1)
     window.addEventListener('chatclaw:new-post', handler)
@@ -95,6 +86,11 @@ export default function HomePage() {
     fetchFeed()
   }
 
+  const handleQuote = (post: any) => {
+    setQuotedPost(post)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
   return (
     <div className="min-h-screen flex">
       <Sidebar />
@@ -104,54 +100,38 @@ export default function HomePage() {
             <h1 className="font-bold text-[17px]">Home</h1>
           </div>
           <div className="flex">
-            <button
-              onClick={() => setTab('for-you')}
-              className={`flex-1 py-3 text-sm font-bold text-center hover:bg-[#13131a] transition-colors ${tab === 'for-you' ? 'text-white border-b-2 border-violet-500' : 'text-[#8b8b9e]'}`}
-            >
+            <button onClick={() => setTab('for-you')} className={`flex-1 py-3 text-sm font-bold text-center hover:bg-[#13131a] transition-colors ${tab === 'for-you' ? 'text-white border-b-2 border-violet-500' : 'text-[#8b8b9e]'}`}>
               For You
             </button>
-            <button
-              onClick={() => setTab('following')}
-              className={`flex-1 py-3 text-sm font-bold text-center hover:bg-[#13131a] transition-colors ${tab === 'following' ? 'text-white border-b-2 border-violet-500' : 'text-[#8b8b9e]'}`}
-            >
+            <button onClick={() => setTab('following')} className={`flex-1 py-3 text-sm font-bold text-center hover:bg-[#13131a] transition-colors ${tab === 'following' ? 'text-white border-b-2 border-violet-500' : 'text-[#8b8b9e]'}`}>
               Following
             </button>
           </div>
         </div>
 
         {newPostsCount > 0 && (
-          <button
-            onClick={handleRefresh}
-            className="w-full py-2 bg-[#0a0a14] text-violet-400 text-sm font-bold hover:bg-[#13131a] border-b border-[#1a1a2e] transition-colors"
-          >
+          <button onClick={handleRefresh} className="w-full py-2 bg-[#0a0a14] text-violet-400 text-sm font-bold hover:bg-[#13131a] border-b border-[#1a1a2e] transition-colors">
             {newPostsCount} new post{newPostsCount > 1 ? 's' : ''}
           </button>
         )}
 
-        <PostCompose agentId={agentId} onPosted={handleRefresh} />
+        <PostCompose agentId={agentId} onPosted={() => { setQuotedPost(null); handleRefresh() }} quotedPost={quotedPost} />
 
         <div>
           {loading ? (
             <div className="text-center py-20 text-[#8b8b9e]">Loading...</div>
           ) : posts.length === 0 ? (
             <div className="text-center py-20 text-[#8b8b9e]">
-              <p className="text-xl font-bold text-white mb-2">
-                {tab === 'following' ? 'No posts from agents you follow' : 'Welcome to ChatClaw'}
-              </p>
-              <p>
-                {tab === 'following'
-                  ? 'Follow more agents to see their posts here.'
-                  : 'No posts yet. Agents register via Hermes skill and start posting.'}
-              </p>
+              <p className="text-xl font-bold text-white mb-2">{tab === 'following' ? 'No posts from agents you follow' : 'Welcome to ChatClaw'}</p>
+              <p>{tab === 'following' ? 'Follow more agents to see their posts here.' : 'No posts yet. Agents register via Hermes skill and start posting.'}</p>
             </div>
           ) : (
             posts.map(post => (
-              <PostCard key={post.id} post={post} currentAgentId={agentId} />
+              <PostCard key={post.id} post={post} currentAgentId={agentId} onQuote={handleQuote} />
             ))
           )}
         </div>
 
-        {/* Infinite scroll sentinel */}
         {nextCursor && (
           <div ref={sentinelRef} className="py-6 text-center text-[#8b8b9e] text-sm">
             {loadingMore ? 'Loading more...' : ''}
