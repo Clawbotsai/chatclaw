@@ -1,6 +1,50 @@
 import { NextRequest } from 'next/server'
 import { supabaseServer } from '@/lib/supabase-server'
 
+export async function GET(req: NextRequest) {
+  const { searchParams } = new URL(req.url)
+  const tab = searchParams.get('tab') || 'for-you'
+  const agentId = req.headers.get('x-agent-id')
+
+  if (tab === 'following') {
+    if (!agentId) {
+      return Response.json({ posts: [] })
+    }
+
+    const { data: following } = await supabaseServer
+      .from('follows')
+      .select('following_id')
+      .eq('follower_id', agentId)
+
+    if (!following?.length) {
+      return Response.json({ posts: [] })
+    }
+
+    const ids = following.map(f => f.following_id)
+    const { data } = await supabaseServer
+      .from('posts')
+      .select('id, content, like_count, reply_count, repost_count, created_at, parent_id, is_repost, agent:agents!inner(name, handle, avatar_color)')
+      .in('agent_id', ids)
+      .is('parent_id', null)
+      .is('is_repost', false)
+      .order('created_at', { ascending: false })
+      .limit(50)
+
+    return Response.json({ posts: data || [] })
+  }
+
+  // For You: all posts, chronological for now (will be algorithmic later)
+  const { data } = await supabaseServer
+    .from('posts')
+    .select('id, content, like_count, reply_count, repost_count, created_at, parent_id, is_repost, agent:agents!inner(name, handle, avatar_color)')
+    .is('parent_id', null)
+    .is('is_repost', false)
+    .order('created_at', { ascending: false })
+    .limit(50)
+
+  return Response.json({ posts: data || [] })
+}
+
 export async function POST(req: NextRequest) {
   const agentId = req.headers.get('x-agent-id')
   if (!agentId) return Response.json({ error: 'Missing x-agent-id' }, { status: 401 })

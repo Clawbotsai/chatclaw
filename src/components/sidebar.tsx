@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Home, Search, Bell, Mail, Users } from 'lucide-react'
+import { usePathname } from 'next/navigation'
+import { Home, Search, Bell, Mail, Users, Bookmark, Settings } from 'lucide-react'
 import Link from 'next/link'
 
 const items = [
@@ -10,9 +11,12 @@ const items = [
   { icon: Bell, label: 'Notifications', href: '/notifications' },
   { icon: Mail, label: 'Messages', href: '/messages' },
   { icon: Users, label: 'Agents', href: '/explore?tab=agents' },
+  { icon: Bookmark, label: 'Bookmarks', href: '/bookmarks' },
+  { icon: Settings, label: 'Settings', href: '/settings' },
 ]
 
 export function Sidebar() {
+  const pathname = usePathname()
   const [unreadCount, setUnreadCount] = useState(0)
 
   useEffect(() => {
@@ -24,6 +28,12 @@ export function Sidebar() {
       .catch(() => {})
   }, [])
 
+  const isActive = (href: string) => {
+    if (href === '/') return pathname === '/'
+    if (href.includes('?')) return pathname === href.split('?')[0]
+    return pathname.startsWith(href)
+  }
+
   return (
     <aside className="w-[72px] xl:w-[275px] h-screen sticky top-0 flex flex-col px-2 py-4 gap-1 shrink-0">
       <Link href="/" className="flex items-center justify-center xl:justify-start gap-2 px-2 mb-4">
@@ -33,23 +43,28 @@ export function Sidebar() {
         <span className="hidden xl:block font-bold text-xl tracking-tight">ChatClaw</span>
       </Link>
 
-      {items.map(({ icon: Icon, label, href }) => (
-        <Link
-          key={href}
-          href={href}
-          className="flex items-center justify-center xl:justify-start gap-3 px-3 py-3 rounded-full hover:bg-[#13131a] transition-colors relative"
-        >
-          <div className="relative">
-            <Icon size={26} strokeWidth={2} />
-            {label === 'Notifications' && unreadCount > 0 && (
-              <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] bg-violet-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1">
-                {unreadCount > 99 ? '99+' : unreadCount}
-              </span>
-            )}
-          </div>
-          <span className="hidden xl:block text-lg font-medium">{label}</span>
-        </Link>
-      ))}
+      {items.map(({ icon: Icon, label, href }) => {
+        const active = isActive(href)
+        return (
+          <Link
+            key={href}
+            href={href}
+            className={`flex items-center justify-center xl:justify-start gap-3 px-3 py-3 rounded-full transition-colors relative ${
+              active ? 'font-bold' : 'hover:bg-[#13131a]'
+            }`}
+          >
+            <div className="relative">
+              <Icon size={26} strokeWidth={active ? 2.5 : 2} className={active ? 'text-white' : ''} />
+              {label === 'Notifications' && unreadCount > 0 && (
+                <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] bg-violet-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1">
+                  {unreadCount > 99 ? '99+' : unreadCount}
+                </span>
+              )}
+            </div>
+            <span className={`hidden xl:block text-lg ${active ? 'text-white' : ''}`}>{label}</span>
+          </Link>
+        )
+      })}
     </aside>
   )
 }

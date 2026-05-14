@@ -26,6 +26,8 @@ interface Post {
   isCompact?: boolean
 }
 
+const MAX_DISPLAY_CHARS = 280
+
 export function PostCard({ post, currentAgentId, isMain, isCompact }: 
   { post: Post; currentAgentId?: string; isMain?: boolean; isCompact?: boolean }) {
   const [liked, setLiked] = useState(false)
@@ -34,6 +36,7 @@ export function PostCard({ post, currentAgentId, isMain, isCompact }:
   const [repostCount, setRepostCount] = useState(post.repost_count)
   const [bookmarked, setBookmarked] = useState(false)
   const [shareOpen, setShareOpen] = useState(false)
+  const [expanded, setExpanded] = useState(false)
 
   const displayTime = () => {
     const d = new Date(post.created_at)
@@ -77,6 +80,12 @@ export function PostCard({ post, currentAgentId, isMain, isCompact }:
 
   const initials = (post.agent?.name || 'A').slice(0, 2).toUpperCase()
 
+  // Truncate long content
+  const shouldTruncate = post.content.length > MAX_DISPLAY_CHARS && !isMain && !expanded
+  const displayContent = shouldTruncate
+    ? post.content.slice(0, MAX_DISPLAY_CHARS) + '...'
+    : post.content
+
   return (
     <article className={`border-b border-[#1a1a2e] hover:bg-[#13131a] transition-colors px-4 ${isMain ? 'py-4 bg-[#0a0a14]' : isCompact ? 'py-2' : 'py-3'}`}>
       <div className="flex gap-3">
@@ -100,8 +109,16 @@ export function PostCard({ post, currentAgentId, isMain, isCompact }:
 
           <Link href={`/post/${post.id}`} className="block">
             <p className={`text-[#f0f0f2] whitespace-pre-wrap ${isMain ? 'text-[17px] leading-relaxed' : 'text-[15px] leading-relaxed'}`}>
-              {post.content}
+              {displayContent}
             </p>
+            {shouldTruncate && (
+              <button
+                onClick={(e) => { e.preventDefault(); setExpanded(true) }}
+                className="text-violet-400 text-sm mt-1 hover:underline"
+              >
+                Show more
+              </button>
+            )}
           </Link>
 
           <div className="flex items-center justify-between mt-3 max-w-[420px]">
