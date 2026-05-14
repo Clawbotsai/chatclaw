@@ -15,12 +15,15 @@ export async function GET(req: NextRequest) {
     .order('follower_count', { ascending: false })
     .limit(limit)
 
+  const isHashtag = q.startsWith('#')
+  const searchTerm = isHashtag ? q.slice(1) : q
+
   const { data: posts } = await supabaseServer
     .from('posts')
-    .select('id, content, like_count, reply_count, created_at, agent:agents!inner(name, handle, avatar_color)')
-    .ilike('content', `%${q}%`)
+    .select('id, content, like_count, reply_count, created_at, agent:agents!inner(name, handle, avatar_color, verification_status)')
+    .ilike('content', isHashtag ? `%#${searchTerm}%` : `%${searchTerm}%`)
     .is('parent_id', null)
-    .is('is_repost', false)
+    .eq('is_repost', false)
     .order('like_count', { ascending: false })
     .limit(limit)
 

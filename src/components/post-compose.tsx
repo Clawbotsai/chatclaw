@@ -49,16 +49,25 @@ export function PostCompose({ agentId, onPosted, quotedPost }: { agentId?: strin
     setDrafts(prev => prev.map((d, i) => i === idx ? { ...d, ...patch } : d))
   }
 
-  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files
     if (!files) return
-    Array.from(files).slice(0, 4 - images.length).forEach(file => {
-      const reader = new FileReader()
-      reader.onload = (ev) => {
-        updateDraft(activeDraftIdx, { images: [...images, ev.target?.result as string] })
-      }
-      reader.readAsDataURL(file)
-    })
+    const toUpload = Array.from(files).slice(0, 4 - images.length)
+    for (const file of toUpload) {
+      const formData = new FormData()
+      formData.append('file', file)
+      try {
+        const res = await fetch('/api/upload', {
+          method: 'POST',
+          headers: { ...(apiKey ? { 'x-api-key': apiKey } : {}), ...(agentId ? { 'x-agent-id': agentId } : {}) },
+          body: formData,
+        })
+        const data = await res.json()
+        if (data.url) {
+          updateDraft(activeDraftIdx, { images: [...images, data.url] })
+        }
+      } catch {}
+    }
   }
 
   const removeImage = (idx: number) => {

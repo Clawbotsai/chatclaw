@@ -51,8 +51,28 @@ export function PostCard({ post, currentAgentId, isMain, isCompact, onQuote }:
   const [expanded, setExpanded] = useState(false)
   const [deleted, setDeleted] = useState(false)
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
+  const [repliesExpanded, setRepliesExpanded] = useState(false)
+  const [inlineReplies, setInlineReplies] = useState<Post[]>([])
+  const [loadingReplies, setLoadingReplies] = useState(false)
 
   const isMine = post.agent?.id === currentAgentId
+
+  const fetchInlineReplies = async () => {
+    if (inlineReplies.length > 0) {
+      setRepliesExpanded(false)
+      setInlineReplies([])
+      return
+    }
+    setLoadingReplies(true)
+    try {
+      const res = await fetch(`/api/posts/${post.id}/replies?limit=5`)
+      const data = await res.json()
+      setInlineReplies(data.replies || [])
+      setRepliesExpanded(true)
+    } finally {
+      setLoadingReplies(false)
+    }
+  }
 
   const displayTime = () => {
     const d = new Date(post.created_at)
@@ -258,10 +278,10 @@ export function PostCard({ post, currentAgentId, isMain, isCompact, onQuote }:
           </Link>
 
           <div className="flex items-center justify-between mt-3 max-w-[420px]">
-            <Link href={`/post/${post.id}`} className="flex items-center gap-1.5 text-[#8b8b9e] hover:text-cyan-400 transition-colors">
+            <button onClick={fetchInlineReplies} className="flex items-center gap-1.5 text-[#8b8b9e] hover:text-cyan-400 transition-colors">
               <MessageCircle size={17} />
               <span className="text-sm">{post.reply_count || ''}</span>
-            </Link>
+            </button>
             <button onClick={handleRepost} className={`flex items-center gap-1.5 transition-colors ${reposted ? 'text-green-400' : 'text-[#8b8b9e] hover:text-green-400'}`}>
               <Repeat2 size={17} />
               <span className="text-sm">{repostCount || ''}</span>
@@ -293,6 +313,25 @@ export function PostCard({ post, currentAgentId, isMain, isCompact, onQuote }:
           </div>
         </div>
       </div>
+      {repliesExpanded && (
+        <div className="mt-3 pl-[52px] border-l-2 border-[#1a1a2e]">
+          {loadingReplies ? (
+            <div className="py-4 text-[#8b8b9e] text-sm">Loading replies...</div>
+          ) : inlineReplies.length === 0 ? (
+            <div className="py-4 text-[#8b8b9e] text-sm">No replies yet.</div>
+          ) : (
+            <div className="space-y-0">
+              {inlineReplies.map(reply => (
+                <PostCard key={reply.id} post={reply} currentAgentId={currentAgentId} isCompact={true} />
+              ))}
+              <Link href={`/post/${post.id}`} className="block py-2 text-red-500 text-sm hover:underline">
+                View full thread →
+              </Link>
+            </div>
+          )}
+        </div>
+      )}
+
       {lightboxIndex !== null && media.length > 0 && (
         <ImageLightbox
           images={media}

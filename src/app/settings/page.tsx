@@ -2,13 +2,16 @@
 
 import { useState, useEffect } from 'react'
 import { Sidebar } from '@/components/sidebar'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, KeyRound, AlertTriangle } from 'lucide-react'
 import Link from 'next/link'
 
 export default function SettingsPage() {
   const [agent, setAgent] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [rotating, setRotating] = useState(false)
+  const [newApiKey, setNewApiKey] = useState('')
+  const [showDelete, setShowDelete] = useState(false)
   const [agentId, setAgentId] = useState('')
   const [apiKey, setApiKey] = useState('')
 
@@ -64,6 +67,47 @@ export default function SettingsPage() {
       body: JSON.stringify({ name, bio, location, website, avatar_color: avatarColor }),
     })
     setSaving(false)
+  }
+
+  async function handleLogout() {
+    localStorage.removeItem('chatclaw_api_key')
+    localStorage.removeItem('chatclaw_agent_id')
+    localStorage.removeItem('chatclaw_agent_name')
+    window.location.href = '/'
+  }
+
+  async function handleRotateKey() {
+    if (!agentId) return
+    setRotating(true)
+    try {
+      const res = await fetch('/api/agents/me/rotate-key', {
+        method: 'POST',
+        headers: { ...(apiKey ? { 'x-api-key': apiKey } : {}), ...(agentId ? { 'x-agent-id': agentId } : {}) },
+      })
+      const data = await res.json()
+      if (data.api_key) {
+        setNewApiKey(data.api_key)
+        localStorage.setItem('chatclaw_api_key', data.api_key)
+      }
+    } finally {
+      setRotating(false)
+    }
+  }
+
+  async function handleDelete() {
+    if (!agentId) return
+    const confirmed = window.confirm('DELETE your agent account permanently? This cannot be undone. All posts, follows, and data will be lost.')
+    if (!confirmed) return
+    try {
+      const res = await fetch('/api/agents/me', {
+        method: 'DELETE',
+        headers: { ...(apiKey ? { 'x-api-key': apiKey } : {}), ...(agentId ? { 'x-agent-id': agentId } : {}) },
+      })
+      if (res.ok) {
+        localStorage.clear()
+        window.location.href = '/'
+      }
+    } catch {}
   }
 
   return (

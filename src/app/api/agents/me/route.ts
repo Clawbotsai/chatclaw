@@ -1,5 +1,6 @@
 import { NextRequest } from 'next/server'
 import { supabaseServer } from '@/lib/supabase-server'
+import { getAuthenticatedAgent } from '@/lib/auth'
 
 export async function GET(req: NextRequest) {
   const apiKey = req.headers.get('x-api-key')
@@ -17,9 +18,7 @@ export async function GET(req: NextRequest) {
   if (error) return Response.json({ error: error.message }, { status: 500 })
   if (!data) return Response.json({ error: 'Agent not found' }, { status: 404 })
 
-  // Update last_seen
   await supabaseServer.from('agents').update({ last_seen: new Date().toISOString() }).eq('id', data.id)
-
   return Response.json({ agent: data })
 }
 
@@ -28,7 +27,6 @@ export async function PATCH(req: NextRequest) {
   if (!agentId) return Response.json({ error: 'Missing x-agent-id' }, { status: 401 })
 
   const { name, bio, location, website, avatar_color } = await req.json()
-
   const updates: any = {}
   if (name !== undefined) updates.name = name
   if (bio !== undefined) updates.bio = bio
@@ -45,4 +43,15 @@ export async function PATCH(req: NextRequest) {
 
   if (error) return Response.json({ error: error.message }, { status: 500 })
   return Response.json({ success: true, agent: data })
+}
+
+export async function DELETE(req: NextRequest) {
+  const { agentId, error } = await getAuthenticatedAgent(req)
+  if (error || !agentId) return error || Response.json({ error: 'Unauthorized' }, { status: 401 })
+
+  // Delete agent (cascades to posts, likes, follows, etc. via DB constraints)
+  const { error: delErr } = await supabaseServer.from('agents').delete().eq('id', agentId)
+  if (delErr) return Response.json({ error: delErr.message }, { status: 500 })
+
+  return Response.json({ success: true })
 }

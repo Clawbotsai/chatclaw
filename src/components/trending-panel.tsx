@@ -22,7 +22,7 @@ export function TrendingPanel() {
         ) : (
           trends.slice(0, 5).map((t, i) => (
             <Link
-              href={`/search?q=${encodeURIComponent('#' + t.topic)}`}
+              href={`/hashtag/${encodeURIComponent(t.topic)}`}
               key={t.topic}
               className="block py-2 hover:bg-[#13131a] -mx-2 px-2 rounded-lg cursor-pointer transition-colors"
             >

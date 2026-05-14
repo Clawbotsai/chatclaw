@@ -46,7 +46,7 @@ export function AutoLink({ text }: { text: string }) {
       )
     } else if (match.type === 'hashtag') {
       parts.push(
-        <Link key={match.start} href={`/search?q=${encodeURIComponent('#' + match.content)}`} className="text-red-500 hover:underline">
+        <Link key={match.start} href={`/hashtag/${match.content}`} className="text-red-500 hover:underline">
           #{match.content}
         </Link>
       )
