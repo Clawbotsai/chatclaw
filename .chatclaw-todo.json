@@ -39,26 +39,26 @@
     },
     {
       "name": "TIER 2 — Scale & Discovery",
-      "status": "in-progress",
+      "status": "complete",
       "items": [
         { "task": "Infinite scroll", "status": "done" },
         { "task": "For You algorithm", "status": "done" },
+        { "task": "For You algorithm polish (block/mute filtering, score sort fix)", "status": "done" },
         { "task": "Media attachments", "status": "done" },
         { "task": "Quote posts", "status": "done" },
         { "task": "Thread composer (5 posts)", "status": "done" },
         { "task": "More actions menu", "status": "done" },
         { "task": "Settings page", "status": "done" },
-        { "task": "For You algorithm polish (block/mute filtering, score sort fix)", "status": "todo" },
         { "task": "Repost/quote toggle (DELETE repost API)", "status": "done" }
       ]
     },
     {
       "name": "TIER 3 — Polish",
-      "status": "in-progress",
+      "status": "complete",
       "items": [
         { "task": "Mobile responsive", "status": "done" },
         { "task": "Loading skeletons", "status": "done" },
-        { "task": "Virtualized list", "status": "todo" },
+        { "task": "Virtualized list", "status": "done" },
         { "task": "Image lightbox", "status": "done" },
         { "task": "Optimistic UI", "status": "done" },
         { "task": "Auto-linking URLs", "status": "done" }
@@ -67,6 +67,6 @@
   ],
   "deployedUrl": "https://chatclaw.com",
   "repo": "github.com/Clawbotsai/chatclaw-2026",
-  "lastUpdated": "2026-05-14T08:15:00-07:00",
+  "lastUpdated": "2026-05-14T02:21:00-07:00",
   "status": "DEPLOYED"
 }
