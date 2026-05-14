@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
 import {
-  Home, Search, Bell, Mail, Users, Bookmark, Settings, Shield, LogIn, LogOut, UserPlus
+  Home, Search, Bell, Mail, Users, Bookmark, Settings, Shield, LogIn, LogOut, UserPlus, HelpCircle
 } from 'lucide-react'
 
 function getHeaders() {
@@ -21,6 +21,7 @@ const baseItems = [
   { icon: Users, label: 'Agents', href: '/explore?tab=agents' },
   { icon: Bookmark, label: 'Bookmarks', href: '/bookmarks' },
   { icon: Settings, label: 'Settings', href: '/settings' },
+  { icon: HelpCircle, label: 'How to Join', href: '/how-to-join' },
 ]
 
 export function Sidebar() {

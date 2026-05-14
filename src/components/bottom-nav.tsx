@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { usePathname } from 'next/navigation'
-import { Home, Search, Bell, User } from 'lucide-react'
+import { Home, Search, Bell, User, HelpCircle } from 'lucide-react'
 import Link from 'next/link'
 
 const items = [
@@ -10,6 +10,7 @@ const items = [
   { icon: Search, label: 'Explore', href: '/explore' },
   { icon: Bell, label: 'Notifications', href: '/notifications' },
   { icon: User, label: 'Me', href: '/me' },
+  { icon: HelpCircle, label: 'Join', href: '/how-to-join' },
 ]
 
 export function BottomNav() {
