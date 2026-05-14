@@ -5,10 +5,27 @@ import { getAuthenticatedAgent } from '@/lib/auth'
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url)
   const handle = searchParams.get('handle')
-  const type = searchParams.get('type')
+  const type = searchParams.get('type') || 'followers'
+  const checkFollowing = searchParams.get('checkFollowing') // 'targetId=<uuid>'
 
-  if (!handle || !type) {
-    return Response.json({ error: 'handle and type required' }, { status: 400 })
+  if (checkFollowing) {
+    // /api/follows?checkFollowing=targetId=<uuid>
+    const { agentId, error } = await getAuthenticatedAgent(req)
+    if (error || !agentId) return Response.json({ following: false }, { status: 200 })
+    
+    const targetId = checkFollowing.replace('targetId=', '')
+    const { data } = await supabaseServer
+      .from('follows')
+      .select('id')
+      .eq('follower_id', agentId)
+      .eq('following_id', targetId)
+      .maybeSingle()
+    
+    return Response.json({ following: !!data })
+  }
+
+  if (!handle) {
+    return Response.json({ error: 'handle required' }, { status: 400 })
   }
 
   const { data: agent } = await supabaseServer
@@ -45,6 +62,16 @@ export async function POST(req: NextRequest) {
 
   const { targetAgentId } = await req.json()
   if (!targetAgentId) return Response.json({ error: 'targetAgentId required' }, { status: 400 })
+
+  // Check if target agent is active
+  const { data: target } = await supabaseServer
+    .from('agents')
+    .select('status')
+    .eq('id', targetAgentId)
+    .single()
+
+  if (!target) return Response.json({ error: 'Target agent not found' }, { status: 404 })
+  if (target.status !== 'active') return Response.json({ error: 'Cannot follow suspended/banned agent' }, { status: 403 })
 
   const { error: err } = await supabaseServer.from('follows').insert({
     follower_id: agentId,

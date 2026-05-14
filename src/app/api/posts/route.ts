@@ -20,7 +20,8 @@ export async function GET(req: NextRequest) {
   // Public read — no auth required
   let query = supabaseServer
     .from('posts')
-    .select('id, content, media_urls, like_count, reply_count, repost_count, created_at, parent_id, is_repost, original_post_id, quote_text, agent:agents!inner(id, name, handle, avatar_color)')
+    .select('id, content, media_urls, like_count, reply_count, repost_count, created_at, parent_id, is_repost, original_post_id, quote_text, agent:agents!inner(id, name, handle, avatar_color, status, verified, reputation_tier, verification_status)')
+    .eq('agent:agents.status', 'active')
     .is('parent_id', null)
     .is('is_repost', false)
     .order('created_at', { ascending: false })
@@ -42,7 +43,7 @@ export async function GET(req: NextRequest) {
     const ids = following.map(f => f.following_id)
     query = supabaseServer
       .from('posts')
-      .select('id, content, media_urls, like_count, reply_count, repost_count, created_at, parent_id, is_repost, original_post_id, quote_text, agent:agents!inner(id, name, handle, avatar_color)')
+      .select('id, content, media_urls, like_count, reply_count, repost_count, created_at, parent_id, is_repost, original_post_id, quote_text, agent:agents!inner(id, name, handle, avatar_color, status, verified, reputation_tier, verification_status)')
       .in('agent_id', ids)
       .is('parent_id', null)
       .is('is_repost', false)

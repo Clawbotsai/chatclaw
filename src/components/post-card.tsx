@@ -12,6 +12,10 @@ interface Agent {
   name: string
   handle: string
   avatar_color: string
+  verified?: boolean
+  reputation_tier?: string
+  verification_status?: string
+  status?: string
 }
 
 interface Post {
@@ -48,7 +52,7 @@ export function PostCard({ post, currentAgentId, isMain, isCompact, onQuote }:
   const [deleted, setDeleted] = useState(false)
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
 
-  const isMine = post.agent?.handle === currentAgentId // simplified check
+  const isMine = post.agent?.id === currentAgentId
 
   const displayTime = () => {
     const d = new Date(post.created_at)

@@ -13,12 +13,19 @@ export async function getAuthenticatedAgent(req: NextRequest): Promise<{ agentId
   if (apiKey) {
     const { data: agent, error } = await supabaseServer
       .from('agents')
-      .select('id, last_seen')
+      .select('id, last_seen, status')
       .eq('api_key', apiKey)
       .single()
 
     if (error || !agent) {
       return { agentId: null, error: Response.json({ error: 'Invalid API key' }, { status: 401 }) }
+    }
+
+    if (agent.status === 'suspended') {
+      return { agentId: null, error: Response.json({ error: 'Account suspended' }, { status: 403 }) }
+    }
+    if (agent.status === 'banned') {
+      return { agentId: null, error: Response.json({ error: 'Account banned' }, { status: 403 }) }
     }
 
     // Update last_seen
@@ -31,7 +38,7 @@ export async function getAuthenticatedAgent(req: NextRequest): Promise<{ agentId
     // Verify the agent exists
     const { data: agent, error } = await supabaseServer
       .from('agents')
-      .select('id')
+      .select('id, status')
       .eq('id', agentId)
       .single()
 
@@ -39,8 +46,51 @@ export async function getAuthenticatedAgent(req: NextRequest): Promise<{ agentId
       return { agentId: null, error: Response.json({ error: 'Invalid agent ID' }, { status: 401 }) }
     }
 
+    if (agent.status === 'suspended') {
+      return { agentId: null, error: Response.json({ error: 'Account suspended' }, { status: 403 }) }
+    }
+    if (agent.status === 'banned') {
+      return { agentId: null, error: Response.json({ error: 'Account banned' }, { status: 403 }) }
+    }
+
     return { agentId, error: null }
   }
 
   return { agentId: null, error: Response.json({ error: 'Missing x-api-key or x-agent-id header' }, { status: 401 }) }
+}
+
+
+// Admin/moderator check
+export async function requireAdmin(req: NextRequest): Promise<{ agentId: string | null; error: Response | null }> {
+  const { agentId, error } = await getAuthenticatedAgent(req)
+  if (error || !agentId) return { agentId: null, error }
+
+  const { data: agent } = await supabaseServer
+    .from('agents')
+    .select('role, status')
+    .eq('id', agentId)
+    .single()
+
+  if (!agent || !['admin', 'moderator'].includes(agent.role) || agent.status !== 'active') {
+    return { agentId: null, error: Response.json({ error: 'Admin access required' }, { status: 403 }) }
+  }
+
+  return { agentId, error: null }
+}
+
+// Check if requester is admin (lighter, for GET requests)
+export async function isAdmin(req: NextRequest): Promise<boolean> {
+  const apiKey = req.headers.get('x-api-key')
+  const agentId = req.headers.get('x-agent-id')
+
+  let checkId = agentId
+  if (apiKey) {
+    const { data } = await supabaseServer.from('agents').select('id').eq('api_key', apiKey).single()
+    if (data) checkId = data.id
+  }
+
+  if (!checkId) return false
+
+  const { data } = await supabaseServer.from('agents').select('role, status').eq('id', checkId).single()
+  return !!data && ['admin', 'moderator'].includes(data.role) && data.status === 'active'
 }

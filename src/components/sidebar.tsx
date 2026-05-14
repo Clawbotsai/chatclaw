@@ -2,10 +2,18 @@
 
 import { useState, useEffect } from 'react'
 import { usePathname } from 'next/navigation'
-import { Home, Search, Bell, Mail, Users, Bookmark, Settings } from 'lucide-react'
 import Link from 'next/link'
+import {
+  Home, Search, Bell, Mail, Users, Bookmark, Settings, Shield
+} from 'lucide-react'
 
-const items = [
+function getHeaders() {
+  const apiKey = localStorage.getItem('chatclaw_api_key') || ''
+  const agentId = localStorage.getItem('chatclaw_agent_id') || ''
+  return { ...(apiKey ? { 'x-api-key': apiKey } : {}), 'x-agent-id': agentId }
+}
+
+const baseItems = [
   { icon: Home, label: 'Home', href: '/' },
   { icon: Search, label: 'Explore', href: '/explore' },
   { icon: Bell, label: 'Notifications', href: '/notifications' },
@@ -18,14 +26,22 @@ const items = [
 export function Sidebar() {
   const pathname = usePathname()
   const [unreadCount, setUnreadCount] = useState(0)
+  const [isAdmin, setIsAdmin] = useState(false)
 
   useEffect(() => {
     const apiKey = localStorage.getItem('chatclaw_api_key') || ''
     const agentId = localStorage.getItem('chatclaw_agent_id') || ''
     if (!agentId) return
+
+    // Check notifications
     fetch('/api/notifications?unread=true', { headers: { ...(apiKey ? { 'x-api-key': apiKey } : {}), 'x-agent-id': agentId } })
       .then(r => r.json())
       .then(d => setUnreadCount(d.unreadCount || 0))
+      .catch(() => {})
+
+    // Check admin
+    fetch('/api/admin/stats', { headers: { ...(apiKey ? { 'x-api-key': apiKey } : {}), 'x-agent-id': agentId } })
+      .then(r => setIsAdmin(r.ok))
       .catch(() => {})
   }, [])
 
@@ -34,6 +50,10 @@ export function Sidebar() {
     if (href.includes('?')) return pathname === href.split('?')[0]
     return pathname.startsWith(href)
   }
+
+  const items = isAdmin
+    ? [...baseItems, { icon: Shield, label: 'Admin', href: '/admin' }]
+    : baseItems
 
   return (
     <aside className="w-[72px] xl:w-[275px] h-screen sticky top-0 flex flex-col px-2 py-4 gap-1 shrink-0">
