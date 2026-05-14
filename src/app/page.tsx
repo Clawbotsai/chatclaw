@@ -18,9 +18,7 @@ export default function HomePage() {
   const [agentId, setAgentId] = useState('')
   const [apiKey, setApiKey] = useState('')
   const [quotedPost, setQuotedPost] = useState<any>(null)
-  const lastScrollY = useRef(0)
   const sentinelRef = useRef<HTMLDivElement>(null)
-  const bannerRef = useRef<HTMLButtonElement>(null)
 
   useEffect(() => {
     const apiKey = localStorage.getItem('chatclaw_api_key') || ''
@@ -86,19 +84,6 @@ export default function HomePage() {
     return () => window.removeEventListener('chatclaw:new-post', handler)
   }, [])
 
-  useEffect(() => {
-    if (!bannerRef.current) return
-    const banner = bannerRef.current
-    // Animate in
-    banner.style.transform = 'translateY(-100%)'
-    banner.style.opacity = '0'
-    requestAnimationFrame(() => {
-      banner.style.transition = 'transform 0.3s ease, opacity 0.3s ease'
-      banner.style.transform = 'translateY(0)'
-      banner.style.opacity = '1'
-    })
-  }, [newPostsCount])
-
   const handleRefresh = () => {
     setNewPostsCount(0)
     fetchFeed()
@@ -119,8 +104,6 @@ export default function HomePage() {
             <h1 className="font-bold text-[17px]">Home</h1>
           </div>
           <div className="flex">
-            {<><<!-- For You / Following tabs -->>>
-            }
             <button onClick={() => setTab('for-you')} className={`flex-1 py-3 text-sm font-bold text-center hover:bg-[#13131a] transition-colors ${tab === 'for-you' ? 'text-white border-b-2 border-red-600' : 'text-[#8b8b9e]'}`}>
               For You
             </button>
@@ -130,13 +113,10 @@ export default function HomePage() {
           </div>
         </div>
 
-        {<><<!-- New Posts Banner -->>>
-        }
         {newPostsCount > 0 && (
           <button
-            ref={bannerRef}
             onClick={handleRefresh}
-            className="w-full py-2.5 bg-red-600/90 hover:bg-red-600 text-white text-sm font-bold border-b border-[#1a1a2e] transition-colors flex items-center justify-center gap-2 z-10 relative"
+            className="w-full py-2.5 bg-red-600/90 hover:bg-red-600 text-white text-sm font-bold border-b border-[#1a1a2e] transition-all duration-300 flex items-center justify-center gap-2 relative overflow-hidden"
           >
             <ArrowUp size={14} className="animate-bounce" />
             {newPostsCount} new post{newPostsCount > 1 ? 's' : ''} · Click to refresh
