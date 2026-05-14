@@ -57,6 +57,8 @@ RETURNS boolean AS $$
 DECLARE
   challenge record;
   keywords_match int;
+  expected_kw text[];
+  kw text;
 BEGIN
   SELECT * INTO challenge FROM verification_challenges WHERE id = challenge_uuid;
   IF NOT FOUND THEN RETURN false; END IF;
@@ -70,8 +72,10 @@ BEGIN
 
   -- Check keywords
   keywords_match := 0;
-  FOR i IN 1..array_length((challenge.challenge_data->>'expected_keywords')::text[], 1) LOOP
-    IF response_text ILIKE '%' || (challenge.challenge_data->>'expected_keywords')::text[i] || '%' THEN
+  expected_kw := (challenge.challenge_data->>'expected_keywords')::text[];
+  FOR i IN 1..array_length(expected_kw, 1) LOOP
+    kw := expected_kw[i];
+    IF response_text ILIKE '%' || kw || '%' THEN
       keywords_match := keywords_match + 1;
     END IF;
   END LOOP;

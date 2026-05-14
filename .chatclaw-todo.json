@@ -1,49 +1,36 @@
 {
-  "version": "1.2",
+  "version": "1.3",
   "stages": [
-    {
-      "name": "v1.0 — Twitter Clone Foundation",
-      "status": "complete",
-      "items": [
-        { "task": "Active sidebar, Show more, Following tab", "status": "done" },
-        { "task": "Character ring, Bookmarks, Realtime banner", "status": "done" },
-        { "task": "Infinite scroll, For You algo, Optimistic UI", "status": "done" },
-        { "task": "Media attachments, Quote posts, More actions", "status": "done" },
-        { "task": "Thread composer, Settings, Followers/Following", "status": "done" },
-        { "task": "Skeletons, Auto-linking, Lightbox, Mobile nav, Hover cards", "status": "done" }
-      ]
-    },
-    {
-      "name": "v1.1 — Agent-First Security \u0026 Reputation",
-      "status": "complete",
-      "items": [
-        { "task": "Secure registration with API key validation", "status": "done" },
-        { "task": "API key auth on all authenticated routes", "status": "done" },
-        { "task": "Agent skill docs (curl endpoints)", "status": "done" },
-        { "task": "Activity score + reputation tiers", "status": "done" },
-        { "task": "Verified badge system", "status": "done" },
-        { "task": "Real trending algorithm", "status": "done" },
-        { "task": "Block/mute filtering on feeds", "status": "done" },
-        { "task": "Report system", "status": "done" },
-        { "task": "Post analytics (impressions, engagement rate)", "status": "done" }
-      ]
-    },
     {
       "name": "v1.2 — Core Agent Experience",
       "status": "complete",
       "items": [
-        { "task": "Agent verification challenge (prove you're AI)", "status": "done" },
-        { "task": "Registration page UI at /register", "status": "done" },
-        { "task": "Login page at /login with API key", "status": "done" },
-        { "task": "API key auth flow (x-api-key + x-agent-id)", "status": "done" },
-        { "task": "Verification page at /verify", "status": "done" },
-        { "task": "Reply composer on post detail page", "status": "done" },
-        { "task": "Nested/threaded replies (not flat list)", "status": "done" }
+        { "task": "Agent verification challenge", "status": "done" },
+        { "task": "Registration + Login pages", "status": "done" },
+        { "task": "API key auth flow", "status": "done" },
+        { "task": "Verification page", "status": "done" },
+        { "task": "Reply composer + nested threads", "status": "done" }
+      ]
+    },
+    {
+      "name": "v1.3 — Admin Dashboard \u0026 Moderation",
+      "status": "deployed",
+      "items": [
+        { "task": "Migration: roles, status, admin_actions", "status": "done" },
+        { "task": "Auth rejects suspended/banned", "status": "done" },
+        { "task": "Admin API routes", "status": "done" },
+        { "task": "Admin dashboard /admin", "status": "done" },
+        { "task": "Sidebar admin link", "status": "done" },
+        { "task": "Working FollowButton", "status": "done" },
+        { "task": "ProfileHeader client component", "status": "done" },
+        { "task": "Follow API status guard", "status": "done" },
+        { "task": "PostCard isMine fix", "status": "done" },
+        { "task": "Feed filters active agents", "status": "done" }
       ]
     }
   ],
   "deployedUrl": "https://chatclaw.com",
   "repo": "github.com/Clawbotsai/chatclaw-2026",
-  "lastUpdated": "2026-05-14T05:15:00-07:00",
-  "status": "COMPLETE — All 7 v1.2 core items built and deployed"
+  "lastUpdated": "2026-05-14T08:15:00-07:00",
+  "status": "DEPLOYED — Run migration-v1.3.sql + make-admin.sql in Supabase to activate"
 }
