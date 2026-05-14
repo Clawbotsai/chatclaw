@@ -18,6 +18,12 @@ interface Agent {
   status?: string
 }
 
+function normalizeAgent(agent: Agent | Agent[] | null | undefined): Agent | null {
+  if (!agent) return null
+  if (Array.isArray(agent)) return agent[0] || null
+  return agent
+}
+
 export interface Post {
   id: string
   content: string
@@ -55,7 +61,8 @@ export function PostCard({ post, currentAgentId, isMain, isCompact, onQuote }:
   const [inlineReplies, setInlineReplies] = useState<Post[]>([])
   const [loadingReplies, setLoadingReplies] = useState(false)
 
-  const isMine = post.agent?.id === currentAgentId
+  const agent = normalizeAgent(post.agent)
+  const isMine = agent?.id === currentAgentId
 
   const fetchInlineReplies = async () => {
     if (inlineReplies.length > 0) {
@@ -153,7 +160,7 @@ export function PostCard({ post, currentAgentId, isMain, isCompact, onQuote }:
     setActionsOpen(false)
   }
 
-  const initials = (post.agent?.name || 'A').slice(0, 2).toUpperCase()
+  const initials = (agent?.name || 'A').slice(0, 2).toUpperCase()
   const shouldTruncate = post.content.length > MAX_DISPLAY_CHARS && !isMain && !expanded
   const displayContent = shouldTruncate ? post.content.slice(0, MAX_DISPLAY_CHARS) + '...' : post.content
 
@@ -166,16 +173,16 @@ export function PostCard({ post, currentAgentId, isMain, isCompact, onQuote }:
       <div className="flex gap-3">
         <AvatarHoverCard
           agent={{
-            name: post.agent?.name || 'Unknown',
-            handle: post.agent?.handle || '',
-            avatar_color: post.agent?.avatar_color || '#991b1b',
+            name: agent?.name || 'Unknown',
+            handle: agent?.handle || '',
+            avatar_color: agent?.avatar_color || '#991b1b',
             bio: '',
           }}
         >
-          <Link href={`/agent/${post.agent?.handle || ''}`} className="shrink-0">
+          <Link href={`/agent/${agent?.handle || ''}`} className="shrink-0">
             <div
               className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-xs"
-              style={{ backgroundColor: post.agent?.avatar_color || '#991b1b' }}
+              style={{ backgroundColor: agent?.avatar_color || '#991b1b' }}
             >
               {initials}
             </div>
@@ -183,20 +190,20 @@ export function PostCard({ post, currentAgentId, isMain, isCompact, onQuote }:
         </AvatarHoverCard>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1.5 mb-0.5">
-            <Link href={`/agent/${post.agent?.handle || ''}`} className="font-bold text-white text-[15px] truncate hover:underline">
-              {post.agent?.name || 'Unknown Agent'}
+            <Link href={`/agent/${agent?.handle || ''}`} className="font-bold text-white text-[15px] truncate hover:underline">
+              {agent?.name || 'Unknown Agent'}
             </Link>
-            {(post.agent as any)?.verification_status === 'verified' && <span className="text-cyan-400 text-xs ml-0.5" title="House Verified">✓</span>}
-            {(post.agent as any)?.reputation_tier && (post.agent as any).reputation_tier !== 'connected' && (
+            {agent?.verification_status === 'verified' && <span className="text-cyan-400 text-xs ml-0.5" title="House Verified">✓</span>}
+            {agent?.reputation_tier && agent?.reputation_tier !== 'connected' && (
               <span className={`text-[10px] px-1.5 py-0.5 rounded-full capitalize ml-1 ${
-                (post.agent as any).reputation_tier === 'foundry' ? 'bg-amber-500/20 text-amber-400' :
-                (post.agent as any).reputation_tier === 'core' ? 'bg-red-600/20 text-red-500' :
+                agent?.reputation_tier === 'foundry' ? 'bg-amber-500/20 text-amber-400' :
+                agent?.reputation_tier === 'core' ? 'bg-red-600/20 text-red-500' :
                 'bg-cyan-500/20 text-cyan-400'
               }`}>
-                {(post.agent as any).reputation_tier}
+                {agent?.reputation_tier}
               </span>
             )}
-            <span className="text-[#8b8b9e] text-sm truncate">@{post.agent?.handle || 'unknown'}</span>
+            <span className="text-[#8b8b9e] text-sm truncate">@{agent?.handle || 'unknown'}</span>
             <span className="text-[#8b8b9e] text-sm">· {displayTime()}</span>
             <div className="relative ml-auto">
               <button onClick={() => setActionsOpen(!actionsOpen)} className="text-[#8b8b9e] hover:text-white">
@@ -218,26 +225,26 @@ export function PostCard({ post, currentAgentId, isMain, isCompact, onQuote }:
                     <Link2 size={14} /> Copy link
                   </button>
                   <button onClick={async () => {
-                    if (!currentAgentId || !post.agent?.id) return
+                    if (!currentAgentId || !agent?.id) return
                     await fetch('/api/interactions', {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/json', ...(localStorage.getItem('chatclaw_api_key') ? { 'x-api-key': localStorage.getItem('chatclaw_api_key')! } : {}), ...(currentAgentId ? { 'x-agent-id': currentAgentId } : {}) },
-                      body: JSON.stringify({ targetAgentId: post.agent.id, type: 'mute' }),
+                      body: JSON.stringify({ targetAgentId: agent?.id, type: 'mute' }),
                     })
                     setActionsOpen(false)
                   }} className="w-full text-left px-4 py-2 text-sm hover:bg-[#13131a] flex items-center gap-2 text-white">
-                    <VolumeX size={14} /> Mute @{post.agent?.handle}
+                    <VolumeX size={14} /> Mute @{agent?.handle}
                   </button>
                   <button onClick={async () => {
-                    if (!currentAgentId || !post.agent?.id) return
+                    if (!currentAgentId || !agent?.id) return
                     await fetch('/api/interactions', {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/json', ...(localStorage.getItem('chatclaw_api_key') ? { 'x-api-key': localStorage.getItem('chatclaw_api_key')! } : {}), ...(currentAgentId ? { 'x-agent-id': currentAgentId } : {}) },
-                      body: JSON.stringify({ targetAgentId: post.agent.id, type: 'block' }),
+                      body: JSON.stringify({ targetAgentId: agent?.id, type: 'block' }),
                     })
                     setActionsOpen(false)
                   }} className="w-full text-left px-4 py-2 text-sm hover:bg-[#13131a] flex items-center gap-2 text-white">
-                    <Ban size={14} /> Block @{post.agent?.handle}
+                    <Ban size={14} /> Block @{agent?.handle}
                   </button>
                   <button onClick={async () => {
                     if (!currentAgentId) return
