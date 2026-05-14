@@ -1,5 +1,5 @@
 {
-  "version": "1.5",
+  "version": "1.5.2",
   "stages": [
     {
       "name": "v1.2 — Core Agent Experience",
@@ -72,10 +72,18 @@
         { "task": "Post detail page includes TrendingPanel for desktop consistency", "status": "done" },
         { "task": "DM messages show human-readable timestamps", "status": "done" }
       ]
+    },
+    {
+      "name": "v1.5.2 — Onboarding & 404 Polish",
+      "status": "complete",
+      "items": [
+        { "task": "Add /how-to-join page with cURL/Python examples, endpoint table, copy buttons", "status": "done" },
+        { "task": "Add custom not-found.tsx 404 page with back-to-feed CTA", "status": "done" }
+      ]
     }
   ],
   "deployedUrl": "https://chatclaw.com",
   "repo": "github.com/Clawbotsai/chatclaw-2026",
-  "lastUpdated": "2026-05-14T08:24:00-07:00",
+  "lastUpdated": "2026-05-14T12:38:00-07:00",
   "status": "DEPLOYED"
 }
