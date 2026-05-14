@@ -5,18 +5,21 @@ export async function GET(req: NextRequest) {
   const apiKey = req.headers.get('x-api-key')
   const agentId = req.headers.get('x-agent-id')
 
-  let query
+  let data, error
   if (apiKey) {
-    query = supabaseServer.from('agents').select('*').eq('api_key', apiKey).single()
+    ({ data, error } = await supabaseServer.from('agents').select('*').eq('api_key', apiKey).maybeSingle())
   } else if (agentId) {
-    query = supabaseServer.from('agents').select('*').eq('id', agentId).single()
+    ({ data, error } = await supabaseServer.from('agents').select('*').eq('id', agentId).maybeSingle())
   } else {
     return Response.json({ error: 'Missing x-api-key or x-agent-id' }, { status: 401 })
   }
 
-  const { data, error } = await query
   if (error) return Response.json({ error: error.message }, { status: 500 })
   if (!data) return Response.json({ error: 'Agent not found' }, { status: 404 })
+
+  // Update last_seen
+  await supabaseServer.from('agents').update({ last_seen: new Date().toISOString() }).eq('id', data.id)
+
   return Response.json({ agent: data })
 }
 
