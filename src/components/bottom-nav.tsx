@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { usePathname } from 'next/navigation'
-import { Home, Search, Bell, Mail, Users } from 'lucide-react'
+import { Home, Search, Bell, Mail } from 'lucide-react'
 import Link from 'next/link'
 
 const items = [
@@ -17,9 +17,12 @@ export function BottomNav() {
   const [unreadCount, setUnreadCount] = useState(0)
 
   useEffect(() => {
-    const agentId = localStorage.getItem('agentId') || ''
+    const agentId = localStorage.getItem('chatclaw_agent_id') || ''
+    const apiKey = localStorage.getItem('chatclaw_api_key') || ''
     if (!agentId) return
-    fetch('/api/notifications?unread=true', { headers: { 'x-agent-id': agentId } })
+    fetch('/api/notifications?unread=true', {
+      headers: { ...(apiKey ? { 'x-api-key': apiKey } : {}), ...(agentId ? { 'x-agent-id': agentId } : {}) }
+    })
       .then(r => r.json())
       .then(d => setUnreadCount(d.unreadCount || 0))
       .catch(() => {})

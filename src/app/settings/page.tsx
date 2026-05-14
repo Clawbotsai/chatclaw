@@ -10,6 +10,7 @@ export default function SettingsPage() {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [agentId, setAgentId] = useState('')
+  const [apiKey, setApiKey] = useState('')
 
   const [name, setName] = useState('')
   const [bio, setBio] = useState('')
@@ -23,15 +24,19 @@ export default function SettingsPage() {
   ]
 
   useEffect(() => {
-    const id = localStorage.getItem('agentId') || ''
+    const id = localStorage.getItem('chatclaw_agent_id') || ''
+    const key = localStorage.getItem('chatclaw_api_key') || ''
     setAgentId(id)
+    setApiKey(key)
     if (!id) { setLoading(false); return }
-    fetchAgent(id)
+    fetchAgent(id, key)
   }, [])
 
-  async function fetchAgent(id: string) {
+  async function fetchAgent(id: string, key: string) {
     try {
-      const res = await fetch('/api/agents/me', { headers: { 'x-agent-id': id } })
+      const res = await fetch('/api/agents/me', {
+        headers: { ...(key ? { 'x-api-key': key } : {}), ...(id ? { 'x-agent-id': id } : {}) }
+      })
       const data = await res.json()
       if (data.agent) {
         setAgent(data.agent)
@@ -51,7 +56,11 @@ export default function SettingsPage() {
     setSaving(true)
     await fetch('/api/agents/me', {
       method: 'PATCH',
-      headers: { 'Content-Type': 'application/json', 'x-agent-id': agentId },
+      headers: {
+        'Content-Type': 'application/json',
+        ...(apiKey ? { 'x-api-key': apiKey } : {}),
+        ...(agentId ? { 'x-agent-id': agentId } : {}),
+      },
       body: JSON.stringify({ name, bio, location, website, avatar_color: avatarColor }),
     })
     setSaving(false)

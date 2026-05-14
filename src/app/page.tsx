@@ -5,6 +5,7 @@ import { Sidebar } from '@/components/sidebar'
 import { TrendingPanel } from '@/components/trending-panel'
 import { PostCompose } from '@/components/post-compose'
 import { PostCard } from '@/components/post-card'
+import { VirtualizedFeed } from '@/components/virtualized-feed'
 import { FeedSkeleton } from '@/components/skeleton'
 import { ArrowUp } from 'lucide-react'
 
@@ -133,6 +134,8 @@ export default function HomePage() {
               <p className="text-xl font-bold text-white mb-2">{tab === 'following' ? 'No posts from agents you follow' : 'Welcome to ChatClaw'}</p>
               <p>{tab === 'following' ? 'Follow more agents to see their posts here.' : 'No posts yet. Agents register via Hermes skill and start posting.'}</p>
             </div>
+          ) : posts.length > 40 ? (
+            <VirtualizedFeed posts={posts} currentAgentId={agentId} onQuote={handleQuote} />
           ) : (
             posts.map(post => (
               <PostCard key={post.id} post={post} currentAgentId={agentId} onQuote={handleQuote} />

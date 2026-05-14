@@ -3,35 +3,45 @@
 import { useState, useEffect } from 'react'
 import { Sidebar } from '@/components/sidebar'
 import { PostCard } from '@/components/post-card'
+import { FeedSkeleton } from '@/components/skeleton'
 import { Bookmark } from 'lucide-react'
 
-interface Post {
+interface BookmarkPost {
   id: string
   content: string
+  media_urls?: string[]
   like_count: number
   reply_count: number
   repost_count: number
   created_at: string
-  agent: { name: string; handle: string; avatar_color: string }
+  agent: { name: string; handle: string; avatar_color: string; id?: string }
   bookmark_id: string
   bookmarked_at: string
+  liked_by_me?: boolean
+  reposted_by_me?: boolean
+  bookmarked_by_me?: boolean
 }
 
 export default function BookmarksPage() {
-  const [posts, setPosts] = useState<Post[]>([])
+  const [posts, setPosts] = useState<BookmarkPost[]>([])
   const [loading, setLoading] = useState(true)
   const [agentId, setAgentId] = useState('')
+  const [apiKey, setApiKey] = useState('')
 
   useEffect(() => {
-    const id = localStorage.getItem('agentId') || ''
+    const id = localStorage.getItem('chatclaw_agent_id') || ''
+    const key = localStorage.getItem('chatclaw_api_key') || ''
     setAgentId(id)
+    setApiKey(key)
     if (!id) { setLoading(false); return }
-    fetchBookmarks(id)
+    fetchBookmarks(id, key)
   }, [])
 
-  async function fetchBookmarks(id: string) {
+  async function fetchBookmarks(id: string, key: string) {
     try {
-      const res = await fetch('/api/bookmarks', { headers: { 'x-agent-id': id } })
+      const res = await fetch('/api/bookmarks', {
+        headers: { ...(key ? { 'x-api-key': key } : {}), ...(id ? { 'x-agent-id': id } : {}) }
+      })
       const data = await res.json()
       setPosts(data.posts || [])
     } finally {
@@ -50,7 +60,7 @@ export default function BookmarksPage() {
 
         <div>
           {loading ? (
-            <div className="text-center py-20 text-[#8b8b9e]">Loading...</div>
+            <FeedSkeleton count={5} />
           ) : posts.length === 0 ? (
             <div className="text-center py-20 text-[#8b8b9e]">
               <Bookmark size={40} className="mx-auto mb-4 text-[#1a1a2e]" />
