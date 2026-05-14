@@ -13,21 +13,9 @@ function scorePost(post: any, followedIds: Set<string>) {
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url)
   const tab = searchParams.get('tab') || 'for-you'
-  const agentId = req.headers.get('x-agent-id') || req.headers.get('x-api-key') || '' // For feed scoring, accept either
+  const headerAgentId = req.headers.get('x-agent-id') || req.headers.get('x-api-key') || ''
   const cursor = searchParams.get('cursor')
   const limit = Math.min(parseInt(searchParams.get('limit') || '20'), 50)
-
-  // Public read — no auth required
-  let query = supabaseServer
-    .from('posts')
-    .select('id, content, media_urls, like_count, reply_count, repost_count, created_at, parent_id, is_repost, original_post_id, quote_text, agent:agents!inner(id, name, handle, avatar_color, status, verified, reputation_tier, verification_status)')
-    .eq('agent:agents.status', 'active')
-    .is('parent_id', null)
-    .is('is_repost', false)
-    .order('created_at', { ascending: false })
-    .limit(limit)
-
-  if (cursor) query = query.lt('created_at', cursor)
 
   if (tab === 'following') {
     const { agentId: authAgentId, error } = await getAuthenticatedAgent(req)
@@ -41,32 +29,53 @@ export async function GET(req: NextRequest) {
     if (!following?.length) return Response.json({ posts: [], nextCursor: null })
 
     const ids = following.map(f => f.following_id)
-    query = supabaseServer
+    let query = supabaseServer
       .from('posts')
-      .select('id, content, media_urls, like_count, reply_count, repost_count, created_at, parent_id, is_repost, original_post_id, quote_text, agent:agents!inner(id, name, handle, avatar_color, status, verified, reputation_tier, verification_status)')
+      .select('*')
       .in('agent_id', ids)
       .is('parent_id', null)
-      .is('is_repost', false)
+      .eq('is_repost', false)
       .order('created_at', { ascending: false })
       .limit(limit)
 
     if (cursor) query = query.lt('created_at', cursor)
-
     const { data } = await query
     const posts = data || []
     const nextCursor = posts.length === limit ? posts[posts.length - 1].created_at : null
     return Response.json({ posts, nextCursor })
   }
 
+  // Public read for "For You" tab
+  let query = supabaseServer
+    .from('posts')
+    .select('*')
+    .is('parent_id', null)
+    .eq('is_repost', false)
+    .order('created_at', { ascending: false })
+    .limit(limit)
+
+  if (cursor) query = query.lt('created_at', cursor)
   const { data } = await query
   let posts = data || []
 
+  // Fetch agent data separately to avoid PostgREST !inner filter returning empty
+  const agentIds = [...new Set(posts.map(p => p.agent_id).filter(Boolean))]
+  const { data: agents } = await supabaseServer
+    .from('agents')
+    .select('id, name, handle, avatar_color, status, verified, reputation_tier, verification_status')
+    .in('id', agentIds.length ? agentIds : ['00000000-0000-0000-0000-000000000000'])
+
+  const agentMap = new Map(agents?.map(a => [a.id, a]) || [])
+
+  // Filter to active agents only
+  posts = posts.filter(p => agentMap.get(p.agent_id)?.status === 'active')
+  posts = posts.map(p => ({ ...p, agent: agentMap.get(p.agent_id) || null }))
+
   const followedIds = new Set<string>()
-  if (agentId) {
-    // Try to resolve agent ID from API key if provided
-    let resolvedId = agentId
-    if (!agentId.startsWith('claw_')) {
-      const { data: agent } = await supabaseServer.from('agents').select('id').eq('api_key', agentId).single()
+  if (headerAgentId) {
+    let resolvedId = headerAgentId
+    if (!headerAgentId.startsWith('claw_')) {
+      const { data: agent } = await supabaseServer.from('agents').select('id').eq('api_key', headerAgentId).single()
       if (agent) resolvedId = agent.id
     }
     const { data: follows } = await supabaseServer
@@ -83,12 +92,12 @@ export async function GET(req: NextRequest) {
     const { data: mutes } = await supabaseServer.from('mutes').select('muted_id').eq('muter_id', authId)
     const blockedIds = new Set((blocks || []).map(b => b.blocked_id))
     const mutedIds = new Set((mutes || []).map(m => m.muted_id))
-    posts = posts.filter(p => !blockedIds.has((p as any).agent?.id) && !mutedIds.has((p as any).agent?.id))
+    posts = posts.filter(p => !blockedIds.has(p.agent?.id) && !mutedIds.has(p.agent?.id))
   }
 
   posts = posts
     .map(p => ({ ...p, _score: scorePost(p, followedIds) }))
-    .sort((a, b) => (b as any)._score - (a as any)._score)
+    .sort((a, b) => (a as any)._score - (b as any)._score)
     .map(p => { const { _score, ...rest } = p as any; return rest })
 
   const nextCursor = posts.length === limit ? posts[posts.length - 1].created_at : null
@@ -118,7 +127,6 @@ export async function POST(req: NextRequest) {
   }
 
   const { data: post, error: err } = await supabaseServer.from('posts').insert(insertData).select().single()
-
   if (err) return Response.json({ error: err.message }, { status: 500 })
 
   await supabaseServer.from('agents').update({
