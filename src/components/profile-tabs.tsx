@@ -3,15 +3,18 @@
 import { useState, useEffect } from 'react'
 import { PostCard, Post } from '@/components/post-card'
 import { FeedSkeleton } from '@/components/skeleton'
+import { Pin } from 'lucide-react'
 
 export function ProfileTabs({
   handle,
   agentId,
   initialPosts,
+  pinnedPost,
 }: {
   handle: string
   agentId: string
   initialPosts: Post[]
+  pinnedPost?: Post | null
 }) {
   const [tab, setTab] = useState<'posts' | 'replies' | 'media' | 'likes'>('posts')
   const [posts, setPosts] = useState<Post[]>(initialPosts)
@@ -83,9 +86,19 @@ export function ProfileTabs({
           </p>
         </div>
       ) : (
-        tabPosts.map((post) => (
-          <PostCard key={post.id} post={post} currentAgentId={currentAgentId} />
-        ))
+        <div>
+          {tab === 'posts' && pinnedPost && (
+            <div>
+              <div className="px-4 py-1.5 flex items-center gap-1.5 text-[#8b8b9e] text-xs border-b border-[#1a1a2e]">
+                <Pin size={12} /> Pinned post
+              </div>
+              <PostCard post={pinnedPost} currentAgentId={currentAgentId} />
+            </div>
+          )}
+          {tabPosts.map((post) => (
+            <PostCard key={post.id} post={post} currentAgentId={currentAgentId} />
+          ))}
+        </div>
       )}
     </div>
   )

@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { Sidebar } from '@/components/sidebar'
 import { TrendingPanel } from '@/components/trending-panel'
 import { PostCard } from '@/components/post-card'
-import { ArrowLeft, MessageCircle } from 'lucide-react'
+import { ArrowLeft, MessageCircle, Eye, BarChart3 } from 'lucide-react'
 import Link from 'next/link'
 
 interface Post {
@@ -20,7 +20,16 @@ interface Post {
   agent: { id: string; name: string; handle: string; avatar_color: string }
 }
 
-export default function PostDetailClient({ post: initialPost, replies: initialReplies, ancestors: initialAncestors }: 
+interface Analytics {
+  impressions: number
+  likes: number
+  replies: number
+  reposts: number
+  engagement_rate: string
+  isOwner: boolean
+}
+
+export default function PostDetailClient({ post: initialPost, replies: initialReplies, ancestors: initialAncestors }:
   { post: Post; replies: Post[]; ancestors: Post[] }) {
   const [post] = useState(initialPost)
   const [replies, setReplies] = useState(initialReplies)
@@ -28,11 +37,21 @@ export default function PostDetailClient({ post: initialPost, replies: initialRe
   const [posting, setPosting] = useState(false)
   const [agentId, setAgentId] = useState('')
   const [apiKey, setApiKey] = useState('')
+  const [analytics, setAnalytics] = useState<Analytics | null>(null)
 
   useEffect(() => {
     setApiKey(localStorage.getItem('chatclaw_api_key') || '')
     setAgentId(localStorage.getItem('chatclaw_agent_id') || '')
   }, [])
+
+  useEffect(() => {
+    fetch(`/api/posts/${post.id}/analytics`)
+      .then(r => r.json())
+      .then(d => {
+        if (d.analytics) setAnalytics(d.analytics)
+      })
+      .catch(() => {})
+  }, [post.id])
 
   async function submitReply() {
     if (!replyText.trim() || replyText.length > 280) return
@@ -74,6 +93,14 @@ export default function PostDetailClient({ post: initialPost, replies: initialRe
         <div className="border-b border-[#1a1a2e]">
           <PostCard post={post} isMain />
         </div>
+
+        {analytics && (
+          <div className="px-4 py-3 border-b border-[#1a1a2e] flex items-center gap-6 text-sm text-[#8b8b9e]">
+            <span className="flex items-center gap-1.5"><Eye size={15} /> {analytics.impressions.toLocaleString()} views</span>
+            <span className="flex items-center gap-1.5"><BarChart3 size={15} /> {analytics.engagement_rate} engagement</span>
+            <span className="flex items-center gap-1.5">{analytics.likes} likes · {analytics.replies} replies · {analytics.reposts} reposts</span>
+          </div>
+        )}
 
         {/* Reply composer */}
         <div className="border-b border-[#1a1a2e] px-4 py-3">

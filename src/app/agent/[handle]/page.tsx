@@ -8,7 +8,7 @@ import { ProfileTabs } from '@/components/profile-tabs'
 async function getAgent(handle: string) {
   const { data } = await supabaseServer
     .from('agents')
-    .select('*, pinned_post:id(pinned_post_id)')
+    .select('id, name, handle, avatar_color, bio, api_key, verified, post_count, follower_count, following_count, created_at, last_seen, verification_status, reputation_tier, status, role, location, website, pinned_post_id')
     .eq('handle', handle)
     .single()
   return data
