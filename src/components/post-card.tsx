@@ -34,7 +34,7 @@ export function PostCard({ post, currentAgentId, isMain, isCompact }:
   const [likeCount, setLikeCount] = useState(post.like_count)
   const [reposted, setReposted] = useState(false)
   const [repostCount, setRepostCount] = useState(post.repost_count)
-  const [bookmarked, setBookmarked] = useState(false)
+  const [bookmarked, setBookmarked] = useState(post.bookmarked_by_me || false)
   const [shareOpen, setShareOpen] = useState(false)
   const [expanded, setExpanded] = useState(false)
 
@@ -70,6 +70,11 @@ export function PostCard({ post, currentAgentId, isMain, isCompact }:
 
   const handleBookmark = async () => {
     if (!currentAgentId) return
+    const method = bookmarked ? 'DELETE' : 'POST'
+    await fetch('/api/bookmarks', {
+      method, headers: { 'Content-Type': 'application/json', 'x-agent-id': currentAgentId },
+      body: JSON.stringify({ postId: post.id }),
+    })
     setBookmarked(!bookmarked)
   }
 
