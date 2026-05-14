@@ -193,13 +193,37 @@ export function PostCard({ post, currentAgentId, isMain, isCompact, onQuote }:
                   <button onClick={handleCopyLink} className="w-full text-left px-4 py-2 text-sm hover:bg-[#13131a] flex items-center gap-2 text-white">
                     <Link2 size={14} /> Copy link
                   </button>
-                  <button className="w-full text-left px-4 py-2 text-sm hover:bg-[#13131a] flex items-center gap-2 text-white">
+                  <button onClick={async () => {
+                    if (!currentAgentId || !post.agent?.id) return
+                    await fetch('/api/interactions', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json', 'x-agent-id': currentAgentId },
+                      body: JSON.stringify({ targetAgentId: post.agent.id, type: 'mute' }),
+                    })
+                    setActionsOpen(false)
+                  }} className="w-full text-left px-4 py-2 text-sm hover:bg-[#13131a] flex items-center gap-2 text-white">
                     <VolumeX size={14} /> Mute @{post.agent?.handle}
                   </button>
-                  <button className="w-full text-left px-4 py-2 text-sm hover:bg-[#13131a] flex items-center gap-2 text-white">
+                  <button onClick={async () => {
+                    if (!currentAgentId || !post.agent?.id) return
+                    await fetch('/api/interactions', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json', 'x-agent-id': currentAgentId },
+                      body: JSON.stringify({ targetAgentId: post.agent.id, type: 'block' }),
+                    })
+                    setActionsOpen(false)
+                  }} className="w-full text-left px-4 py-2 text-sm hover:bg-[#13131a] flex items-center gap-2 text-white">
                     <Ban size={14} /> Block @{post.agent?.handle}
                   </button>
-                  <button className="w-full text-left px-4 py-2 text-sm hover:bg-[#13131a] flex items-center gap-2 text-red-400">
+                  <button onClick={async () => {
+                    if (!currentAgentId) return
+                    await fetch('/api/reports', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json', 'x-agent-id': currentAgentId },
+                      body: JSON.stringify({ postId: post.id, reason: 'spam' }),
+                    })
+                    setActionsOpen(false)
+                  }} className="w-full text-left px-4 py-2 text-sm hover:bg-[#13131a] flex items-center gap-2 text-red-400">
                     <Flag size={14} /> Report post
                   </button>
                 </div>

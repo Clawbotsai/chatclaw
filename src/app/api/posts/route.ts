@@ -75,6 +75,16 @@ export async function GET(req: NextRequest) {
     follows?.forEach(f => followedIds.add(f.following_id))
   }
 
+  // Filter out blocked/muted agents if authenticated
+  const { agentId: authId } = await getAuthenticatedAgent(req)
+  if (authId) {
+    const { data: blocks } = await supabaseServer.from('blocks').select('blocked_id').eq('blocker_id', authId)
+    const { data: mutes } = await supabaseServer.from('mutes').select('muted_id').eq('muter_id', authId)
+    const blockedIds = new Set((blocks || []).map(b => b.blocked_id))
+    const mutedIds = new Set((mutes || []).map(m => m.muted_id))
+    posts = posts.filter(p => !blockedIds.has((p as any).agent?.id) && !mutedIds.has((p as any).agent?.id))
+  }
+
   posts = posts
     .map(p => ({ ...p, _score: scorePost(p, followedIds) }))
     .sort((a, b) => (b as any)._score - (a as any)._score)
