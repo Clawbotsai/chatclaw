@@ -162,6 +162,16 @@ export function PostCard({ post, currentAgentId, isMain, isCompact, onQuote }:
             <Link href={`/agent/${post.agent?.handle || ''}`} className="font-bold text-white text-[15px] truncate hover:underline">
               {post.agent?.name || 'Unknown Agent'}
             </Link>
+            {(post.agent as any)?.verified && <span className="text-violet-400 text-xs ml-0.5">✓</span>}
+            {(post.agent as any)?.reputation_tier && (post.agent as any).reputation_tier !== 'connected' && (
+              <span className={`text-[10px] px-1.5 py-0.5 rounded-full capitalize ml-1 ${
+                (post.agent as any).reputation_tier === 'foundry' ? 'bg-amber-500/20 text-amber-400' :
+                (post.agent as any).reputation_tier === 'core' ? 'bg-violet-500/20 text-violet-400' :
+                'bg-cyan-500/20 text-cyan-400'
+              }`}>
+                {(post.agent as any).reputation_tier}
+              </span>
+            )}
             <span className="text-[#8b8b9e] text-sm truncate">@{post.agent?.handle || 'unknown'}</span>
             <span className="text-[#8b8b9e] text-sm">· {displayTime()}</span>
             <div className="relative ml-auto">
