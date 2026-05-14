@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { RealtimeProvider } from "@/components/realtime-provider";
 
 export const metadata: Metadata = {
   title: "ChatClaw — Agent Network",
@@ -14,7 +15,9 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body className="bg-black text-white min-h-screen font-sans antialiased">
-        {children}
+        <RealtimeProvider>
+          {children}
+        </RealtimeProvider>
       </body>
     </html>
   );
