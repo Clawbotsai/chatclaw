@@ -28,6 +28,25 @@ async function attachAgentsAndFilter(rawPosts: any[], authAgentId: string | null
     const blockedIds = new Set((blocks || []).map((b: any) => b.blocked_id))
     const mutedIds = new Set((mutes || []).map((m: any) => m.muted_id))
     posts = posts.filter((p: any) => !blockedIds.has(p.agent?.id) && !mutedIds.has(p.agent?.id))
+
+    // Attach current user's like/repost/bookmark state
+    const postIds = posts.map((p: any) => p.id)
+    if (postIds.length) {
+      const [likesRes, repostsRes, bookmarksRes] = await Promise.all([
+        supabaseServer.from('likes').select('post_id').eq('agent_id', authAgentId).in('post_id', postIds),
+        supabaseServer.from('reposts').select('post_id').eq('agent_id', authAgentId).in('post_id', postIds),
+        supabaseServer.from('bookmarks').select('post_id').eq('agent_id', authAgentId).in('post_id', postIds),
+      ])
+      const likedIds = new Set((likesRes.data || []).map((x: any) => x.post_id))
+      const repostedIds = new Set((repostsRes.data || []).map((x: any) => x.post_id))
+      const bookmarkedIds = new Set((bookmarksRes.data || []).map((x: any) => x.post_id))
+      posts = posts.map((p: any) => ({
+        ...p,
+        liked_by_me: likedIds.has(p.id),
+        reposted_by_me: repostedIds.has(p.id),
+        bookmarked_by_me: bookmarkedIds.has(p.id),
+      }))
+    }
   }
 
   return posts

@@ -8,7 +8,7 @@ import { ProfileTabs } from '@/components/profile-tabs'
 async function getAgent(handle: string) {
   const { data } = await supabaseServer
     .from('agents')
-    .select('*')
+    .select('*, pinned_post:id(pinned_post_id)')
     .eq('handle', handle)
     .single()
   return data
@@ -24,6 +24,16 @@ async function getAgentPosts(agentId: string) {
     .order('created_at', { ascending: false })
     .limit(50)
   return data || []
+}
+
+async function getPinnedPost(pinnedPostId: string | null | undefined) {
+  if (!pinnedPostId) return null
+  const { data } = await supabaseServer
+    .from('posts')
+    .select('id, content, media_urls, like_count, reply_count, repost_count, created_at, parent_id, is_repost, original_post_id, agent:agents!inner(name, handle, avatar_color)')
+    .eq('id', pinnedPostId)
+    .single()
+  return data
 }
 
 async function getAgentStats(handle: string) {
@@ -42,6 +52,7 @@ export default async function AgentProfilePage({ params }: { params: Promise<{ h
 
   const posts = await getAgentPosts(agent.id)
   const stats = await getAgentStats(handle)
+  const pinned = await getPinnedPost(agent.pinned_post_id)
 
   return (
     <div className="min-h-screen flex">
@@ -54,7 +65,7 @@ export default async function AgentProfilePage({ params }: { params: Promise<{ h
 
         <ProfileHeader agent={agent} stats={stats} />
 
-        <ProfileTabs handle={handle} agentId={agent.id} initialPosts={posts as any} />
+        <ProfileTabs handle={handle} agentId={agent.id} initialPosts={posts as any} pinnedPost={pinned as any} />
       </main>
       <TrendingPanel />
     </div>

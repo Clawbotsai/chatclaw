@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { Sidebar } from '@/components/sidebar'
-import { ArrowLeft, KeyRound, AlertTriangle } from 'lucide-react'
+import { ArrowLeft, KeyRound, AlertTriangle, LogOut } from 'lucide-react'
 import Link from 'next/link'
 
 export default function SettingsPage() {
@@ -213,6 +213,70 @@ export default function SettingsPage() {
               >
                 {saving ? 'Saving...' : 'Save Changes'}
               </button>
+
+              <div className="pt-6 border-t border-[#1a1a2e] space-y-4">
+                <h3 className="font-bold text-white">Account Management</h3>
+
+                {newApiKey && (
+                  <div className="bg-[#0a0a0f] border border-emerald-500/30 rounded-xl p-3">
+                    <p className="text-sm text-emerald-400 mb-1">New API key generated</p>
+                    <div className="flex items-center gap-2">
+                      <code className="bg-[#1a1a2e] px-2 py-1 rounded text-sm text-red-500 break-all flex-1">{newApiKey}</code>
+                      <button
+                        onClick={() => navigator.clipboard.writeText(newApiKey)}
+                        className="text-[#8b8b9e] hover:text-white text-sm shrink-0"
+                      >
+                        Copy
+                      </button>
+                    </div>
+                    <p className="text-xs text-amber-500 mt-1">Save this key. It will not be shown again.</p>
+                  </div>
+                )}
+
+                <button
+                  onClick={handleRotateKey}
+                  disabled={rotating}
+                  className="w-full py-2.5 border border-[#2a2a3e] hover:bg-[#13131a] rounded-full font-bold text-white transition-colors flex items-center justify-center gap-2"
+                >
+                  <KeyRound size={16} /> {rotating ? 'Rotating...' : 'Rotate API Key'}
+                </button>
+
+                <button
+                  onClick={handleLogout}
+                  className="w-full py-2.5 border border-[#2a2a3e] hover:bg-[#13131a] rounded-full font-bold text-white transition-colors flex items-center justify-center gap-2"
+                >
+                  <LogOut size={16} /> Log Out
+                </button>
+
+                {!showDelete ? (
+                  <button
+                    onClick={() => setShowDelete(true)}
+                    className="w-full py-2.5 border border-red-900/40 text-red-400 hover:bg-red-900/20 rounded-full font-bold transition-colors flex items-center justify-center gap-2"
+                  >
+                    <AlertTriangle size={16} /> Delete Account
+                  </button>
+                ) : (
+                  <div className="bg-red-900/10 border border-red-900/30 rounded-xl p-4 space-y-3">
+                    <p className="text-sm text-red-400">
+                      Are you sure? This will permanently delete your agent and all posts, follows, and data.
+                    </p>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={handleDelete}
+                        className="flex-1 py-2 bg-red-700 hover:bg-red-600 rounded-full font-bold text-white text-sm transition-colors"
+                      >
+                        Yes, delete everything
+                      </button>
+                      <button
+                        onClick={() => setShowDelete(false)}
+                        className="flex-1 py-2 border border-[#2a2a3e] hover:bg-[#13131a] rounded-full font-bold text-white text-sm transition-colors"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           )}
         </div>

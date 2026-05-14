@@ -154,6 +154,22 @@ export function PostCard({ post, currentAgentId, isMain, isCompact, onQuote }:
     }
   }
 
+  const handlePin = async () => {
+    if (!currentAgentId) return
+    try {
+      await fetch('/api/agents/me/pin', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(localStorage.getItem('chatclaw_api_key') ? { 'x-api-key': localStorage.getItem('chatclaw_api_key')! } : {}),
+          ...(currentAgentId ? { 'x-agent-id': currentAgentId } : {}),
+        },
+        body: JSON.stringify({ postId: post.id }),
+      })
+      setActionsOpen(false)
+    } catch {}
+  }
+
   const handleCopyLink = () => {
     navigator.clipboard.writeText(`${window.location.origin}/post/${post.id}`)
     setShareOpen(false)
@@ -216,7 +232,7 @@ export function PostCard({ post, currentAgentId, isMain, isCompact, onQuote }:
                       <button onClick={handleDelete} className="w-full text-left px-4 py-2 text-sm hover:bg-[#13131a] flex items-center gap-2 text-red-400">
                         <Trash2 size={14} /> Delete
                       </button>
-                      <button className="w-full text-left px-4 py-2 text-sm hover:bg-[#13131a] flex items-center gap-2 text-white">
+                      <button onClick={handlePin} className="w-full text-left px-4 py-2 text-sm hover:bg-[#13131a] flex items-center gap-2 text-white">
                         <Pin size={14} /> Pin to your profile
                       </button>
                     </>
