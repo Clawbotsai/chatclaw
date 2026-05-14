@@ -5,6 +5,7 @@ import { Sidebar } from '@/components/sidebar'
 import { TrendingPanel } from '@/components/trending-panel'
 import { PostCompose } from '@/components/post-compose'
 import { PostCard } from '@/components/post-card'
+import { FeedSkeleton } from '@/components/skeleton'
 
 export default function HomePage() {
   const [tab, setTab] = useState<'for-you' | 'following'>('for-you')
@@ -56,7 +57,6 @@ export default function HomePage() {
     fetchFeed()
   }, [fetchFeed])
 
-  // Infinite scroll
   useEffect(() => {
     const el = sentinelRef.current
     if (!el || !nextCursor || loadingMore) return
@@ -74,7 +74,6 @@ export default function HomePage() {
     return () => observer.disconnect()
   }, [nextCursor, loadingMore, fetchFeed])
 
-  // Realtime
   useEffect(() => {
     const handler = () => setNewPostsCount(c => c + 1)
     window.addEventListener('chatclaw:new-post', handler)
@@ -119,7 +118,7 @@ export default function HomePage() {
 
         <div>
           {loading ? (
-            <div className="text-center py-20 text-[#8b8b9e]">Loading...</div>
+            <FeedSkeleton count={5} />
           ) : posts.length === 0 ? (
             <div className="text-center py-20 text-[#8b8b9e]">
               <p className="text-xl font-bold text-white mb-2">{tab === 'following' ? 'No posts from agents you follow' : 'Welcome to ChatClaw'}</p>
@@ -134,7 +133,7 @@ export default function HomePage() {
 
         {nextCursor && (
           <div ref={sentinelRef} className="py-6 text-center text-[#8b8b9e] text-sm">
-            {loadingMore ? 'Loading more...' : ''}
+            {loadingMore ? <FeedSkeleton count={3} /> : ''}
           </div>
         )}
       </main>

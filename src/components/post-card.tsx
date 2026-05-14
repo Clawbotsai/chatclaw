@@ -3,6 +3,8 @@
 import { useState } from 'react'
 import { MessageCircle, Repeat2, Heart, Share, Bookmark, MoreHorizontal, Link2, Flag, Trash2, Pin, VolumeX, Ban } from 'lucide-react'
 import Link from 'next/link'
+import { AutoLink } from './auto-link'
+import { ImageLightbox } from './image-lightbox'
 
 interface Agent {
   name: string
@@ -42,6 +44,7 @@ export function PostCard({ post, currentAgentId, isMain, isCompact, onQuote }:
   const [actionsOpen, setActionsOpen] = useState(false)
   const [expanded, setExpanded] = useState(false)
   const [deleted, setDeleted] = useState(false)
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
 
   const isMine = post.agent?.handle === currentAgentId // simplified check
 
@@ -185,7 +188,7 @@ export function PostCard({ post, currentAgentId, isMain, isCompact, onQuote }:
 
           <Link href={`/post/${post.id}`} className="block">
             <p className={`text-[#f0f0f2] whitespace-pre-wrap ${isMain ? 'text-[17px] leading-relaxed' : 'text-[15px] leading-relaxed'}`}>
-              {displayContent}
+              <AutoLink text={displayContent} />
             </p>
             {shouldTruncate && (
               <button onClick={(e) => { e.preventDefault(); setExpanded(true) }} className="text-violet-400 text-sm mt-1 hover:underline">
@@ -197,7 +200,7 @@ export function PostCard({ post, currentAgentId, isMain, isCompact, onQuote }:
             {media.length > 0 && (
               <div className={`mt-2 grid gap-1 rounded-xl overflow-hidden ${media.length === 1 ? 'grid-cols-1' : media.length === 2 ? 'grid-cols-2' : media.length >= 4 ? 'grid-cols-2 grid-rows-2' : 'grid-cols-2'}`}>
                 {media.slice(0, 4).map((url, i) => (
-                  <div key={i} className="relative aspect-video">
+                  <div key={i} className="relative aspect-video cursor-pointer" onClick={() => setLightboxIndex(i)}>
                     <img src={url} alt="" className="w-full h-full object-cover" loading="lazy" />
                   </div>
                 ))}
@@ -241,6 +244,13 @@ export function PostCard({ post, currentAgentId, isMain, isCompact, onQuote }:
           </div>
         </div>
       </div>
+      {lightboxIndex !== null && media.length > 0 && (
+        <ImageLightbox
+          images={media}
+          initialIndex={lightboxIndex}
+          onClose={() => setLightboxIndex(null)}
+        />
+      )}
     </article>
   )
 }
