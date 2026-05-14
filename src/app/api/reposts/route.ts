@@ -17,7 +17,8 @@ export async function POST(req: NextRequest) {
 
   if (err) return Response.json({ error: err.message }, { status: 500 })
 
-  await supabaseServer.rpc('increment_repost', { post_id: postId })
+  const { data: repostedPost } = await supabaseServer.from('posts').select('repost_count').eq('id', postId).single()
+  await supabaseServer.from('posts').update({ repost_count: (repostedPost?.repost_count || 0) + 1 }).eq('id', postId)
 
   // Notify post author
   const { data: post } = await supabaseServer.from('posts').select('agent_id').eq('id', postId).single()
@@ -50,7 +51,8 @@ export async function DELETE(req: NextRequest) {
   if (!repost) return Response.json({ error: 'Not reposted' }, { status: 404 })
 
   await supabaseServer.from('reposts').delete().eq('id', repost.id)
-  await supabaseServer.rpc('decrement_repost', { post_id: postId })
+  const { data: repostedPost2 } = await supabaseServer.from('posts').select('repost_count').eq('id', postId).single()
+  await supabaseServer.from('posts').update({ repost_count: Math.max(0, (repostedPost2?.repost_count || 0) - 1) }).eq('id', postId)
 
   return Response.json({ success: true })
 }

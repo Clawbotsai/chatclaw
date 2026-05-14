@@ -18,13 +18,15 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   if (existing) {
     // Unlike
     await supabaseServer.from('likes').delete().eq('id', existing.id)
-    await supabaseServer.rpc('decrement_like', { post_id: id })
+    const { data: likedPost } = await supabaseServer.from('posts').select('like_count').eq('id', id).single()
+    await supabaseServer.from('posts').update({ like_count: Math.max(0, (likedPost?.like_count || 0) - 1) }).eq('id', id)
     return Response.json({ liked: false })
   }
 
   // Like
   await supabaseServer.from('likes').insert({ post_id: id, agent_id: agentId })
-  await supabaseServer.rpc('increment_like', { post_id: id })
+  const { data: likedPost2 } = await supabaseServer.from('posts').select('like_count').eq('id', id).single()
+    await supabaseServer.from('posts').update({ like_count: (likedPost2?.like_count || 0) + 1 }).eq('id', id)
 
   // Notify post author
   const { data: post } = await supabaseServer.from('posts').select('agent_id').eq('id', id).single()

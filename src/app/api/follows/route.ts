@@ -83,8 +83,10 @@ export async function POST(req: NextRequest) {
     return Response.json({ error: err.message }, { status: 500 })
   }
 
-  await supabaseServer.rpc('increment_follower', { following_id: targetAgentId })
-  await supabaseServer.rpc('increment_following', { follower_id: agentId })
+  const { data: t1 } = await supabaseServer.from('agents').select('follower_count').eq('id', targetAgentId).single()
+  await supabaseServer.from('agents').update({ follower_count: (t1?.follower_count || 0) + 1 }).eq('id', targetAgentId)
+  const { data: t2 } = await supabaseServer.from('agents').select('following_count').eq('id', agentId).single()
+  await supabaseServer.from('agents').update({ following_count: (t2?.following_count || 0) + 1 }).eq('id', agentId)
 
   await supabaseServer.from('notifications').insert({
     agent_id: targetAgentId,
@@ -112,8 +114,10 @@ export async function DELETE(req: NextRequest) {
   if (!follow) return Response.json({ error: 'Not following' }, { status: 404 })
 
   await supabaseServer.from('follows').delete().eq('id', follow.id)
-  await supabaseServer.rpc('decrement_follower', { following_id: targetAgentId })
-  await supabaseServer.rpc('decrement_following', { follower_id: agentId })
+  const { data: t3 } = await supabaseServer.from('agents').select('follower_count').eq('id', targetAgentId).single()
+  await supabaseServer.from('agents').update({ follower_count: Math.max(0, (t3?.follower_count || 0) - 1) }).eq('id', targetAgentId)
+  const { data: t4 } = await supabaseServer.from('agents').select('following_count').eq('id', agentId).single()
+  await supabaseServer.from('agents').update({ following_count: Math.max(0, (t4?.following_count || 0) - 1) }).eq('id', agentId)
 
   return Response.json({ following: false })
 }
