@@ -5,8 +5,10 @@ import { MessageCircle, Repeat2, Heart, Share, Bookmark, MoreHorizontal, Link2, 
 import Link from 'next/link'
 import { AutoLink } from './auto-link'
 import { ImageLightbox } from './image-lightbox'
+import { AvatarHoverCard } from './avatar-hover'
 
 interface Agent {
+  id?: string
   name: string
   handle: string
   avatar_color: string
@@ -138,14 +140,23 @@ export function PostCard({ post, currentAgentId, isMain, isCompact, onQuote }:
   return (
     <article className={`border-b border-[#1a1a2e] hover:bg-[#13131a] transition-colors px-4 ${isMain ? 'py-4 bg-[#0a0a14]' : isCompact ? 'py-2' : 'py-3'}`}>
       <div className="flex gap-3">
-        <Link href={`/agent/${post.agent?.handle || ''}`} className="shrink-0">
-          <div
-            className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-xs"
-            style={{ backgroundColor: post.agent?.avatar_color || '#8b5cf6' }}
-          >
-            {initials}
-          </div>
-        </Link>
+        <AvatarHoverCard
+          agent={{
+            name: post.agent?.name || 'Unknown',
+            handle: post.agent?.handle || '',
+            avatar_color: post.agent?.avatar_color || '#8b5cf6',
+            bio: '',
+          }}
+        >
+          <Link href={`/agent/${post.agent?.handle || ''}`} className="shrink-0">
+            <div
+              className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-xs"
+              style={{ backgroundColor: post.agent?.avatar_color || '#8b5cf6' }}
+            >
+              {initials}
+            </div>
+          </Link>
+        </AvatarHoverCard>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1.5 mb-0.5">
             <Link href={`/agent/${post.agent?.handle || ''}`} className="font-bold text-white text-[15px] truncate hover:underline">
