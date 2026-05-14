@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { Sidebar } from '@/components/sidebar'
 import { TrendingPanel } from '@/components/trending-panel'
 import { PostCompose } from '@/components/post-compose'
@@ -20,36 +20,72 @@ export default function HomePage() {
   const [tab, setTab] = useState<'for-you' | 'following'>('for-you')
   const [posts, setPosts] = useState<Post[]>([])
   const [loading, setLoading] = useState(true)
+  const [loadingMore, setLoadingMore] = useState(false)
   const [newPostsCount, setNewPostsCount] = useState(0)
+  const [nextCursor, setNextCursor] = useState<string | null>(null)
   const [agentId, setAgentId] = useState('')
+  const sentinelRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const id = localStorage.getItem('agentId') || ''
     setAgentId(id)
   }, [])
 
-  const fetchFeed = useCallback(async () => {
-    setLoading(true)
+  const fetchFeed = useCallback(async (cursor?: string | null) => {
+    const isLoadMore = !!cursor
+    if (isLoadMore) setLoadingMore(true)
+    else setLoading(true)
+
     try {
-      const res = await fetch(`/api/posts?tab=${tab}`, {
+      const url = new URL('/api/posts', window.location.origin)
+      url.searchParams.set('tab', tab)
+      url.searchParams.set('limit', '20')
+      if (cursor) url.searchParams.set('cursor', cursor)
+
+      const res = await fetch(url.toString(), {
         headers: agentId ? { 'x-agent-id': agentId } : {},
       })
       const data = await res.json()
-      setPosts(data.posts || [])
+
+      if (isLoadMore) {
+        setPosts(prev => [...prev, ...(data.posts || [])])
+      } else {
+        setPosts(data.posts || [])
+      }
+      setNextCursor(data.nextCursor || null)
     } finally {
       setLoading(false)
+      setLoadingMore(false)
     }
   }, [tab, agentId])
 
   useEffect(() => {
+    setPosts([])
+    setNextCursor(null)
     fetchFeed()
   }, [fetchFeed])
 
+  // Infinite scroll: intersection observer on sentinel
+  useEffect(() => {
+    const el = sentinelRef.current
+    if (!el || !nextCursor || loadingMore) return
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && nextCursor && !loadingMore) {
+          fetchFeed(nextCursor)
+        }
+      },
+      { rootMargin: '200px' }
+    )
+
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [nextCursor, loadingMore, fetchFeed])
+
   // Realtime: listen for new posts and show banner
   useEffect(() => {
-    const handler = () => {
-      setNewPostsCount(c => c + 1)
-    }
+    const handler = () => setNewPostsCount(c => c + 1)
     window.addEventListener('chatclaw:new-post', handler)
     return () => window.removeEventListener('chatclaw:new-post', handler)
   }, [])
@@ -83,7 +119,6 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* New posts banner */}
         {newPostsCount > 0 && (
           <button
             onClick={handleRefresh}
@@ -115,6 +150,13 @@ export default function HomePage() {
             ))
           )}
         </div>
+
+        {/* Infinite scroll sentinel */}
+        {nextCursor && (
+          <div ref={sentinelRef} className="py-6 text-center text-[#8b8b9e] text-sm">
+            {loadingMore ? 'Loading more...' : ''}
+          </div>
+        )}
       </main>
       <TrendingPanel />
     </div>

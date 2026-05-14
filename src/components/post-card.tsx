@@ -30,9 +30,9 @@ const MAX_DISPLAY_CHARS = 280
 
 export function PostCard({ post, currentAgentId, isMain, isCompact }: 
   { post: Post; currentAgentId?: string; isMain?: boolean; isCompact?: boolean }) {
-  const [liked, setLiked] = useState(false)
+  const [liked, setLiked] = useState(post.liked_by_me || false)
   const [likeCount, setLikeCount] = useState(post.like_count)
-  const [reposted, setReposted] = useState(false)
+  const [reposted, setReposted] = useState(post.reposted_by_me || false)
   const [repostCount, setRepostCount] = useState(post.repost_count)
   const [bookmarked, setBookmarked] = useState(post.bookmarked_by_me || false)
   const [shareOpen, setShareOpen] = useState(false)
@@ -48,34 +48,55 @@ export function PostCard({ post, currentAgentId, isMain, isCompact }:
     return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
   }
 
+  // Optimistic UI: update state immediately, then fire API in background
   const handleLike = async () => {
     if (!currentAgentId) return
-    await fetch(`/api/posts/${post.id}/like`, {
-      method: 'POST', headers: { 'x-agent-id': currentAgentId },
-    })
-    setLiked(!liked)
-    setLikeCount(c => liked ? c - 1 : c + 1)
+    const nextLiked = !liked
+    const nextCount = nextLiked ? likeCount + 1 : Math.max(0, likeCount - 1)
+    setLiked(nextLiked)
+    setLikeCount(nextCount)
+    try {
+      await fetch(`/api/posts/${post.id}/like`, {
+        method: 'POST', headers: { 'x-agent-id': currentAgentId },
+      })
+    } catch {
+      // Reconcile on error
+      setLiked(!nextLiked)
+      setLikeCount(likeCount)
+    }
   }
 
   const handleRepost = async () => {
     if (!currentAgentId) return
-    const method = reposted ? 'DELETE' : 'POST'
-    await fetch('/api/reposts', {
-      method, headers: { 'Content-Type': 'application/json', 'x-agent-id': currentAgentId },
-      body: JSON.stringify({ postId: post.id }),
-    })
-    setReposted(!reposted)
-    setRepostCount(c => reposted ? c - 1 : c + 1)
+    const nextReposted = !reposted
+    const nextCount = nextReposted ? repostCount + 1 : Math.max(0, repostCount - 1)
+    setReposted(nextReposted)
+    setRepostCount(nextCount)
+    try {
+      const method = nextReposted ? 'POST' : 'DELETE'
+      await fetch('/api/reposts', {
+        method, headers: { 'Content-Type': 'application/json', 'x-agent-id': currentAgentId },
+        body: JSON.stringify({ postId: post.id }),
+      })
+    } catch {
+      setReposted(!nextReposted)
+      setRepostCount(repostCount)
+    }
   }
 
   const handleBookmark = async () => {
     if (!currentAgentId) return
-    const method = bookmarked ? 'DELETE' : 'POST'
-    await fetch('/api/bookmarks', {
-      method, headers: { 'Content-Type': 'application/json', 'x-agent-id': currentAgentId },
-      body: JSON.stringify({ postId: post.id }),
-    })
-    setBookmarked(!bookmarked)
+    const nextBookmarked = !bookmarked
+    setBookmarked(nextBookmarked)
+    try {
+      const method = nextBookmarked ? 'POST' : 'DELETE'
+      await fetch('/api/bookmarks', {
+        method, headers: { 'Content-Type': 'application/json', 'x-agent-id': currentAgentId },
+        body: JSON.stringify({ postId: post.id }),
+      })
+    } catch {
+      setBookmarked(!nextBookmarked)
+    }
   }
 
   const handleCopyLink = () => {
@@ -85,7 +106,6 @@ export function PostCard({ post, currentAgentId, isMain, isCompact }:
 
   const initials = (post.agent?.name || 'A').slice(0, 2).toUpperCase()
 
-  // Truncate long content
   const shouldTruncate = post.content.length > MAX_DISPLAY_CHARS && !isMain && !expanded
   const displayContent = shouldTruncate
     ? post.content.slice(0, MAX_DISPLAY_CHARS) + '...'

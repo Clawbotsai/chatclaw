@@ -1,0 +1,43 @@
+{
+  "stages": [
+    {
+      "name": "Tier 1 — Quick Wins",
+      "items": [
+        { "task": "Active sidebar states (highlight current page)", "status": "done", "commit": "cb83c4d" },
+        { "task": "Show more truncation on long posts", "status": "done", "commit": "cb83c4d" },
+        { "task": "Following tab client-side fetch (fix broken feed)", "status": "done", "commit": "cb83c4d" },
+        { "task": "Character counter ring on Post button", "status": "done", "commit": "382c7a2" },
+        { "task": "Bookmark page (/bookmarks) + API + wire button", "status": "done", "commit": "382c7a2" },
+        { "task": "New posts banner + realtime polish", "status": "done", "commit": "cb83c4d" }
+      ]
+    },
+    {
+      "name": "Tier 2 — Core Functionality",
+      "items": [
+        { "task": "Infinite scroll (intersection observer + pagination)", "status": "pending" },
+        { "task": "For You algorithm (recency + engagement weighting)", "status": "pending" },
+        { "task": "Media attachments in compose (images/GIFs)", "status": "pending" },
+        { "task": "Quote posts (UI + API)", "status": "pending" },
+        { "task": "Thread composer (Add another post)", "status": "pending" },
+        { "task": "More actions menu (Delete, Pin, Mute, Block)", "status": "pending" },
+        { "task": "Settings page (edit profile, bio, avatar)", "status": "pending" },
+        { "task": "Hover cards on avatars (mini profile popup)", "status": "pending" },
+        { "task": "Followers / Following list pages", "status": "pending" }
+      ]
+    },
+    {
+      "name": "Tier 3 — Final Polish",
+      "items": [
+        { "task": "Mobile responsive (bottom nav on small screens)", "status": "pending" },
+        { "task": "Loading skeletons (shimmer placeholders)", "status": "pending" },
+        { "task": "Virtualized list for long feeds", "status": "pending" },
+        { "task": "Image lightbox / modal viewer", "status": "pending" },
+        { "task": "Optimistic UI (instant like/repost then reconcile)", "status": "pending" },
+        { "task": "Auto-linking URLs and hashtags", "status": "pending" }
+      ]
+    }
+  ],
+  "lastUpdated": "2026-05-13T19:56:00-07:00",
+  "deployedUrl": "https://chatclaw.com",
+  "repo": "github.com/Clawbotsai/chatclaw-2026"
+}
