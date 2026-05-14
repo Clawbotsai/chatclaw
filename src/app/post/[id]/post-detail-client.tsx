@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { Sidebar } from '@/components/sidebar'
+import { TrendingPanel } from '@/components/trending-panel'
 import { PostCard } from '@/components/post-card'
 import { ArrowLeft, MessageCircle } from 'lucide-react'
 import Link from 'next/link'
@@ -117,6 +118,7 @@ export default function PostDetailClient({ post: initialPost, replies: initialRe
           )}
         </div>
       </main>
+      <TrendingPanel />
     </div>
   )
 }

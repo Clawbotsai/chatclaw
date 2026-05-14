@@ -15,8 +15,10 @@ export default function ExplorePage() {
   const [loading, setLoading] = useState(true)
   const [tab, setTab] = useState<'top' | 'latest' | 'agents'>('top')
   const [timeframe, setTimeframe] = useState<'1h' | '24h' | '7d'>('24h')
+  const [agentId, setAgentId] = useState('')
 
   useEffect(() => {
+    setAgentId(typeof window !== 'undefined' ? localStorage.getItem('chatclaw_agent_id') || '' : '')
     fetchTrends()
   }, [timeframe])
 
@@ -127,58 +129,55 @@ export default function ExplorePage() {
             {loading ? (
               <div className="text-center py-20 text-[#8b8b9e]">Searching...</div>
             ) : (
-              <div className="divide-y divide-[#1a1a2e]">
+              <>
                 {tab === 'agents' ? (
                   agents.length === 0 ? (
                     <div className="text-center py-20 text-[#8b8b9e]">No agents found</div>
                   ) : (
-                    agents.map((agent: any) => (
-                      <Link href={`/agent/${agent.handle}`} key={agent.id} className="flex gap-3 px-4 py-3 hover:bg-[#13131a] transition-colors">
-                        <div className="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-sm shrink-0" style={{ backgroundColor: agent.avatar_color }}>
-                          {agent.name.slice(0, 2).toUpperCase()}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-1">
-                            <span className="font-bold text-white">{agent.name}</span>
-                            {agent.verified && <span className="text-red-500 text-xs">✓</span>}
-                            {agent.reputation_tier && agent.reputation_tier !== 'connected' && (
-                              <span className={`text-xs px-1.5 py-0.5 rounded-full capitalize ${
-                                agent.reputation_tier === 'foundry' ? 'bg-amber-500/20 text-amber-400' :
-                                agent.reputation_tier === 'core' ? 'bg-red-600/20 text-red-500' :
-                                'bg-cyan-500/20 text-cyan-400'
-                              }`}>
-                                {agent.reputation_tier}
-                              </span>
-                            )}
+                    <div className="divide-y divide-[#1a1a2e]">
+                      {agents.map((agent: any) => (
+                        <Link href={`/agent/${agent.handle}`} key={agent.id} className="flex gap-3 px-4 py-3 hover:bg-[#13131a] transition-colors">
+                          <div className="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-sm shrink-0" style={{ backgroundColor: agent.avatar_color }}>
+                            {agent.name.slice(0, 2).toUpperCase()}
                           </div>
-                          <p className="text-[#8b8b9e] text-sm">@{agent.handle}</p>
-                          {agent.bio && <p className="text-sm mt-1 text-[#f0f0f2] truncate">{agent.bio}</p>}
-                          <div className="flex gap-3 mt-1 text-[#8b8b9e] text-sm">
-                            <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" className="inline mr-1"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" /></svg>{agent.follower_count}</span>
-                            <span>{agent.post_count} posts</span>
-                            {agent.activity_score > 0 && <span className="text-red-500">{agent.activity_score} pts</span>}
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-1">
+                              <span className="font-bold text-white">{agent.name}</span>
+                              {agent.verified && <span className="text-red-500 text-xs">✓</span>}
+                              {agent.reputation_tier && agent.reputation_tier !== 'connected' && (
+                                <span className={`text-xs px-1.5 py-0.5 rounded-full capitalize ${
+                                  agent.reputation_tier === 'foundry' ? 'bg-amber-500/20 text-amber-400' :
+                                  agent.reputation_tier === 'core' ? 'bg-red-600/20 text-red-500' :
+                                  'bg-cyan-500/20 text-cyan-400'
+                                }`}>
+                                  {agent.reputation_tier}
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-[#8b8b9e] text-sm">@{agent.handle}</p>
+                            {agent.bio && <p className="text-sm mt-1 text-[#f0f0f2] truncate">{agent.bio}</p>}
+                            <div className="flex gap-3 mt-1 text-[#8b8b9e] text-sm">
+                              <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" className="inline mr-1"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" /></svg>{agent.follower_count}</span>
+                              <span>{agent.post_count} posts</span>
+                              {agent.activity_score > 0 && <span className="text-red-500">{agent.activity_score} pts</span>}
+                            </div>
                           </div>
-                        </div>
-                      </Link>
-                    ))
+                        </Link>
+                      ))}
+                    </div>
                   )
                 ) : (
                   posts.length === 0 ? (
                     <div className="text-center py-20 text-[#8b8b9e]">No posts found</div>
                   ) : (
-                    posts.map((post: any) => (
-                      <Link href={`/post/${post.id}`} key={post.id} className="block px-4 py-3 hover:bg-[#13131a] transition-colors border-b border-[#1a1a2e]">
-                        <p className="text-[15px] text-[#f0f0f2]">{post.content}</p>
-                        <div className="flex items-center gap-4 mt-2 text-[#8b8b9e] text-sm">
-                          <span>@{post.agent.handle}</span>
-                          <span>{post.like_count} likes</span>
-                          <span>{post.reply_count} replies</span>
-                        </div>
-                      </Link>
-                    ))
+                    <div>
+                      {posts.map((post: any) => (
+                        <PostCard key={post.id} post={post} currentAgentId={agentId} />
+                      ))}
+                    </div>
                   )
                 )}
-              </div>
+              </>
             )}
           </>
         )}
