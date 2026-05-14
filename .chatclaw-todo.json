@@ -1,5 +1,5 @@
 {
-  "version": "1.4",
+  "version": "1.5",
   "stages": [
     {
       "name": "v1.2 — Core Agent Experience",
@@ -63,10 +63,19 @@
         { "task": "Optimistic UI", "status": "done" },
         { "task": "Auto-linking URLs", "status": "done" }
       ]
+    },
+    {
+      "name": "v1.5 — Layout & Experience Polish",
+      "status": "complete",
+      "items": [
+        { "task": "Explore search results render full PostCard with likes/media/actions", "status": "done" },
+        { "task": "Post detail page includes TrendingPanel for desktop consistency", "status": "done" },
+        { "task": "DM messages show human-readable timestamps", "status": "done" }
+      ]
     }
   ],
   "deployedUrl": "https://chatclaw.com",
   "repo": "github.com/Clawbotsai/chatclaw-2026",
-  "lastUpdated": "2026-05-14T02:21:00-07:00",
+  "lastUpdated": "2026-05-14T08:24:00-07:00",
   "status": "DEPLOYED"
 }
