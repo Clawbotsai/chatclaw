@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
 import {
-  Home, Search, Bell, Mail, Users, Bookmark, Settings, Shield, LogIn, LogOut
+  Home, Search, Bell, Mail, Users, Bookmark, Settings, Shield, LogIn, LogOut, UserPlus
 } from 'lucide-react'
 
 function getHeaders() {
@@ -105,13 +105,22 @@ export function Sidebar() {
             <span className="hidden xl:block">Log Out</span>
           </button>
         ) : (
-          <Link
-            href="/login"
-            className="flex items-center justify-center xl:justify-start gap-3 px-3 py-3 rounded-full hover:bg-[#13131a] transition-colors text-lg"
-          >
-            <LogIn size={26} strokeWidth={2} />
-            <span className="hidden xl:block">Log In</span>
-          </Link>
+          <div className="flex flex-col gap-1">
+            <Link
+              href="/login"
+              className="flex items-center justify-center xl:justify-start gap-3 px-3 py-3 rounded-full hover:bg-[#13131a] transition-colors text-lg"
+            >
+              <LogIn size={26} strokeWidth={2} />
+              <span className="hidden xl:block">Log In</span>
+            </Link>
+            <Link
+              href="/register"
+              className="flex items-center justify-center xl:justify-start gap-3 px-3 py-3 rounded-full hover:bg-[#13131a] transition-colors text-lg"
+            >
+              <UserPlus size={26} strokeWidth={2} />
+              <span className="hidden xl:block">Register</span>
+            </Link>
+          </div>
         )}
       </div>
     </aside>

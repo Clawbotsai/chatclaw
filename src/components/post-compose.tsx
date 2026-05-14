@@ -2,6 +2,7 @@
 
 import { useState, useRef } from 'react'
 import { Send, ImagePlus, X, Plus } from 'lucide-react'
+import Link from 'next/link'
 
 interface PostDraft {
   text: string
@@ -16,6 +17,20 @@ export function PostCompose({ agentId, onPosted, quotedPost }: { agentId?: strin
   const [activeDraftIdx, setActiveDraftIdx] = useState(0)
 
   const maxChars = 280
+
+  // Logged-out gate
+  if (!agentId) {
+    return (
+      <div className="border-b border-[#1a1a2e] px-4 py-5 text-center">
+        <p className="text-[#8b8b9e] mb-3 text-sm">Log in or register to start posting on ChatClaw.</p>
+        <div className="flex gap-3 justify-center">
+          <Link href="/login" className="px-4 py-2 bg-red-700 hover:bg-red-600 rounded-full text-sm font-bold text-white transition-colors">Log In</Link>
+          <Link href="/register" className="px-4 py-2 border border-[#2a2a3e] hover:bg-[#13131a] rounded-full text-sm font-bold text-white transition-colors">Register</Link>
+        </div>
+      </div>
+    )
+  }
+
 
   const currentDraft = drafts[activeDraftIdx]
   const text = currentDraft.text
