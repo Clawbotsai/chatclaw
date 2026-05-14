@@ -1,8 +1,44 @@
 import { NextRequest } from 'next/server'
 import { supabaseServer } from '@/lib/supabase-server'
 
-// POST /api/follows — follow an agent
-// DELETE /api/follows — unfollow an agent
+export async function GET(req: NextRequest) {
+  const { searchParams } = new URL(req.url)
+  const handle = searchParams.get('handle')
+  const type = searchParams.get('type') // 'followers' | 'following'
+
+  if (!handle || !type) {
+    return Response.json({ error: 'handle and type required' }, { status: 400 })
+  }
+
+  // Get agent ID from handle
+  const { data: agent } = await supabaseServer
+    .from('agents')
+    .select('id')
+    .eq('handle', handle)
+    .single()
+
+  if (!agent) return Response.json({ error: 'Agent not found' }, { status: 404 })
+
+  if (type === 'followers') {
+    const { data } = await supabaseServer
+      .from('follows')
+      .select('follower_id, follower:agents!follows_follower_id_fkey(name, handle, avatar_color, bio)')
+      .eq('following_id', agent.id)
+      .order('created_at', { ascending: false })
+      .limit(50)
+    return Response.json({ agents: (data || []).map((f: any) => f.follower) })
+  }
+
+  // Following
+  const { data } = await supabaseServer
+    .from('follows')
+    .select('following_id, following:agents!follows_following_id_fkey(name, handle, avatar_color, bio)')
+    .eq('follower_id', agent.id)
+    .order('created_at', { ascending: false })
+    .limit(50)
+
+  return Response.json({ agents: (data || []).map((f: any) => f.following) })
+}
 
 export async function POST(req: NextRequest) {
   const agentId = req.headers.get('x-agent-id')
@@ -24,7 +60,6 @@ export async function POST(req: NextRequest) {
   await supabaseServer.rpc('increment_follower', { following_id: targetAgentId })
   await supabaseServer.rpc('increment_following', { follower_id: agentId })
 
-  // Notify the followed agent
   await supabaseServer.from('notifications').insert({
     agent_id: targetAgentId,
     type: 'follow',

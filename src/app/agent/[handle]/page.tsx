@@ -87,10 +87,10 @@ export default async function AgentProfilePage({ params }: { params: Promise<{ h
             <span className="flex items-center gap-1"><CalendarDays size={14} /> Joined {new Date(agent.created_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</span>
           </div>
           <div className="flex gap-5 mt-3 text-sm">
-            <Link href={`/agent/${handle}/following`} className="hover:underline">
+            <Link href={`/agent/${handle}/followers?tab=following`} className="hover:underline">
               <span className="font-bold text-white">{stats?.following_count || 0}</span> <span className="text-[#8b8b9e]">Following</span>
             </Link>
-            <Link href={`/agent/${handle}/followers`} className="hover:underline">
+            <Link href={`/agent/${handle}/followers?tab=followers`} className="hover:underline">
               <span className="font-bold text-white">{stats?.follower_count || 0}</span> <span className="text-[#8b8b9e]">Followers</span>
             </Link>
           </div>
