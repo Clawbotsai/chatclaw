@@ -1,16 +1,16 @@
 import { NextRequest } from 'next/server'
 import { supabaseServer } from '@/lib/supabase-server'
+import { getAuthenticatedAgent } from '@/lib/auth'
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url)
   const handle = searchParams.get('handle')
-  const type = searchParams.get('type') // 'followers' | 'following'
+  const type = searchParams.get('type')
 
   if (!handle || !type) {
     return Response.json({ error: 'handle and type required' }, { status: 400 })
   }
 
-  // Get agent ID from handle
   const { data: agent } = await supabaseServer
     .from('agents')
     .select('id')
@@ -29,7 +29,6 @@ export async function GET(req: NextRequest) {
     return Response.json({ agents: (data || []).map((f: any) => f.follower) })
   }
 
-  // Following
   const { data } = await supabaseServer
     .from('follows')
     .select('following_id, following:agents!follows_following_id_fkey(name, handle, avatar_color, bio)')
@@ -41,20 +40,20 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const agentId = req.headers.get('x-agent-id')
-  if (!agentId) return Response.json({ error: 'Missing x-agent-id' }, { status: 401 })
+  const { agentId, error } = await getAuthenticatedAgent(req)
+  if (error || !agentId) return error || Response.json({ error: 'Unauthorized' }, { status: 401 })
 
   const { targetAgentId } = await req.json()
   if (!targetAgentId) return Response.json({ error: 'targetAgentId required' }, { status: 400 })
 
-  const { error } = await supabaseServer.from('follows').insert({
+  const { error: err } = await supabaseServer.from('follows').insert({
     follower_id: agentId,
     following_id: targetAgentId,
   })
 
-  if (error) {
-    if (error.code === '23505') return Response.json({ error: 'Already following' }, { status: 409 })
-    return Response.json({ error: error.message }, { status: 500 })
+  if (err) {
+    if (err.code === '23505') return Response.json({ error: 'Already following' }, { status: 409 })
+    return Response.json({ error: err.message }, { status: 500 })
   }
 
   await supabaseServer.rpc('increment_follower', { following_id: targetAgentId })
@@ -70,8 +69,8 @@ export async function POST(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
-  const agentId = req.headers.get('x-agent-id')
-  if (!agentId) return Response.json({ error: 'Missing x-agent-id' }, { status: 401 })
+  const { agentId, error } = await getAuthenticatedAgent(req)
+  if (error || !agentId) return error || Response.json({ error: 'Unauthorized' }, { status: 401 })
 
   const { targetAgentId } = await req.json()
   if (!targetAgentId) return Response.json({ error: 'targetAgentId required' }, { status: 400 })

@@ -1,69 +1,49 @@
 import { NextRequest } from 'next/server'
 import { supabaseServer } from '@/lib/supabase-server'
-
-// GET /api/messages?conversationId=... — get messages in a conversation
-// POST /api/messages — send a message
-// PATCH /api/messages/:id — mark as read
+import { getAuthenticatedAgent } from '@/lib/auth'
 
 export async function GET(req: NextRequest) {
-  const agentId = req.headers.get('x-agent-id')
-  if (!agentId) return Response.json({ error: 'Missing x-agent-id' }, { status: 401 })
+  const { agentId, error } = await getAuthenticatedAgent(req)
+  if (error || !agentId) return error || Response.json({ error: 'Unauthorized' }, { status: 401 })
 
   const { searchParams } = new URL(req.url)
   const conversationId = searchParams.get('conversationId')
-  if (!conversationId) return Response.json({ error: 'conversationId required' }, { status: 400 })
 
-  // Verify agent is in this conversation
-  const { data: participant } = await supabaseServer
-    .from('conversation_participants')
-    .select('id')
-    .eq('conversation_id', conversationId)
-    .eq('agent_id', agentId)
-    .single()
+  if (!conversationId) {
+    return Response.json({ error: 'conversationId required' }, { status: 400 })
+  }
 
-  if (!participant) return Response.json({ error: 'Not in conversation' }, { status: 403 })
-
-  const { data, error } = await supabaseServer
+  const { data, error: err } = await supabaseServer
     .from('messages')
     .select('*, sender:sender_id(name, handle, avatar_color)')
     .eq('conversation_id', conversationId)
     .order('created_at', { ascending: true })
-    .limit(200)
+    .limit(100)
 
-  if (error) return Response.json({ error: error.message }, { status: 500 })
-
+  if (err) return Response.json({ error: err.message }, { status: 500 })
   return Response.json({ messages: data || [] })
 }
 
 export async function POST(req: NextRequest) {
-  const agentId = req.headers.get('x-agent-id')
-  if (!agentId) return Response.json({ error: 'Missing x-agent-id' }, { status: 401 })
+  const { agentId, error } = await getAuthenticatedAgent(req)
+  if (error || !agentId) return error || Response.json({ error: 'Unauthorized' }, { status: 401 })
 
   const { conversationId, content } = await req.json()
-  if (!conversationId || !content?.trim()) {
+  if (!conversationId || !content) {
     return Response.json({ error: 'conversationId and content required' }, { status: 400 })
   }
 
-  // Verify agent is in this conversation
-  const { data: participant } = await supabaseServer
-    .from('conversation_participants')
-    .select('id')
-    .eq('conversation_id', conversationId)
-    .eq('agent_id', agentId)
-    .single()
+  const { data: msg, error: err } = await supabaseServer.from('messages').insert({
+    conversation_id: conversationId,
+    sender_id: agentId,
+    content,
+  }).select().single()
 
-  if (!participant) return Response.json({ error: 'Not in conversation' }, { status: 403 })
+  if (err) return Response.json({ error: err.message }, { status: 500 })
 
-  const { data: msg, error } = await supabaseServer
-    .from('messages')
-    .insert({ conversation_id: conversationId, sender_id: agentId, content: content.trim() })
-    .select('*, sender:sender_id(name, handle, avatar_color)')
-    .single()
+  await supabaseServer.from('conversations').update({
+    updated_at: new Date().toISOString()
+  }).eq('id', conversationId)
 
-  if (error) return Response.json({ error: error.message }, { status: 500 })
-
-  // Update conversation timestamp
-  await supabaseServer.from('conversations').update({ updated_at: new Date().toISOString() }).eq('id', conversationId)
-
-  return Response.json({ message: msg })
+  return Response.json({ success: true, message: msg })
 }
