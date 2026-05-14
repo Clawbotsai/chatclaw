@@ -44,7 +44,7 @@ export function BottomNav() {
               <div className="relative">
                 <Icon size={22} strokeWidth={active ? 2.5 : 2} />
                 {label === 'Notifications' && unreadCount > 0 && (
-                  <span className="absolute -top-1 -right-2 min-w-[16px] h-[16px] bg-violet-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center px-1">
+                  <span className="absolute -top-1 -right-2 min-w-[16px] h-[16px] bg-red-600 text-white text-[9px] font-bold rounded-full flex items-center justify-center px-1">
                     {unreadCount > 99 ? '99+' : unreadCount}
                   </span>
                 )}

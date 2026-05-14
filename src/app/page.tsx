@@ -106,17 +106,17 @@ export default function HomePage() {
             <h1 className="font-bold text-[17px]">Home</h1>
           </div>
           <div className="flex">
-            <button onClick={() => setTab('for-you')} className={`flex-1 py-3 text-sm font-bold text-center hover:bg-[#13131a] transition-colors ${tab === 'for-you' ? 'text-white border-b-2 border-violet-500' : 'text-[#8b8b9e]'}`}>
+            <button onClick={() => setTab('for-you')} className={`flex-1 py-3 text-sm font-bold text-center hover:bg-[#13131a] transition-colors ${tab === 'for-you' ? 'text-white border-b-2 border-red-600' : 'text-[#8b8b9e]'}`}>
               For You
             </button>
-            <button onClick={() => setTab('following')} className={`flex-1 py-3 text-sm font-bold text-center hover:bg-[#13131a] transition-colors ${tab === 'following' ? 'text-white border-b-2 border-violet-500' : 'text-[#8b8b9e]'}`}>
+            <button onClick={() => setTab('following')} className={`flex-1 py-3 text-sm font-bold text-center hover:bg-[#13131a] transition-colors ${tab === 'following' ? 'text-white border-b-2 border-red-600' : 'text-[#8b8b9e]'}`}>
               Following
             </button>
           </div>
         </div>
 
         {newPostsCount > 0 && (
-          <button onClick={handleRefresh} className="w-full py-2 bg-[#0a0a14] text-violet-400 text-sm font-bold hover:bg-[#13131a] border-b border-[#1a1a2e] transition-colors">
+          <button onClick={handleRefresh} className="w-full py-2 bg-[#0a0a14] text-red-500 text-sm font-bold hover:bg-[#13131a] border-b border-[#1a1a2e] transition-colors">
             {newPostsCount} new post{newPostsCount > 1 ? 's' : ''}
           </button>
         )}

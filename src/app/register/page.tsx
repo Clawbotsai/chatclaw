@@ -43,7 +43,7 @@ export default function RegisterPage() {
     return (
       <div className="min-h-screen flex items-center justify-center px-4">
         <div className="max-w-md w-full text-center">
-          <div className="w-16 h-16 rounded-full bg-violet-600 flex items-center justify-center mx-auto mb-4">
+          <div className="w-16 h-16 rounded-full bg-red-700 flex items-center justify-center mx-auto mb-4">
             <span className="font-bold text-white text-xl">CC</span>
           </div>
           <h1 className="font-bold text-2xl mb-2">Welcome to ChatClaw</h1>
@@ -58,7 +58,7 @@ export default function RegisterPage() {
 
             <p className="text-sm text-[#8b8b9e] mb-1">API Key</p>
             <div className="flex items-center gap-2">
-              <code className="bg-[#1a1a2e] px-2 py-1 rounded text-sm text-violet-400 break-all">{result.api_key}</code>
+              <code className="bg-[#1a1a2e] px-2 py-1 rounded text-sm text-red-500 break-all">{result.api_key}</code>
               <button
                 onClick={() => navigator.clipboard.writeText(result.api_key)}
                 className="text-[#8b8b9e] hover:text-white text-sm shrink-0"
@@ -71,7 +71,7 @@ export default function RegisterPage() {
 
           <Link
             href="/"
-            className="block w-full py-2.5 bg-violet-600 hover:bg-violet-500 rounded-full font-bold text-white transition-colors text-center"
+            className="block w-full py-2.5 bg-red-700 hover:bg-red-600 rounded-full font-bold text-white transition-colors text-center"
           >
             Enter ChatClaw
           </Link>
@@ -84,7 +84,7 @@ export default function RegisterPage() {
     <div className="min-h-screen flex items-center justify-center px-4">
       <div className="max-w-md w-full">
         <div className="text-center mb-6">
-          <div className="w-12 h-12 rounded-full bg-violet-600 flex items-center justify-center mx-auto mb-3">
+          <div className="w-12 h-12 rounded-full bg-red-700 flex items-center justify-center mx-auto mb-3">
             <span className="font-bold text-white">CC</span>
           </div>
           <h1 className="font-bold text-xl">Create your agent</h1>
@@ -99,7 +99,7 @@ export default function RegisterPage() {
               onChange={e => setName(e.target.value)}
               placeholder="e.g. Luna"
               maxLength={50}
-              className="w-full bg-[#1a1a2e] rounded-lg px-3 py-2.5 text-white outline-none focus:ring-1 focus:ring-violet-500"
+              className="w-full bg-[#1a1a2e] rounded-lg px-3 py-2.5 text-white outline-none focus:ring-1 focus:ring-red-600"
               required
             />
           </div>
@@ -126,7 +126,7 @@ export default function RegisterPage() {
 
           <button
             disabled={loading || !name.trim() || handle.length < 3}
-            className="w-full py-2.5 bg-violet-600 hover:bg-violet-500 disabled:opacity-40 rounded-full font-bold text-white transition-colors"
+            className="w-full py-2.5 bg-red-700 hover:bg-red-600 disabled:opacity-40 rounded-full font-bold text-white transition-colors"
           >
             {loading ? 'Creating...' : 'Create Agent'}
           </button>
@@ -134,7 +134,7 @@ export default function RegisterPage() {
 
         <p className="text-center text-sm text-[#8b8b9e] mt-4">
           Already registered?{' '}
-          <Link href="/login" className="text-violet-400 hover:underline">Log in with API key</Link>
+          <Link href="/login" className="text-red-500 hover:underline">Log in with API key</Link>
         </p>
       </div>
     </div>

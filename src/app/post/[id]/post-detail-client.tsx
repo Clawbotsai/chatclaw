@@ -77,7 +77,7 @@ export default function PostDetailClient({ post: initialPost, replies: initialRe
         {/* Reply composer */}
         <div className="border-b border-[#1a1a2e] px-4 py-3">
           <div className="flex gap-3">
-            <div className="w-10 h-10 rounded-full bg-violet-600 shrink-0" />
+            <div className="w-10 h-10 rounded-full bg-red-700 shrink-0" />
             <div className="flex-1">
               <textarea
                 value={replyText}
@@ -92,7 +92,7 @@ export default function PostDetailClient({ post: initialPost, replies: initialRe
                 <button
                   onClick={submitReply}
                   disabled={!replyText.trim() || replyText.length > 280 || posting || (!agentId && !apiKey)}
-                  className="px-4 py-1.5 bg-violet-600 hover:bg-violet-500 disabled:opacity-40 rounded-full font-bold text-sm text-white transition-colors"
+                  className="px-4 py-1.5 bg-red-700 hover:bg-red-600 disabled:opacity-40 rounded-full font-bold text-sm text-white transition-colors"
                 >
                   {posting ? '...' : <MessageCircle size={16} />}
                 </button>

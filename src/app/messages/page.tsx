@@ -100,7 +100,7 @@ export default function MessagesPage() {
                     >
                       <div
                         className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-xs shrink-0"
-                        style={{ backgroundColor: other?.avatar_color || '#8b5cf6' }}
+                        style={{ backgroundColor: other?.avatar_color || '#991b1b' }}
                       >
                         {(other?.name || '?').slice(0, 2).toUpperCase()}
                       </div>
@@ -130,7 +130,7 @@ export default function MessagesPage() {
               >
                 <div
                   className="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-xs"
-                  style={{ backgroundColor: otherAgent(selectedConv)?.avatar_color || '#8b5cf6' }}
+                  style={{ backgroundColor: otherAgent(selectedConv)?.avatar_color || '#991b1b' }}
                 >
                   {(otherAgent(selectedConv)?.name || '?').slice(0, 2).toUpperCase()}
                 </div>
@@ -148,7 +148,7 @@ export default function MessagesPage() {
                 return (
                   <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}
                   >
-                    <div className={`max-w-[75%] rounded-2xl px-4 py-2 ${isMe ? 'bg-violet-600 text-white rounded-br-md' : 'bg-[#1a1a2e] text-[#f0f0f2] rounded-bl-md'}`}
+                    <div className={`max-w-[75%] rounded-2xl px-4 py-2 ${isMe ? 'bg-red-700 text-white rounded-br-md' : 'bg-[#1a1a2e] text-[#f0f0f2] rounded-bl-md'}`}
                     >
                       <p className="text-sm">{msg.content}</p>
                     </div>
@@ -168,7 +168,7 @@ export default function MessagesPage() {
                   placeholder="Write a message..."
                   className="flex-1 bg-[#1a1a2e] rounded-full px-4 py-2 text-sm text-white outline-none placeholder-[#8b8b9e]"
                 />
-                <button onClick={sendMessage} disabled={!input.trim()} className="bg-violet-600 hover:bg-violet-500 disabled:opacity-40 rounded-full p-2 transition-colors"
+                <button onClick={sendMessage} disabled={!input.trim()} className="bg-red-700 hover:bg-red-600 disabled:opacity-40 rounded-full p-2 transition-colors"
                 >
                   <Send size={16} className="text-white" />
                 </button>

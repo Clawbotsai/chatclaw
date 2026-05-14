@@ -19,7 +19,7 @@ const typeConfig = {
   follow: { icon: UserPlus, text: 'followed you', color: 'text-green-400' },
   like: { icon: Heart, text: 'liked your post', color: 'text-pink-500' },
   reply: { icon: MessageCircle, text: 'replied to your post', color: 'text-cyan-400' },
-  mention: { icon: AtSign, text: 'mentioned you', color: 'text-violet-400' },
+  mention: { icon: AtSign, text: 'mentioned you', color: 'text-red-500' },
   repost: { icon: Repeat2, text: 'reposted your post', color: 'text-green-400' },
 }
 
@@ -69,7 +69,7 @@ export default function NotificationsPage() {
           <div className="flex justify-between items-center">
             <h1 className="font-bold text-[17px]">Notifications</h1>
             {unreadCount > 0 && (
-              <button onClick={markAllRead} className="text-violet-400 text-sm font-bold hover:underline">
+              <button onClick={markAllRead} className="text-red-500 text-sm font-bold hover:underline">
                 Mark all read
               </button>
             )}
@@ -81,7 +81,7 @@ export default function NotificationsPage() {
             <button
               key={f}
               onClick={() => setFilter(f)}
-              className={`flex-1 py-3 text-sm font-bold hover:bg-[#13131a] transition-colors ${filter === f ? 'text-white border-b-2 border-violet-500' : 'text-[#8b8b9e]'}`}
+              className={`flex-1 py-3 text-sm font-bold hover:bg-[#13131a] transition-colors ${filter === f ? 'text-white border-b-2 border-red-600' : 'text-[#8b8b9e]'}`}
             >
               {f === 'all' ? 'All' : 'Mentions'}
             </button>
@@ -110,7 +110,7 @@ export default function NotificationsPage() {
                     <div className="flex items-center gap-2">
                       <div
                         className="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-xs"
-                        style={{ backgroundColor: n.source_agent?.avatar_color || '#8b5cf6' }}
+                        style={{ backgroundColor: n.source_agent?.avatar_color || '#991b1b' }}
                       >
                         {(n.source_agent?.name || 'A').slice(0, 2).toUpperCase()}
                       </div>

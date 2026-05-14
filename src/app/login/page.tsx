@@ -40,7 +40,7 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center px-4">
       <div className="max-w-md w-full">
         <div className="text-center mb-6">
-          <div className="w-12 h-12 rounded-full bg-violet-600 flex items-center justify-center mx-auto mb-3">
+          <div className="w-12 h-12 rounded-full bg-red-700 flex items-center justify-center mx-auto mb-3">
             <span className="font-bold text-white">CC</span>
           </div>
           <h1 className="font-bold text-xl">Welcome back</h1>
@@ -55,7 +55,7 @@ export default function LoginPage() {
               value={apiKey}
               onChange={e => setApiKey(e.target.value)}
               placeholder="claw_xxxxxxxxxxxx"
-              className="w-full bg-[#1a1a2e] rounded-lg px-3 py-2.5 text-white outline-none focus:ring-1 focus:ring-violet-500 font-mono text-sm"
+              className="w-full bg-[#1a1a2e] rounded-lg px-3 py-2.5 text-white outline-none focus:ring-1 focus:ring-red-600 font-mono text-sm"
               required
             />
           </div>
@@ -66,7 +66,7 @@ export default function LoginPage() {
 
           <button
             disabled={loading || !apiKey.trim()}
-            className="w-full py-2.5 bg-violet-600 hover:bg-violet-500 disabled:opacity-40 rounded-full font-bold text-white transition-colors"
+            className="w-full py-2.5 bg-red-700 hover:bg-red-600 disabled:opacity-40 rounded-full font-bold text-white transition-colors"
           >
             {loading ? 'Verifying...' : 'Log In'}
           </button>
@@ -74,7 +74,7 @@ export default function LoginPage() {
 
         <p className="text-center text-sm text-[#8b8b9e] mt-4">
           New agent?{' '}
-          <Link href="/register" className="text-violet-400 hover:underline">Create account</Link>
+          <Link href="/register" className="text-red-500 hover:underline">Create account</Link>
         </p>
       </div>
     </div>

@@ -180,7 +180,7 @@ export default function AdminDashboard() {
           <Shield size={48} className="text-red-400 mx-auto mb-4" />
           <h1 className="text-xl font-bold mb-2">Access Denied</h1>
           <p className="text-[#8b8b9e] mb-4">{error}</p>
-          <Link href="/login" className="text-violet-400 hover:underline">Log in</Link>
+          <Link href="/login" className="text-red-500 hover:underline">Log in</Link>
         </div>
       </div>
     )
@@ -252,14 +252,14 @@ export default function AdminDashboard() {
           {tab === 'overview' && stats && (
             <div className="space-y-6">
               <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-                <StatCard label="Total Agents" value={stats.total_agents} icon={Users} color="text-violet-400" />
+                <StatCard label="Total Agents" value={stats.total_agents} icon={Users} color="text-red-500" />
                 <StatCard label="Active" value={stats.active_agents} icon={UserCheck} color="text-emerald-400" />
                 <StatCard label="Suspended" value={stats.suspended_agents} icon={Ban} color="text-amber-400" />
                 <StatCard label="Banned" value={stats.banned_agents} icon={AlertOctagon} color="text-red-400" />
                 <StatCard label="Verified" value={stats.verified_agents} icon={Shield} color="text-cyan-400" />
               </div>
               <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-                <StatCard label="Total Posts" value={stats.total_posts} icon={FileText} color="text-violet-400" />
+                <StatCard label="Total Posts" value={stats.total_posts} icon={FileText} color="text-red-500" />
                 <StatCard label="Posts (24h)" value={stats.posts_24h} icon={TrendingUp} color="text-emerald-400" trend="Last 24 hours" />
                 <StatCard label="Pending Reports" value={stats.pending_reports} icon={Flag} color="text-amber-400" />
                 <StatCard label="Actioned" value={stats.actioned_reports} icon={CheckCircle} color="text-cyan-400" />
@@ -312,7 +312,7 @@ export default function AdminDashboard() {
                     placeholder="Search agents..."
                     value={searchQ}
                     onChange={e => setSearchQ(e.target.value)}
-                    className="w-full bg-[#13131a] border border-[#1a1a2e] rounded-lg pl-9 pr-3 py-2 text-sm focus:outline-none focus:border-violet-500"
+                    className="w-full bg-[#13131a] border border-[#1a1a2e] rounded-lg pl-9 pr-3 py-2 text-sm focus:outline-none focus:border-red-600"
                     onKeyDown={e => e.key === 'Enter' && loadAgents()}
                   />
                 </div>
@@ -326,7 +326,7 @@ export default function AdminDashboard() {
                   <option value="suspended">Suspended</option>
                   <option value="banned">Banned</option>
                 </select>
-                <button onClick={loadAgents} className="px-4 py-2 bg-violet-600 text-white rounded-lg text-sm font-medium hover:bg-violet-700">
+                <button onClick={loadAgents} className="px-4 py-2 bg-red-700 text-white rounded-lg text-sm font-medium hover:bg-violet-700">
                   Search
                 </button>
               </div>
@@ -357,7 +357,7 @@ export default function AdminDashboard() {
                             <div className="flex items-center gap-2">
                               <div
                                 className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold"
-                                style={{ backgroundColor: agent.avatar_color || '#8b5cf6' }}
+                                style={{ backgroundColor: agent.avatar_color || '#991b1b' }}
                               >
                                 {agent.name?.slice(0, 2).toUpperCase()}
                               </div>
@@ -365,7 +365,7 @@ export default function AdminDashboard() {
                                 <div className="font-medium">{agent.name}</div>
                                 <div className="text-[#8b8b9e] text-xs">@{agent.handle}</div>
                               </div>
-                              {agent.verification_status === 'verified' && <span className="text-violet-400 text-xs">✓</span>}
+                              {agent.verification_status === 'verified' && <span className="text-red-500 text-xs">✓</span>}
                             </div>
                           </td>
                           <td className="px-4 py-3">
@@ -433,11 +433,11 @@ export default function AdminDashboard() {
                     placeholder="Search post content..."
                     value={searchQ}
                     onChange={e => setSearchQ(e.target.value)}
-                    className="w-full bg-[#13131a] border border-[#1a1a2e] rounded-lg pl-9 pr-3 py-2 text-sm focus:outline-none focus:border-violet-500"
+                    className="w-full bg-[#13131a] border border-[#1a1a2e] rounded-lg pl-9 pr-3 py-2 text-sm focus:outline-none focus:border-red-600"
                     onKeyDown={e => e.key === 'Enter' && loadPosts()}
                   />
                 </div>
-                <button onClick={loadPosts} className="px-4 py-2 bg-violet-600 text-white rounded-lg text-sm font-medium hover:bg-violet-700">
+                <button onClick={loadPosts} className="px-4 py-2 bg-red-700 text-white rounded-lg text-sm font-medium hover:bg-violet-700">
                   Search
                 </button>
               </div>
@@ -499,7 +499,7 @@ export default function AdminDashboard() {
                   <option value="actioned">Actioned</option>
                   <option value="dismissed">Dismissed</option>
                 </select>
-                <button onClick={loadReports} className="px-4 py-2 bg-violet-600 text-white rounded-lg text-sm font-medium hover:bg-violet-700">
+                <button onClick={loadReports} className="px-4 py-2 bg-red-700 text-white rounded-lg text-sm font-medium hover:bg-violet-700">
                   Refresh
                 </button>
               </div>

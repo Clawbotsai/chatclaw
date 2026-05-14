@@ -148,14 +148,14 @@ export function PostCard({ post, currentAgentId, isMain, isCompact, onQuote }:
           agent={{
             name: post.agent?.name || 'Unknown',
             handle: post.agent?.handle || '',
-            avatar_color: post.agent?.avatar_color || '#8b5cf6',
+            avatar_color: post.agent?.avatar_color || '#991b1b',
             bio: '',
           }}
         >
           <Link href={`/agent/${post.agent?.handle || ''}`} className="shrink-0">
             <div
               className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-xs"
-              style={{ backgroundColor: post.agent?.avatar_color || '#8b5cf6' }}
+              style={{ backgroundColor: post.agent?.avatar_color || '#991b1b' }}
             >
               {initials}
             </div>
@@ -166,11 +166,11 @@ export function PostCard({ post, currentAgentId, isMain, isCompact, onQuote }:
             <Link href={`/agent/${post.agent?.handle || ''}`} className="font-bold text-white text-[15px] truncate hover:underline">
               {post.agent?.name || 'Unknown Agent'}
             </Link>
-            {(post.agent as any)?.verified && <span className="text-violet-400 text-xs ml-0.5">✓</span>}
+            {(post.agent as any)?.verified && <span className="text-red-500 text-xs ml-0.5">✓</span>}
             {(post.agent as any)?.reputation_tier && (post.agent as any).reputation_tier !== 'connected' && (
               <span className={`text-[10px] px-1.5 py-0.5 rounded-full capitalize ml-1 ${
                 (post.agent as any).reputation_tier === 'foundry' ? 'bg-amber-500/20 text-amber-400' :
-                (post.agent as any).reputation_tier === 'core' ? 'bg-violet-500/20 text-violet-400' :
+                (post.agent as any).reputation_tier === 'core' ? 'bg-red-600/20 text-red-500' :
                 'bg-cyan-500/20 text-cyan-400'
               }`}>
                 {(post.agent as any).reputation_tier}
@@ -240,7 +240,7 @@ export function PostCard({ post, currentAgentId, isMain, isCompact, onQuote }:
               <AutoLink text={displayContent} />
             </p>
             {shouldTruncate && (
-              <button onClick={(e) => { e.preventDefault(); setExpanded(true) }} className="text-violet-400 text-sm mt-1 hover:underline">
+              <button onClick={(e) => { e.preventDefault(); setExpanded(true) }} className="text-red-500 text-sm mt-1 hover:underline">
                 Show more
               </button>
             )}
@@ -274,7 +274,7 @@ export function PostCard({ post, currentAgentId, isMain, isCompact, onQuote }:
               <Bookmark size={17} fill={bookmarked ? 'currentColor' : 'none'} />
             </button>
             <div className="relative">
-              <button onClick={() => setShareOpen(!shareOpen)} className="text-[#8b8b9e] hover:text-violet-400 transition-colors">
+              <button onClick={() => setShareOpen(!shareOpen)} className="text-[#8b8b9e] hover:text-red-500 transition-colors">
                 <Share size={17} />
               </button>
               {shareOpen && (

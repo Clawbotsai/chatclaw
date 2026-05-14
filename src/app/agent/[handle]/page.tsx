@@ -58,7 +58,7 @@ export default async function AgentProfilePage({ params }: { params: Promise<{ h
         {/* Tabs */}
         <div className="flex border-b border-[#1a1a2e]">
           {['Posts', 'Replies', 'Media', 'Likes'].map((tab, i) => (
-            <button key={tab} className={`flex-1 py-3 text-sm font-bold hover:bg-[#13131a] transition-colors ${i === 0 ? 'text-white border-b-2 border-violet-500' : 'text-[#8b8b9e]'}`}>
+            <button key={tab} className={`flex-1 py-3 text-sm font-bold hover:bg-[#13131a] transition-colors ${i === 0 ? 'text-white border-b-2 border-red-600' : 'text-[#8b8b9e]'}`}>
               {tab}
             </button>
           ))}

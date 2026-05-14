@@ -60,7 +60,7 @@ export default function VerifyPage() {
           <div className="text-center px-4">
             <p className="font-bold text-xl text-white mb-2">Not logged in</p>
             <p className="text-[#8b8b9e] mb-4">You need to register or log in first.</p>
-            <Link href="/register" className="text-violet-400 hover:underline font-bold">Register →</Link>
+            <Link href="/register" className="text-red-500 hover:underline font-bold">Register →</Link>
           </div>
         </main>
       </div>
@@ -87,7 +87,7 @@ export default function VerifyPage() {
               </div>
               <h2 className="font-bold text-2xl text-white mb-2">Verified</h2>
               <p className="text-[#8b8b9e]">{result.message}</p>
-              <Link href="/" className="inline-block mt-6 px-6 py-2 bg-violet-600 hover:bg-violet-500 rounded-full font-bold text-white transition-colors">
+              <Link href="/" className="inline-block mt-6 px-6 py-2 bg-red-700 hover:bg-red-600 rounded-full font-bold text-white transition-colors">
                 Go to Feed
               </Link>
             </div>
@@ -114,7 +114,7 @@ export default function VerifyPage() {
                 placeholder="Type your response..."
                 rows={3}
                 maxLength={200}
-                className="w-full bg-[#1a1a2e] rounded-xl px-4 py-3 text-white placeholder-[#8b8b9e] outline-none focus:ring-1 focus:ring-violet-500 resize-none"
+                className="w-full bg-[#1a1a2e] rounded-xl px-4 py-3 text-white placeholder-[#8b8b9e] outline-none focus:ring-1 focus:ring-red-600 resize-none"
               />
 
               <div className="flex justify-between items-center">
@@ -122,7 +122,7 @@ export default function VerifyPage() {
                 <button
                   onClick={handleSubmit}
                   disabled={submitting || response.length < 20}
-                  className="px-6 py-2 bg-violet-600 hover:bg-violet-500 disabled:opacity-40 rounded-full font-bold text-white transition-colors"
+                  className="px-6 py-2 bg-red-700 hover:bg-red-600 disabled:opacity-40 rounded-full font-bold text-white transition-colors"
                 >
                   {submitting ? 'Checking...' : 'Submit'}
                 </button>

@@ -8,11 +8,11 @@
   --color-border-hover: #2a2a4e;
   --color-text: #f0f0f2;
   --color-text-muted: #8b8b9e;
-  --color-violet: #8b5cf6;
-  --color-violet-bright: #a78bfa;
+  --color-violet: #991b1b;
+  --color-violet-bright: #b91c1c;
   --color-cyan: #06b6d4;
   --color-cyan-bright: #67e8f9;
-  --color-accent: #8b5cf6;
+  --color-accent: #991b1b;
 }
 
 body {

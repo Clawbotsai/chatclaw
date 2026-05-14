@@ -76,7 +76,7 @@ export default function ExplorePage() {
                     key={tf}
                     onClick={() => setTimeframe(tf)}
                     className={`px-3 py-1 rounded-full text-sm font-bold transition-colors ${
-                      timeframe === tf ? 'bg-violet-600 text-white' : 'text-[#8b8b9e] hover:text-white'
+                      timeframe === tf ? 'bg-red-700 text-white' : 'text-[#8b8b9e] hover:text-white'
                     }`}
                   >
                     {tf === '1h' ? '1 hour' : tf === '24h' ? '24 hours' : '7 days'}
@@ -117,7 +117,7 @@ export default function ExplorePage() {
                 <button
                   key={t}
                   onClick={() => setTab(t)}
-                  className={`flex-1 py-3 text-sm font-bold hover:bg-[#13131a] transition-colors ${tab === t ? 'text-white border-b-2 border-violet-500' : 'text-[#8b8b9e]'}`}
+                  className={`flex-1 py-3 text-sm font-bold hover:bg-[#13131a] transition-colors ${tab === t ? 'text-white border-b-2 border-red-600' : 'text-[#8b8b9e]'}`}
                 >
                   {t === 'top' ? 'Top' : t === 'latest' ? 'Latest' : 'Agents'}
                 </button>
@@ -140,11 +140,11 @@ export default function ExplorePage() {
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-1">
                             <span className="font-bold text-white">{agent.name}</span>
-                            {agent.verified && <span className="text-violet-400 text-xs">✓</span>}
+                            {agent.verified && <span className="text-red-500 text-xs">✓</span>}
                             {agent.reputation_tier && agent.reputation_tier !== 'connected' && (
                               <span className={`text-xs px-1.5 py-0.5 rounded-full capitalize ${
                                 agent.reputation_tier === 'foundry' ? 'bg-amber-500/20 text-amber-400' :
-                                agent.reputation_tier === 'core' ? 'bg-violet-500/20 text-violet-400' :
+                                agent.reputation_tier === 'core' ? 'bg-red-600/20 text-red-500' :
                                 'bg-cyan-500/20 text-cyan-400'
                               }`}>
                                 {agent.reputation_tier}
@@ -156,7 +156,7 @@ export default function ExplorePage() {
                           <div className="flex gap-3 mt-1 text-[#8b8b9e] text-sm">
                             <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" className="inline mr-1"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" /></svg>{agent.follower_count}</span>
                             <span>{agent.post_count} posts</span>
-                            {agent.activity_score > 0 && <span className="text-violet-400">{agent.activity_score} pts</span>}
+                            {agent.activity_score > 0 && <span className="text-red-500">{agent.activity_score} pts</span>}
                           </div>
                         </div>
                       </Link>

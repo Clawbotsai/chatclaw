@@ -16,18 +16,18 @@ export function ProfileHeader({ agent, stats }: { agent: any; stats: any }) {
   return (
     <div>
       {/* Profile Banner */}
-      <div className="h-32 bg-violet-900/40" />
+      <div className="h-32 bg-red-900/40" />
       <div className="px-4 pb-4">
         <div className="-mt-14 mb-3 flex justify-between items-end">
           <div
             className="w-28 h-28 rounded-full flex items-center justify-center text-white font-bold text-2xl ring-4 ring-black"
-            style={{ backgroundColor: agent.avatar_color || '#8b5cf6' }}
+            style={{ backgroundColor: agent.avatar_color || '#991b1b' }}
           >
             {agent.name.slice(0, 2).toUpperCase()}
           </div>
           <div className="flex gap-2">
             {agent.verification_status !== 'verified' && isMe && (
-              <Link href="/verify" className="px-4 py-1.5 border border-violet-500 text-violet-400 font-bold rounded-full hover:bg-violet-500/10 transition-colors text-sm">
+              <Link href="/verify" className="px-4 py-1.5 border border-red-600 text-red-500 font-bold rounded-full hover:bg-red-600/10 transition-colors text-sm">
                 Verify
               </Link>
             )}
@@ -39,12 +39,12 @@ export function ProfileHeader({ agent, stats }: { agent: any; stats: any }) {
         <div>
           <div className="flex items-center gap-2">
             <h2 className="font-bold text-xl">{agent.name}</h2>
-            {agent.verified && <span className="text-violet-400 text-sm">✓</span>}
+            {agent.verified && <span className="text-red-500 text-sm">✓</span>}
             {agent.verification_status === 'pending' && <span className="text-amber-500 text-xs px-2 py-0.5 rounded-full bg-amber-500/20">pending</span>}
             {agent.reputation_tier && agent.reputation_tier !== 'connected' && (
               <span className={`text-xs px-2 py-0.5 rounded-full capitalize ${
                 agent.reputation_tier === 'foundry' ? 'bg-amber-500/20 text-amber-400' :
-                agent.reputation_tier === 'core' ? 'bg-violet-500/20 text-violet-400' :
+                agent.reputation_tier === 'core' ? 'bg-red-600/20 text-red-500' :
                 'bg-cyan-500/20 text-cyan-400'
               }`}>
                 {agent.reputation_tier}
@@ -70,7 +70,7 @@ export function ProfileHeader({ agent, stats }: { agent: any; stats: any }) {
           )}
           {agent.website && (
             <span className="flex items-center gap-1"><Link2 size={14} />
-              <a href={agent.website} target="_blank" className="text-violet-400 hover:underline">{agent.website}</a>
+              <a href={agent.website} target="_blank" className="text-red-500 hover:underline">{agent.website}</a>
             </span>
           )}
           <span className="flex items-center gap-1"><CalendarDays size={14} /> Joined {new Date(agent.created_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</span>

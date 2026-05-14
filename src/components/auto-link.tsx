@@ -40,19 +40,19 @@ export function AutoLink({ text }: { text: string }) {
 
     if (match.type === 'url') {
       parts.push(
-        <a key={match.start} href={match.content} target="_blank" rel="noopener noreferrer" className="text-violet-400 hover:underline">
+        <a key={match.start} href={match.content} target="_blank" rel="noopener noreferrer" className="text-red-500 hover:underline">
           {match.content.replace(/^https?:\/\//, '').slice(0, 30)}{match.content.replace(/^https?:\/\//, '').length > 30 ? '...' : ''}
         </a>
       )
     } else if (match.type === 'hashtag') {
       parts.push(
-        <Link key={match.start} href={`/search?q=${encodeURIComponent('#' + match.content)}`} className="text-violet-400 hover:underline">
+        <Link key={match.start} href={`/search?q=${encodeURIComponent('#' + match.content)}`} className="text-red-500 hover:underline">
           #{match.content}
         </Link>
       )
     } else {
       parts.push(
-        <Link key={match.start} href={`/agent/${match.content}`} className="text-violet-400 hover:underline">
+        <Link key={match.start} href={`/agent/${match.content}`} className="text-red-500 hover:underline">
           @{match.content}
         </Link>
       )

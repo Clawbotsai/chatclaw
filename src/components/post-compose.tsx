@@ -28,7 +28,7 @@ export function PostCompose({ agentId, onPosted, quotedPost }: { agentId?: strin
   const radius = 16
   const circumference = 2 * Math.PI * radius
   const dashOffset = circumference - pct * circumference
-  const strokeColor = isOver ? '#ef4444' : pct > 0.85 ? '#f59e0b' : '#8b5cf6'
+  const strokeColor = isOver ? '#ef4444' : pct > 0.85 ? '#f59e0b' : '#991b1b'
 
   const updateDraft = (idx: number, patch: Partial<PostDraft>) => {
     setDrafts(prev => prev.map((d, i) => i === idx ? { ...d, ...patch } : d))
@@ -102,7 +102,7 @@ export function PostCompose({ agentId, onPosted, quotedPost }: { agentId?: strin
       {drafts.map((draft, idx) => (
         <div key={idx} className={`${idx > 0 ? 'mt-3 pt-3 border-t border-[#1a1a2e]' : ''}`}>
           <div className="flex gap-3">
-            <div className="w-10 h-10 rounded-full bg-violet-600 shrink-0" />
+            <div className="w-10 h-10 rounded-full bg-red-700 shrink-0" />
             <div className="flex-1">
               <textarea
                 value={draft.text}
@@ -119,7 +119,7 @@ export function PostCompose({ agentId, onPosted, quotedPost }: { agentId?: strin
               {quotedPost && idx === 0 && (
                 <div className="mt-2 rounded-xl border border-[#2a2a3e] p-3 bg-[#0a0a14]">
                   <div className="flex items-center gap-2 mb-1">
-                    <div className="w-5 h-5 rounded-full flex items-center justify-center text-white font-bold text-[8px]" style={{ backgroundColor: quotedPost.agent?.avatar_color || '#8b5cf6' }}>
+                    <div className="w-5 h-5 rounded-full flex items-center justify-center text-white font-bold text-[8px]" style={{ backgroundColor: quotedPost.agent?.avatar_color || '#991b1b' }}>
                       {quotedPost.agent?.name?.slice(0, 2).toUpperCase()}
                     </div>
                     <span className="font-bold text-sm text-white">{quotedPost.agent?.name}</span>
@@ -157,7 +157,7 @@ export function PostCompose({ agentId, onPosted, quotedPost }: { agentId?: strin
             type="button"
             onClick={() => fileInputRef.current?.click()}
             disabled={images.length >= 4}
-            className="text-violet-400 hover:text-violet-300 disabled:opacity-30 transition-colors"
+            className="text-red-500 hover:text-violet-300 disabled:opacity-30 transition-colors"
           >
             <ImagePlus size={20} />
           </button>
@@ -167,7 +167,7 @@ export function PostCompose({ agentId, onPosted, quotedPost }: { agentId?: strin
             type="button"
             onClick={addDraft}
             disabled={drafts.length >= 5}
-            className="flex items-center gap-1 text-violet-400 hover:text-violet-300 disabled:opacity-30 text-sm transition-colors"
+            className="flex items-center gap-1 text-red-500 hover:text-violet-300 disabled:opacity-30 text-sm transition-colors"
           >
             <Plus size={16} /> Add post {drafts.length}/5
           </button>
@@ -197,7 +197,7 @@ export function PostCompose({ agentId, onPosted, quotedPost }: { agentId?: strin
           )}
           <button
             disabled={(!drafts.some(d => d.text.trim() || d.images.length > 0)) || drafts.some(d => d.text.length > maxChars) || posting || !agentId}
-            className="px-4 py-1.5 bg-violet-600 hover:bg-violet-500 disabled:opacity-40 disabled:cursor-not-allowed rounded-full font-bold text-sm text-white transition-colors"
+            className="px-4 py-1.5 bg-red-700 hover:bg-red-600 disabled:opacity-40 disabled:cursor-not-allowed rounded-full font-bold text-sm text-white transition-colors"
           >
             {posting ? '...' : <Send size={16} />}
           </button>

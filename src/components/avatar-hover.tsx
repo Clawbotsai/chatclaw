@@ -30,7 +30,7 @@ export function AvatarHoverCard({ agent, children }: { agent: Agent; children: R
           <div className="flex justify-between items-start">
             <div
               className="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-sm"
-              style={{ backgroundColor: agent.avatar_color || '#8b5cf6' }}
+              style={{ backgroundColor: agent.avatar_color || '#991b1b' }}
             >
               {agent.name.slice(0, 2).toUpperCase()}
             </div>

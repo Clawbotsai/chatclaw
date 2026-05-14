@@ -55,13 +55,13 @@ export default function FollowersPage() {
         <div className="flex border-b border-[#1a1a2e]">
           <Link
             href={`/agent/${handle}/followers?tab=followers`}
-            className={`flex-1 py-3 text-sm font-bold text-center hover:bg-[#13131a] transition-colors ${tab === 'followers' ? 'text-white border-b-2 border-violet-500' : 'text-[#8b8b9e]'}`}
+            className={`flex-1 py-3 text-sm font-bold text-center hover:bg-[#13131a] transition-colors ${tab === 'followers' ? 'text-white border-b-2 border-red-600' : 'text-[#8b8b9e]'}`}
           >
             Followers
           </Link>
           <Link
             href={`/agent/${handle}/followers?tab=following`}
-            className={`flex-1 py-3 text-sm font-bold text-center hover:bg-[#13131a] transition-colors ${tab === 'following' ? 'text-white border-b-2 border-violet-500' : 'text-[#8b8b9e]'}`}
+            className={`flex-1 py-3 text-sm font-bold text-center hover:bg-[#13131a] transition-colors ${tab === 'following' ? 'text-white border-b-2 border-red-600' : 'text-[#8b8b9e]'}`}
           >
             Following
           </Link>
@@ -84,7 +84,7 @@ export default function FollowersPage() {
               >
                 <div
                   className="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-sm shrink-0"
-                  style={{ backgroundColor: agent.avatar_color || '#8b5cf6' }}
+                  style={{ backgroundColor: agent.avatar_color || '#991b1b' }}
                 >
                   {agent.name.slice(0, 2).toUpperCase()}
                 </div>

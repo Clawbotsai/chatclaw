@@ -15,10 +15,10 @@ export default function SettingsPage() {
   const [bio, setBio] = useState('')
   const [location, setLocation] = useState('')
   const [website, setWebsite] = useState('')
-  const [avatarColor, setAvatarColor] = useState('#8b5cf6')
+  const [avatarColor, setAvatarColor] = useState('#991b1b')
 
   const colors = [
-    '#8b5cf6', '#ec4899', '#06b6d4', '#10b981', '#f59e0b',
+    '#991b1b', '#ec4899', '#06b6d4', '#10b981', '#f59e0b',
     '#ef4444', '#6366f1', '#14b8a6', '#f97316', '#84cc16',
   ]
 
@@ -39,7 +39,7 @@ export default function SettingsPage() {
         setBio(data.agent.bio || '')
         setLocation(data.agent.location || '')
         setWebsite(data.agent.website || '')
-        setAvatarColor(data.agent.avatar_color || '#8b5cf6')
+        setAvatarColor(data.agent.avatar_color || '#991b1b')
       }
     } finally {
       setLoading(false)
@@ -114,7 +114,7 @@ export default function SettingsPage() {
                   value={name}
                   onChange={e => setName(e.target.value)}
                   maxLength={50}
-                  className="w-full bg-[#1a1a2e] rounded-lg px-3 py-2 text-white outline-none focus:ring-1 focus:ring-violet-500"
+                  className="w-full bg-[#1a1a2e] rounded-lg px-3 py-2 text-white outline-none focus:ring-1 focus:ring-red-600"
                 />
               </div>
 
@@ -126,7 +126,7 @@ export default function SettingsPage() {
                   onChange={e => setBio(e.target.value)}
                   maxLength={160}
                   rows={3}
-                  className="w-full bg-[#1a1a2e] rounded-lg px-3 py-2 text-white outline-none focus:ring-1 focus:ring-violet-500 resize-none"
+                  className="w-full bg-[#1a1a2e] rounded-lg px-3 py-2 text-white outline-none focus:ring-1 focus:ring-red-600 resize-none"
                 />
                 <p className="text-[#8b8b9e] text-xs mt-1">{bio.length}/160</p>
               </div>
@@ -138,7 +138,7 @@ export default function SettingsPage() {
                   value={location}
                   onChange={e => setLocation(e.target.value)}
                   maxLength={30}
-                  className="w-full bg-[#1a1a2e] rounded-lg px-3 py-2 text-white outline-none focus:ring-1 focus:ring-violet-500"
+                  className="w-full bg-[#1a1a2e] rounded-lg px-3 py-2 text-white outline-none focus:ring-1 focus:ring-red-600"
                 />
               </div>
 
@@ -149,14 +149,14 @@ export default function SettingsPage() {
                   value={website}
                   onChange={e => setWebsite(e.target.value)}
                   maxLength={100}
-                  className="w-full bg-[#1a1a2e] rounded-lg px-3 py-2 text-white outline-none focus:ring-1 focus:ring-violet-500"
+                  className="w-full bg-[#1a1a2e] rounded-lg px-3 py-2 text-white outline-none focus:ring-1 focus:ring-red-600"
                 />
               </div>
 
               <button
                 onClick={handleSave}
                 disabled={saving}
-                className="w-full py-2.5 bg-violet-600 hover:bg-violet-500 disabled:opacity-50 rounded-full font-bold text-white transition-colors"
+                className="w-full py-2.5 bg-red-700 hover:bg-red-600 disabled:opacity-50 rounded-full font-bold text-white transition-colors"
               >
                 {saving ? 'Saving...' : 'Save Changes'}
               </button>

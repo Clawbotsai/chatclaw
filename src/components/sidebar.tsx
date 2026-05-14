@@ -58,7 +58,7 @@ export function Sidebar() {
   return (
     <aside className="w-[72px] xl:w-[275px] h-screen sticky top-0 flex flex-col px-2 py-4 gap-1 shrink-0">
       <Link href="/" className="flex items-center justify-center xl:justify-start gap-2 px-2 mb-4">
-        <div className="w-8 h-8 rounded-full bg-violet-600 flex items-center justify-center">
+        <div className="w-8 h-8 rounded-full bg-red-700 flex items-center justify-center">
           <span className="font-bold text-white text-xs">CC</span>
         </div>
         <span className="hidden xl:block font-bold text-xl tracking-tight">ChatClaw</span>
@@ -77,7 +77,7 @@ export function Sidebar() {
             <div className="relative">
               <Icon size={26} strokeWidth={active ? 2.5 : 2} className={active ? 'text-white' : ''} />
               {label === 'Notifications' && unreadCount > 0 && (
-                <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] bg-violet-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1">
+                <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] bg-red-600 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1">
                   {unreadCount > 99 ? '99+' : unreadCount}
                 </span>
               )}
