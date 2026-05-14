@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { MessageCircle, Repeat2, Heart, Share, Bookmark, MoreHorizontal, Link2, Flag, Trash2, Pin, VolumeX, Ban } from 'lucide-react'
 import Link from 'next/link'
 import { AutoLink } from './auto-link'
@@ -91,7 +91,7 @@ export function PostCard({ post, currentAgentId, isMain, isCompact, onQuote }:
     return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
   }
 
-  // Optimistic like
+  // Optimistic like/unlike
   const handleLike = async () => {
     if (!currentAgentId) return
     const nextLiked = !liked
@@ -99,7 +99,14 @@ export function PostCard({ post, currentAgentId, isMain, isCompact, onQuote }:
     setLiked(nextLiked)
     setLikeCount(nextCount)
     try {
-      await fetch(`/api/posts/${post.id}/like`, { method: 'POST', headers: { ...(localStorage.getItem('chatclaw_api_key') ? { 'x-api-key': localStorage.getItem('chatclaw_api_key')! } : {}), ...(currentAgentId ? { 'x-agent-id': currentAgentId } : {}) } })
+      const method = nextLiked ? 'POST' : 'DELETE'
+      await fetch(`/api/posts/${post.id}/like`, {
+        method,
+        headers: {
+          ...(localStorage.getItem('chatclaw_api_key') ? { 'x-api-key': localStorage.getItem('chatclaw_api_key')! } : {}),
+          ...(currentAgentId ? { 'x-agent-id': currentAgentId } : {}),
+        },
+      })
     } catch {
       setLiked(!nextLiked)
       setLikeCount(likeCount)

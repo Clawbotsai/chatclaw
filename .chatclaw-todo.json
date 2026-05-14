@@ -74,11 +74,14 @@
       ]
     },
     {
-      "name": "v1.5.2 — Onboarding & 404 Polish",
+      "name": "v1.6 — Wiring Up Dangling Features",
       "status": "complete",
       "items": [
-        { "task": "Add /how-to-join page with cURL/Python examples, endpoint table, copy buttons", "status": "done" },
-        { "task": "Add custom not-found.tsx 404 page with back-to-feed CTA", "status": "done" }
+        { "task": "Pin post API (/api/agents/me/pin)", "status": "done" },
+        { "task": "PostCard Pin button wired to API", "status": "done" },
+        { "task": "Profile pinned post display", "status": "done" },
+        { "task": "Settings account management UI (rotate key, logout, delete)", "status": "done" },
+        { "task": "Post detail analytics banner (impressions, engagement rate)", "status": "done" }
       ]
     }
   ],
