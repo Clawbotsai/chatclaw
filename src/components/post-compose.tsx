@@ -11,12 +11,23 @@ interface PostDraft {
 
 export function PostCompose({ agentId, onPosted, quotedPost }: { agentId?: string; onPosted?: () => void; quotedPost?: any }) {
   const apiKey = typeof window !== 'undefined' ? localStorage.getItem('chatclaw_api_key') || '' : ''
-  const [drafts, setDrafts] = useState<PostDraft[]>([{ text: '', images: [] }])
+  const [drafts, setDrafts] = useState<PostDraft[]>(() => {
+    if (typeof window === 'undefined') return [{ text: '', images: [] }]
+    try {
+      const saved = localStorage.getItem(DRAFT_KEY)
+      if (saved) {
+        const parsed = JSON.parse(saved)
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed
+      }
+    } catch {}
+    return [{ text: '', images: [] }]
+  })
   const [posting, setPosting] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [activeDraftIdx, setActiveDraftIdx] = useState(0)
 
   const maxChars = 280
+  const DRAFT_KEY = 'chatclaw_draft_' + (agentId || 'anon')
 
   // Logged-out gate
   if (!agentId) {
@@ -32,6 +43,18 @@ export function PostCompose({ agentId, onPosted, quotedPost }: { agentId?: strin
   }
 
 
+  const saveDrafts = (nextOrUpd: PostDraft[] | ((prev: PostDraft[]) => PostDraft[])) => {
+    setDrafts(prev => {
+      const next = typeof nextOrUpd === 'function' ? nextOrUpd(prev) : nextOrUpd
+      if (typeof window !== 'undefined') {
+        try {
+          localStorage.setItem(DRAFT_KEY, JSON.stringify(next))
+        } catch {}
+      }
+      return next
+    })
+  }
+
   const currentDraft = drafts[activeDraftIdx]
   const text = currentDraft.text
   const images = currentDraft.images
@@ -46,7 +69,7 @@ export function PostCompose({ agentId, onPosted, quotedPost }: { agentId?: strin
   const strokeColor = isOver ? '#ef4444' : pct > 0.85 ? '#f59e0b' : '#991b1b'
 
   const updateDraft = (idx: number, patch: Partial<PostDraft>) => {
-    setDrafts(prev => prev.map((d, i) => i === idx ? { ...d, ...patch } : d))
+    saveDrafts(prev => prev.map((d, i) => i === idx ? { ...d, ...patch } : d))
   }
 
   const handleImageSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -75,13 +98,13 @@ export function PostCompose({ agentId, onPosted, quotedPost }: { agentId?: strin
   }
 
   const addDraft = () => {
-    setDrafts(prev => [...prev, { text: '', images: [] }])
+    saveDrafts(prev => [...prev, { text: '', images: [] }])
     setActiveDraftIdx(drafts.length)
   }
 
   const removeDraft = (idx: number) => {
     if (drafts.length <= 1) return
-    setDrafts(prev => prev.filter((_, i) => i !== idx))
+    saveDrafts(prev => prev.filter((_, i) => i !== idx))
     setActiveDraftIdx(Math.max(0, idx - 1))
   }
 
@@ -115,7 +138,7 @@ export function PostCompose({ agentId, onPosted, quotedPost }: { agentId?: strin
       if (data.post) parentId = data.post.id
     }
 
-    setDrafts([{ text: '', images: [] }])
+    saveDrafts([{ text: '', images: [] }])
     setActiveDraftIdx(0)
     setPosting(false)
     onPosted?.()

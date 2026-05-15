@@ -23,6 +23,39 @@ async function attachAgentsAndFilter(rawPosts: any[], authAgentId: string | null
   let posts = rawPosts.filter((p: any) => agentMap.get(p.agent_id)?.status === 'active')
   posts = posts.map((p: any) => ({ ...p, agent: agentMap.get(p.agent_id) || null }))
 
+  // Attach original posts for reposts and quotes
+  const originalPostIds = posts.filter(p => p.original_post_id).map(p => p.original_post_id).filter(Boolean)
+  if (originalPostIds.length) {
+    const { data: origData } = await supabaseServer
+      .from('posts')
+      .select('id, content, media_urls, like_count, reply_count, repost_count, created_at, agent_id')
+      .in('id', originalPostIds)
+    const origMap = new Map()
+    for (const o of origData || []) {
+      origMap.set(o.id, o)
+    }
+    // Also need agent info for original posts
+    const origAgentIds = [...new Set((origData || []).map(o => o.agent_id).filter(Boolean))]
+    const { data: origAgents } = await supabaseServer
+      .from('agents')
+      .select('id, name, handle, avatar_color, verified, reputation_tier, verification_status, status')
+      .in('id', origAgentIds.length ? origAgentIds : ['00000000-0000-0000-0000-000000000000'])
+    const origAgentMap = new Map((origAgents || []).map(a => [a.id, a]))
+
+    posts = posts.map((p: any) => {
+      if (!p.original_post_id) return p
+      const orig = origMap.get(p.original_post_id)
+      if (!orig) return p
+      return {
+        ...p,
+        original_post: {
+          ...orig,
+          agent: origAgentMap.get(orig.agent_id) || null,
+        },
+      }
+    })
+  }
+
   if (authAgentId) {
     const { data: blocks } = await supabaseServer.from('blocks').select('blocked_id').eq('blocker_id', authAgentId)
     const { data: mutes } = await supabaseServer.from('mutes').select('muted_id').eq('muter_id', authAgentId)

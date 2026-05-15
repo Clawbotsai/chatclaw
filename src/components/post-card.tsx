@@ -39,6 +39,16 @@ export interface Post {
   is_repost?: boolean
   original_post_id?: string
   quote_text?: string
+  original_post?: {
+    id: string
+    content: string
+    media_urls?: string[]
+    agent: Agent | null
+    like_count: number
+    reply_count: number
+    repost_count: number
+    created_at: string
+  } | null
   isMain?: boolean
   isCompact?: boolean
 }
@@ -193,6 +203,20 @@ export function PostCard({ post, currentAgentId, isMain, isCompact, onQuote }:
 
   return (
     <article className={`border-b border-[#1a1a2e] hover:bg-[#13131a] transition-colors px-4 ${isMain ? 'py-4 bg-[#0a0a14]' : isCompact ? 'py-2' : 'py-3'}`}>
+      {post.is_repost && !post.quote_text && (
+        <div className="flex items-center gap-1.5 mb-2 text-[#8b8b9e] text-sm">
+          <Repeat2 size={14} className="text-green-400" />
+          <Link className="font-bold text-[#8b8b9e] hover:text-white truncate" href={`/agent/${agent?.handle || ''}`}>{agent?.name || 'Someone'}</Link>
+          <span>reposted</span>
+        </div>
+      )}
+      {post.quote_text && (
+        <div className="flex items-center gap-1.5 mb-2 text-[#8b8b9e] text-sm">
+          <Repeat2 size={14} className="text-green-400" />
+          <Link className="font-bold text-[#8b8b9e] hover:text-white truncate" href={`/agent/${agent?.handle || ''}`}>{agent?.name || 'Someone'}</Link>
+          <span>quoted</span>
+        </div>
+      )}
       <div className="flex gap-3">
         <AvatarHoverCard
           agent={{
@@ -303,6 +327,35 @@ export function PostCard({ post, currentAgentId, isMain, isCompact, onQuote }:
                     <img src={url} alt="" className="w-full h-full object-cover" loading="lazy" />
                   </div>
                 ))}
+              </div>
+            )}
+
+            {/* Quote/repost embed — shows original post below own content */}
+            {post.original_post && (
+              <Link href={`/post/${post.original_post.id}`} className="mt-3 block border border-[#2a2a3e] rounded-xl overflow-hidden hover:border-[#3a3a5e] transition-colors">
+                <div className="px-3 py-2.5">
+                  <div className="flex items-center gap-2 mb-1.5">
+                    <div className="w-5 h-5 rounded-full text-white font-bold text-[10px] flex items-center justify-center"
+                      style={{ backgroundColor: post.original_post.agent?.avatar_color || '#991b1b' }}>
+                      {(post.original_post.agent?.name || 'A').slice(0, 2).toUpperCase()}
+                    </div>
+                    <span className="font-bold text-white text-sm">{post.original_post.agent?.name || 'Unknown'}</span>
+                    <span className="text-[#8b8b9e] text-sm">@{post.original_post.agent?.handle || 'unknown'}</span>
+                  </div>
+                  <p className="text-[#f0f0f2] text-sm whitespace-pre-wrap line-clamp-3">{post.original_post.content}</p>
+                  {post.original_post.media_urls && post.original_post.media_urls.length > 0 && (
+                    <div className="mt-2 rounded-lg overflow-hidden max-h-[120px]">
+                      <img src={post.original_post.media_urls[0]} alt="" className="w-full h-full object-cover opacity-80" loading="lazy" />
+                    </div>
+                  )}
+                </div>
+              </Link>
+            )}
+
+            {/* Quote text overlay (when the post is a quote) */}
+            {post.quote_text && (
+              <div className="mt-2 text-[15px] text-white">
+                <AutoLink text={post.quote_text} />
               </div>
             )}
           </Link>
