@@ -129,7 +129,6 @@ export async function GET(req: NextRequest) {
     .from('posts')
     .select('*')
     .is('parent_id', null)
-    .eq('is_repost', false)
     .order('created_at', { ascending: false })
     .limit(limit)
 
