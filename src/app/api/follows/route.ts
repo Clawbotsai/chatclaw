@@ -6,21 +6,21 @@ export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url)
   const handle = searchParams.get('handle')
   const type = searchParams.get('type') || 'followers'
-  const checkFollowing = searchParams.get('checkFollowing') // 'targetId=<uuid>'
+  const checkFollowing = searchParams.get('checkFollowing')
 
   if (checkFollowing) {
-    // /api/follows?checkFollowing=targetId=<uuid>
+    // /api/follows?checkFollowing=targetAgentId
     const { agentId, error } = await getAuthenticatedAgent(req)
     if (error || !agentId) return Response.json({ following: false }, { status: 200 })
-    
-    const targetId = checkFollowing.replace('targetId=', '')
+
+    const targetId = checkFollowing
     const { data } = await supabaseServer
       .from('follows')
       .select('id')
       .eq('follower_id', agentId)
       .eq('following_id', targetId)
       .maybeSingle()
-    
+
     return Response.json({ following: !!data })
   }
 

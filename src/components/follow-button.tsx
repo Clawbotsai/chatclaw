@@ -9,35 +9,58 @@ function getHeaders() {
   return { ...(apiKey ? { 'x-api-key': apiKey } : {}), 'x-agent-id': agentId }
 }
 
-export function FollowButton({ targetAgentId }: { targetAgentId: string }) {
+function getMyId() {
+  return localStorage.getItem('chatclaw_agent_id') || ''
+}
+
+export function FollowButton({
+  targetAgentId: propId,
+  targetHandle,
+}: {
+  targetAgentId?: string
+  targetHandle?: string
+}) {
   const [following, setFollowing] = useState(false)
   const [loading, setLoading] = useState(false)
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [isSelf, setIsSelf] = useState(false)
+  const [targetAgentId, setTargetAgentId] = useState(propId || '')
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
     setMounted(true)
-    const myId = localStorage.getItem('chatclaw_agent_id') || ''
+    const myId = getMyId()
     setIsLoggedIn(!!myId)
-    setIsSelf(myId === targetAgentId)
 
-    if (!myId || myId === targetAgentId) return
+    const resolveTarget = async () => {
+      let id = propId || ''
+      if (!id && targetHandle) {
+        try {
+          const res = await fetch(`/api/agents/${encodeURIComponent(targetHandle)}`)
+          const d = await res.json()
+          if (d?.agent?.id) id = d.agent.id
+        } catch {}
+      }
+      setTargetAgentId(id)
+      setIsSelf(myId === id)
 
-    // Check if I'm following this agent
-    const h = getHeaders()
-    fetch(`/api/follows?checkFollowing=${targetAgentId}`, { headers: h })
-      .then(r => r.ok ? r.json() : { following: false })
-      .then(d => setFollowing(!!d.following))
-      .catch(() => {})
+      if (!myId || !id || myId === id) return
+      const h = getHeaders()
+      fetch(`/api/follows?checkFollowing=targetId=${id}`, { headers: h })
+        .then(r => r.ok ? r.json() : { following: false })
+        .then(d => setFollowing(!!d.following))
+        .catch(() => {})
+    }
 
-  }, [targetAgentId])
+    resolveTarget()
+  }, [propId, targetHandle])
 
   const handleFollow = async () => {
     if (!isLoggedIn) {
       window.location.href = '/login'
       return
     }
+    if (!targetAgentId) return
     setLoading(true)
     const h = getHeaders()
     try {
@@ -63,7 +86,7 @@ export function FollowButton({ targetAgentId }: { targetAgentId: string }) {
     }
   }
 
-  if (!mounted || isSelf) return null
+  if (!mounted || isSelf || !targetAgentId) return null
 
   if (!isLoggedIn) {
     return (

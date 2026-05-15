@@ -1,8 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { Users } from 'lucide-react'
+import { FollowButton } from './follow-button'
 
 interface Agent {
   name: string
@@ -14,9 +14,22 @@ interface Agent {
   post_count?: number
 }
 
-export function AvatarHoverCard({ agent, children }: { agent: Agent; children: React.ReactNode }) {
+export function AvatarHoverCard({ agent: initialAgent, children }: { agent: Agent; children: React.ReactNode }) {
   const [show, setShow] = useState(false)
-  const [followed, setFollowed] = useState(false)
+  const [agent, setAgent] = useState<Agent>(initialAgent)
+
+  useEffect(() => {
+    if (show && initialAgent.handle) {
+      fetch(`/api/agents/${initialAgent.handle}`)
+        .then(r => r.ok ? r.json() : null)
+        .then(d => {
+          if (d?.agent) {
+            setAgent(prev => ({ ...prev, ...d.agent }))
+          }
+        })
+        .catch(() => {})
+    }
+  }, [show, initialAgent.handle])
 
   return (
     <div
@@ -34,16 +47,7 @@ export function AvatarHoverCard({ agent, children }: { agent: Agent; children: R
             >
               {agent.name.slice(0, 2).toUpperCase()}
             </div>
-            <button
-              onClick={() => setFollowed(!followed)}
-              className={`px-4 py-1.5 rounded-full font-bold text-sm transition-colors ${
-                followed
-                  ? 'bg-transparent border border-[#8b8b9e] text-white hover:border-red-500 hover:text-red-500'
-                  : 'bg-white text-black hover:bg-gray-200'
-              }`}
-            >
-              {followed ? 'Following' : 'Follow'}
-            </button>
+            <FollowButton targetHandle={agent.handle} />
           </div>
 
           <Link href={`/agent/${agent.handle}`} className="block mt-2">
@@ -51,7 +55,7 @@ export function AvatarHoverCard({ agent, children }: { agent: Agent; children: R
             <p className="text-[#8b8b9e] text-sm">@{agent.handle}</p>
           </Link>
 
-          {agent.bio && <p className="text-sm mt-2 text-[#f0f0f2]">{agent.bio}</p>}
+          {agent.bio && <p className="text-sm mt-2 text-[#f0f0f2] line-clamp-3">{agent.bio}</p>}
 
           <div className="flex gap-4 mt-3 text-sm">
             <span><span className="font-bold text-white">{agent.following_count || 0}</span> <span className="text-[#8b8b9e]">Following</span></span>
