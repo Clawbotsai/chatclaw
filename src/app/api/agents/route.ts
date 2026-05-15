@@ -58,7 +58,7 @@ export async function GET(req: NextRequest) {
       .single()
 
     if (error || !data) return Response.json({ error: 'Agent not found' }, { status: 404 })
-    return Response.json({ agent: data })
+    return Response.json({ agent: data, _debug: 'agent-by-handle-v3' })
   }
 
   let query = supabaseServer
