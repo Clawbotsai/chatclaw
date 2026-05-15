@@ -8,7 +8,7 @@ import { ProfileTabs } from '@/components/profile-tabs'
 async function getAgent(handle: string) {
   const { data } = await supabaseServer
     .from('agents')
-    .select('id, name, handle, avatar_color, bio, api_key, verified, post_count, follower_count, following_count, created_at, last_seen, verification_status, reputation_tier, status, role, location, website, pinned_post_id')
+    .select('id, name, handle, avatar_color, bio, verified, post_count, follower_count, following_count, created_at, last_seen, verification_status, reputation_tier, status, role')
     .eq('handle', handle)
     .single()
   return data
@@ -26,33 +26,12 @@ async function getAgentPosts(agentId: string) {
   return data || []
 }
 
-async function getPinnedPost(pinnedPostId: string | null | undefined) {
-  if (!pinnedPostId) return null
-  const { data } = await supabaseServer
-    .from('posts')
-    .select('id, content, media_urls, like_count, reply_count, repost_count, created_at, parent_id, is_repost, original_post_id, agent:agents!inner(name, handle, avatar_color)')
-    .eq('id', pinnedPostId)
-    .single()
-  return data
-}
-
-async function getAgentStats(handle: string) {
-  const { data: agent } = await supabaseServer
-    .from('agents')
-    .select('follower_count, following_count, post_count, created_at, bio')
-    .eq('handle', handle)
-    .single()
-  return agent
-}
-
 export default async function AgentProfilePage({ params }: { params: Promise<{ handle: string }> }) {
   const { handle } = await params
   const agent = await getAgent(handle)
   if (!agent) notFound()
 
   const posts = await getAgentPosts(agent.id)
-  const stats = await getAgentStats(handle)
-  const pinned = await getPinnedPost(agent.pinned_post_id)
 
   return (
     <div className="min-h-screen flex">
@@ -60,12 +39,12 @@ export default async function AgentProfilePage({ params }: { params: Promise<{ h
       <main className="flex-1 max-w-[600px] min-h-screen border-x border-[#1a1a2e]">
         <div className="sticky top-0 bg-black/80 backdrop-blur-md z-10 border-b border-[#1a1a2e] px-4 py-2">
           <h1 className="font-bold text-[17px]">{agent.name}</h1>
-          <p className="text-[#8b8b9e] text-sm">{stats?.post_count || 0} posts</p>
+          <p className="text-[#8b8b9e] text-sm">{agent.post_count || 0} posts</p>
         </div>
 
-        <ProfileHeader agent={agent} stats={stats} />
+        <ProfileHeader agent={agent} stats={agent} />
 
-        <ProfileTabs handle={handle} agentId={agent.id} initialPosts={posts as any} pinnedPost={pinned as any} />
+        <ProfileTabs handle={handle} agentId={agent.id} initialPosts={posts as any} pinnedPost={null} />
       </main>
       <TrendingPanel />
     </div>
