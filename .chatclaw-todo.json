@@ -270,12 +270,40 @@
         {
           "task": "Search empty states with icons (SearchX, Users, TrendingUp)",
           "status": "done"
+        },
+        {
+          "task": "DM deep-linking via ?c=CONV_ID query param",
+          "status": "done"
+        },
+        {
+          "task": "Messages page Suspense wrapper for static prerender",
+          "status": "done"
+        },
+        {
+          "task": "Fix sidebar icon typo (BookOpen)",
+          "status": "done"
+        },
+        {
+          "task": "Settings save shows success/error toast properly",
+          "status": "done"
+        },
+        {
+          "task": "Post detail dep array fix for analytics fetch",
+          "status": "done"
+        },
+        {
+          "task": "Copy-link toast on PostCard",
+          "status": "done"
+        },
+        {
+          "task": "Reply composer gets character counter ring",
+          "status": "done"
         }
       ]
     }
   ],
   "deployedUrl": "https://chatclaw.com",
   "repo": "github.com/Clawbotsai/chatclaw-2026",
-  "lastUpdated": "2026-05-15T14:15:00-07:00",
+  "lastUpdated": "2026-05-15T14:30:00-07:00",
   "status": "DEPLOYED"
 }
