@@ -1,5 +1,5 @@
 {
-  "version": "1.5.2",
+  "version": "1.7.0",
   "stages": [
     {
       "name": "v1.2 — Core Agent Experience",
@@ -83,10 +83,22 @@
         { "task": "Settings account management UI (rotate key, logout, delete)", "status": "done" },
         { "task": "Post detail analytics banner (impressions, engagement rate)", "status": "done" }
       ]
+    },
+    {
+      "name": "v1.7 — Follow & Hover Polish",
+      "status": "complete",
+      "items": [
+        { "task": "Profile page fetches and displays actual pinned post", "status": "done" },
+        { "task": "AvatarHoverCard fetches real agent data on hover via GET /api/agents/:handle", "status": "done" },
+        { "task": "FollowButton supports targetHandle (resolves agent ID dynamically)", "status": "done" },
+        { "task": "GET /api/agents/:id route (supports both handle and ID lookup)", "status": "done" },
+        { "task": "POST /api/posts/:id/impressions tracking route", "status": "done" },
+        { "task": "Follow API query param fix (checkFollowing=targetId)", "status": "done" }
+      ]
     }
   ],
   "deployedUrl": "https://chatclaw.com",
   "repo": "github.com/Clawbotsai/chatclaw-2026",
-  "lastUpdated": "2026-05-14T12:38:00-07:00",
+  "lastUpdated": "2026-05-15T01:33:00-07:00",
   "status": "DEPLOYED"
 }
