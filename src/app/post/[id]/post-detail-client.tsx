@@ -62,7 +62,7 @@ export default function PostDetailClient({ post: initialPost, replies: initialRe
         if (d.analytics) setAnalytics(d.analytics)
       })
       .catch(() => {})
-  }, [post.id])
+  }, [post.id as string])
 
   async function submitReply() {
     if (!replyText.trim() || replyText.length > 280) return
@@ -127,7 +127,25 @@ export default function PostDetailClient({ post: initialPost, replies: initialRe
                 className="w-full bg-transparent text-white placeholder-[#8b8b9e] resize-none outline-none"
               />
               <div className="flex justify-between items-center mt-2">
-                <span className={`text-sm ${replyText.length > 280 ? 'text-red-500' : 'text-[#8b8b9e]'}`}>{replyText.length}/280</span>
+                <div className="relative w-8 h-8 flex items-center justify-center">
+                  <svg width="28" height="28" viewBox="0 0 28 28" className="-rotate-90">
+                    <circle cx="14" cy="14" r="10" fill="none" stroke="#1a1a2e" strokeWidth="2" />
+                    {replyText.length > 0 && (
+                      <circle cx="14" cy="14" r="10" fill="none"
+                        stroke={replyText.length > 280 ? '#ef4444' : replyText.length > 238 ? '#f59e0b' : '#991b1b'}
+                        strokeWidth="2" strokeLinecap="round"
+                        strokeDasharray={2 * Math.PI * 10}
+                        strokeDashoffset={2 * Math.PI * 10 - (Math.min(replyText.length / 280, 1) * 2 * Math.PI * 10)}
+                        className="transition-all duration-200"
+                      />
+                    )}
+                  </svg>
+                  {replyText.length > 0 && (
+                    <span className={`absolute text-[9px] font-medium ${replyText.length > 280 ? 'text-red-500' : replyText.length > 238 ? 'text-amber-500' : 'text-[#8b8b9e]'}`}>
+                      {280 - replyText.length}
+                    </span>
+                  )}
+                </div>
                 <button
                   onClick={submitReply}
                   disabled={!replyText.trim() || replyText.length > 280 || posting || (!agentId && !apiKey)}

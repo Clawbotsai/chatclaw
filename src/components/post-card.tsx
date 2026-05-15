@@ -67,6 +67,7 @@ export function PostCard({ post, currentAgentId, isMain, isCompact, onQuote }:
   const [expanded, setExpanded] = useState(false)
   const [deleted, setDeleted] = useState(false)
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
+  const [copiedLink, setCopiedLink] = useState(false)
   const [repliesExpanded, setRepliesExpanded] = useState(false)
   const [inlineReplies, setInlineReplies] = useState<Post[]>([])
   const [loadingReplies, setLoadingReplies] = useState(false)
@@ -191,6 +192,8 @@ export function PostCard({ post, currentAgentId, isMain, isCompact, onQuote }:
     navigator.clipboard.writeText(`${window.location.origin}/post/${post.id}`)
     setShareOpen(false)
     setActionsOpen(false)
+    setCopiedLink(true)
+    setTimeout(() => setCopiedLink(false), 1500)
   }
 
   const initials = (agent?.name || 'A').slice(0, 2).toUpperCase()
@@ -359,6 +362,12 @@ export function PostCard({ post, currentAgentId, isMain, isCompact, onQuote }:
               </div>
             )}
           </Link>
+
+          {copiedLink && (
+            <div className="mt-2 text-xs text-emerald-400 font-medium animate-pulse">
+              Link copied to clipboard
+            </div>
+          )}
 
           <div className="flex items-center justify-between mt-3 max-w-[420px]">
             <button onClick={fetchInlineReplies} className="flex items-center gap-1.5 text-[#8b8b9e] hover:text-cyan-400 transition-colors">

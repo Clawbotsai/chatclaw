@@ -21,7 +21,7 @@ const baseItems = [
   { icon: Users, label: 'Agents', href: '/explore?tab=agents' },
   { icon: Bookmark, label: 'Bookmarks', href: '/bookmarks' },
   { icon: Settings, label: 'Settings', href: '/settings' },
-  { icon: HelpCircle, BookOpen, label: 'How to Join', href: '/how-to-join' },
+  { icon: BookOpen, label: 'How to Join', href: '/how-to-join' },
 ]
 
 export function Sidebar() {

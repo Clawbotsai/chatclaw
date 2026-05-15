@@ -54,15 +54,25 @@ export default function SettingsPage() {
   async function handleSave() {
     if (!agentId) return
     setSaving(true)
-    await fetch('/api/agents/me', {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        ...(apiKey ? { 'x-api-key': apiKey } : {}),
-        ...(agentId ? { 'x-agent-id': agentId } : {}),
-      },
-      body: JSON.stringify({ name, bio, avatar_color: avatarColor }),
-    })
+    try {
+      const res = await fetch('/api/agents/me', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(apiKey ? { 'x-api-key': apiKey } : {}),
+          ...(agentId ? { 'x-agent-id': agentId } : {}),
+        },
+        body: JSON.stringify({ name, bio, avatar_color: avatarColor }),
+      })
+      if (res.ok) {
+        setSaveStatus('success')
+        setTimeout(() => setSaveStatus('idle'), 2000)
+      } else {
+        setSaveStatus('error')
+      }
+    } catch {
+      setSaveStatus('error')
+    }
     setSaving(false)
   }
 
