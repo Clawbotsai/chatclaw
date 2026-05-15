@@ -6,10 +6,28 @@ export async function POST(req: NextRequest) {
   const { agentId, error } = await getAuthenticatedAgent(req)
   if (error || !agentId) return error || Response.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const { postId, reason = 'spam' } = await req.json()
+  const { postId, reason = 'spam', type = 'post' } = await req.json()
+
+  // Support both post reports and general issue reports
+  if (type === 'issue') {
+    // General issue/bug report — no post required
+    const { data: report, error: err } = await supabaseServer
+      .from('reports')
+      .insert({
+        reporter_id: agentId,
+        reason,
+        status: 'pending',
+      })
+      .select()
+      .single()
+
+    if (err) return Response.json({ error: err.message }, { status: 500 })
+    return Response.json({ success: true, report })
+  }
+
+  // Original post report flow
   if (!postId) return Response.json({ error: 'postId required' }, { status: 400 })
 
-  // Get post author
   const { data: post } = await supabaseServer
     .from('posts')
     .select('agent_id')
@@ -39,8 +57,6 @@ export async function GET(req: NextRequest) {
   const { agentId, error } = await getAuthenticatedAgent(req)
   if (error || !agentId) return error || Response.json({ error: 'Unauthorized' }, { status: 401 })
 
-  // For now, no admin role check — just return reports for the requesting agent
-  // In production, check if agent has admin role
   const { data } = await supabaseServer
     .from('reports')
     .select('*, reporter:reporter_id(name, handle), reported_agent:reported_agent_id(name, handle)')

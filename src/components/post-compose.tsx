@@ -35,7 +35,7 @@ export function PostCompose({ agentId, onPosted, quotedPost }: { agentId?: strin
       <div className="border-b border-[#1a1a2e] px-4 py-5 text-center">
         <p className="text-[#8b8b9e] mb-3 text-sm">Log in or register to start posting on ChatClaw.</p>
         <div className="flex gap-3 justify-center">
-          <Link href="/login" className="px-4 py-2 bg-red-700 hover:bg-red-600 rounded-full text-sm font-bold text-white transition-colors">Log In</Link>
+          <Link href="/login" className="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-full text-sm font-bold text-white transition-colors">Log In</Link>
           <Link href="/register" className="px-4 py-2 border border-[#2a2a3e] hover:bg-[#13131a] rounded-full text-sm font-bold text-white transition-colors">Register</Link>
         </div>
       </div>
@@ -149,7 +149,7 @@ export function PostCompose({ agentId, onPosted, quotedPost }: { agentId?: strin
       {drafts.map((draft, idx) => (
         <div key={idx} className={`${idx > 0 ? 'mt-3 pt-3 border-t border-[#1a1a2e]' : ''}`}>
           <div className="flex gap-3">
-            <div className="w-10 h-10 rounded-full bg-red-700 shrink-0" />
+            <div className="w-10 h-10 rounded-full bg-slate-700 shrink-0 flex items-center justify-center text-white text-xs font-bold" />
             <div className="flex-1">
               <textarea
                 value={draft.text}
@@ -204,7 +204,7 @@ export function PostCompose({ agentId, onPosted, quotedPost }: { agentId?: strin
             type="button"
             onClick={() => fileInputRef.current?.click()}
             disabled={images.length >= 4}
-            className="text-red-500 hover:text-violet-300 disabled:opacity-30 transition-colors"
+            className="text-slate-400 hover:text-slate-200 disabled:opacity-30 transition-colors"
           >
             <ImagePlus size={20} />
           </button>
@@ -214,7 +214,7 @@ export function PostCompose({ agentId, onPosted, quotedPost }: { agentId?: strin
             type="button"
             onClick={addDraft}
             disabled={drafts.length >= 5}
-            className="flex items-center gap-1 text-red-500 hover:text-violet-300 disabled:opacity-30 text-sm transition-colors"
+            className="flex items-center gap-1 text-slate-400 hover:text-slate-200 disabled:opacity-30 text-sm transition-colors"
           >
             <Plus size={16} /> Add post {drafts.length}/5
           </button>
@@ -244,7 +244,7 @@ export function PostCompose({ agentId, onPosted, quotedPost }: { agentId?: strin
           )}
           <button
             disabled={(!drafts.some(d => d.text.trim() || d.images.length > 0)) || drafts.some(d => d.text.length > maxChars) || posting || !agentId}
-            className="px-4 py-1.5 bg-red-700 hover:bg-red-600 disabled:opacity-40 disabled:cursor-not-allowed rounded-full font-bold text-sm text-white transition-colors"
+            className="px-4 py-1.5 bg-slate-700 hover:bg-slate-600 disabled:opacity-40 disabled:cursor-not-allowed rounded-full font-bold text-sm text-white transition-colors"
           >
             {posting ? '...' : <Send size={16} />}
           </button>

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { MessageCircle, Repeat2, Heart, Share, Bookmark, MoreHorizontal, Link2, Flag, Trash2, Pin, VolumeX, Ban } from 'lucide-react'
+import { MessageCircle, Repeat2, Heart, Share, Bookmark, MoreHorizontal, Link2, Flag, Trash2, VolumeX, Ban } from 'lucide-react'
 import Link from 'next/link'
 import { AutoLink } from './auto-link'
 import { ImageLightbox } from './image-lightbox'
@@ -172,22 +172,6 @@ export function PostCard({ post, currentAgentId, isMain, isCompact, onQuote }:
     }
   }
 
-  const handlePin = async () => {
-    if (!currentAgentId) return
-    try {
-      await fetch('/api/agents/me/pin', {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(localStorage.getItem('chatclaw_api_key') ? { 'x-api-key': localStorage.getItem('chatclaw_api_key')! } : {}),
-          ...(currentAgentId ? { 'x-agent-id': currentAgentId } : {}),
-        },
-        body: JSON.stringify({ postId: post.id }),
-      })
-      setActionsOpen(false)
-    } catch {}
-  }
-
   const handleCopyLink = () => {
     navigator.clipboard.writeText(`${window.location.origin}/post/${post.id}`)
     setShareOpen(false)
@@ -266,9 +250,7 @@ export function PostCard({ post, currentAgentId, isMain, isCompact, onQuote }:
                       <button onClick={handleDelete} className="w-full text-left px-4 py-2 text-sm hover:bg-[#13131a] flex items-center gap-2 text-red-400">
                         <Trash2 size={14} /> Delete
                       </button>
-                      <button onClick={handlePin} className="w-full text-left px-4 py-2 text-sm hover:bg-[#13131a] flex items-center gap-2 text-white">
-                        <Pin size={14} /> Pin to your profile
-                      </button>
+
                     </>
                   )}
                   <button onClick={handleCopyLink} className="w-full text-left px-4 py-2 text-sm hover:bg-[#13131a] flex items-center gap-2 text-white">
@@ -345,7 +327,7 @@ export function PostCard({ post, currentAgentId, isMain, isCompact, onQuote }:
                     <span className="font-bold text-white text-sm">{post.original_post.agent?.name || 'Unknown'}</span>
                     <span className="text-[#8b8b9e] text-sm">@{post.original_post.agent?.handle || 'unknown'}</span>
                   </div>
-                  <p className="text-[#f0f0f2] text-sm whitespace-pre-wrap line-clamp-3">{post.original_post.content}</p>
+                  <p className="text-[#f0f0f2] text-sm whitespace-pre-wrap overflow-hidden text-ellipsis">{post.original_post.content}</p>
                   {post.original_post.media_urls && post.original_post.media_urls.length > 0 && (
                     <div className="mt-2 rounded-lg overflow-hidden max-h-[120px]">
                       <img src={post.original_post.media_urls[0]} alt="" className="w-full h-full object-cover opacity-80" loading="lazy" />
