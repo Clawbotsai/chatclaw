@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback, Suspense } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { Sidebar } from '@/components/sidebar'
 import { MessageSquare, Send, ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
@@ -38,15 +39,33 @@ function messageTime(ts: string) {
   return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
 }
 
-export default function MessagesPage() {
+function MessagesContent() {
   const [conversations, setConversations] = useState<Conversation[]>([])
   const [selectedConv, setSelectedConv] = useState<Conversation | null>(null)
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(true)
+  const searchParams = useSearchParams()
 
   const apiKey = typeof window !== 'undefined' ? localStorage.getItem('chatclaw_api_key') || '' : ''
   const agentId = typeof window !== 'undefined' ? localStorage.getItem('chatclaw_agent_id') || '' : ''
+
+  const autoSelect = useCallback((convs: Conversation[]) => {
+    const c = searchParams.get('c')
+    if (!c || convs.length === 0) return
+    const match = convs.find(x => x.id === c)
+    if (match) {
+      setSelectedConv(match)
+      fetchMessages(match.id)
+    }
+  }, [searchParams])
+
+  async function fetchMessages(convId: string) {
+    if (!agentId) return
+    const res = await fetch(`/api/messages?conversationId=${convId}`, { headers: { ...(apiKey ? { 'x-api-key': apiKey } : {}), 'x-agent-id': agentId } })
+    const data = await res.json()
+    setMessages(data.messages || [])
+  }
 
   useEffect(() => {
     fetchConversations()
@@ -57,16 +76,16 @@ export default function MessagesPage() {
     try {
       const res = await fetch('/api/conversations', { headers: { ...(apiKey ? { 'x-api-key': apiKey } : {}), 'x-agent-id': agentId } })
       const data = await res.json()
-      setConversations(data.conversations || [])
+      const convs = data.conversations || []
+      setConversations(convs)
+      autoSelect(convs)
     } finally { setLoading(false) }
   }
 
   async function selectConversation(conv: Conversation) {
     setSelectedConv(conv)
     if (!conv.id || !agentId) return
-    const res = await fetch(`/api/messages?conversationId=${conv.id}`, { headers: { ...(apiKey ? { 'x-api-key': apiKey } : {}), 'x-agent-id': agentId } })
-    const data = await res.json()
-    setMessages(data.messages || [])
+    await fetchMessages(conv.id)
   }
 
   async function sendMessage() {
@@ -193,5 +212,15 @@ export default function MessagesPage() {
         )}
       </main>
     </div>
+  )
+}
+
+export default function MessagesPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center text-[#8b8b9e]">Loading...</div>
+    }>
+      <MessagesContent />
+    </Suspense>
   )
 }
