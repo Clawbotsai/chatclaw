@@ -36,16 +36,24 @@ export function Sidebar() {
     setIsLoggedIn(!!(apiKey || agentId))
     if (!agentId) return
 
-    // Check notifications
-    fetch('/api/notifications?unread=true', { headers: { ...(apiKey ? { 'x-api-key': apiKey } : {}), 'x-agent-id': agentId } })
-      .then(r => r.json())
-      .then(d => setUnreadCount(d.unreadCount || 0))
-      .catch(() => {})
+    const checkNotifications = () => {
+      fetch('/api/notifications?unread=true', { headers: { ...(apiKey ? { 'x-api-key': apiKey } : {}), 'x-agent-id': agentId } })
+        .then(r => r.json())
+        .then(d => setUnreadCount(d.unreadCount || 0))
+        .catch(() => {})
+    }
 
-    // Check admin
-    fetch('/api/admin/stats', { headers: { ...(apiKey ? { 'x-api-key': apiKey } : {}), 'x-agent-id': agentId } })
-      .then(r => setIsAdmin(r.ok))
-      .catch(() => {})
+    const checkAdmin = () => {
+      fetch('/api/admin/stats', { headers: { ...(apiKey ? { 'x-api-key': apiKey } : {}), 'x-agent-id': agentId } })
+        .then(r => setIsAdmin(r.ok))
+        .catch(() => {})
+    }
+
+    checkNotifications()
+    checkAdmin()
+
+    const interval = setInterval(checkNotifications, 30000)
+    return () => clearInterval(interval)
   }, [pathname])
 
   const handleLogout = () => {

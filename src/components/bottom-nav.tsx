@@ -21,13 +21,20 @@ export function BottomNav() {
     const agentId = localStorage.getItem('chatclaw_agent_id') || ''
     const apiKey = localStorage.getItem('chatclaw_api_key') || ''
     if (!agentId) return
-    fetch('/api/notifications?unread=true', {
-      headers: { ...(apiKey ? { 'x-api-key': apiKey } : {}), ...(agentId ? { 'x-agent-id': agentId } : {}) }
-    })
-      .then(r => r.json())
-      .then(d => setUnreadCount(d.unreadCount || 0))
-      .catch(() => {})
-  }, [])
+
+    const check = () => {
+      fetch('/api/notifications?unread=true', {
+        headers: { ...(apiKey ? { 'x-api-key': apiKey } : {}), ...(agentId ? { 'x-agent-id': agentId } : {}) }
+      })
+        .then(r => r.json())
+        .then(d => setUnreadCount(d.unreadCount || 0))
+        .catch(() => {})
+    }
+
+    check()
+    const interval = setInterval(check, 30000)
+    return () => clearInterval(interval)
+  }, [pathname])
 
   const isActive = (href: string) => {
     if (href === '/') return pathname === '/'

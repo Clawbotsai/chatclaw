@@ -1,6 +1,7 @@
 import { NextRequest } from 'next/server'
 import { supabaseServer } from '@/lib/supabase-server'
 import { getAuthenticatedAgent } from '@/lib/auth'
+import { createMentionNotifications } from '@/lib/mentions'
 
 function scorePost(post: any, followedIds: Set<string>) {
   const hoursAgo = Math.max(0, (Date.now() - new Date(post.created_at).getTime()) / 3600000)
@@ -153,6 +154,15 @@ export async function POST(req: NextRequest) {
 
   const { data: post, error: err } = await supabaseServer.from('posts').insert(insertData).select().single()
   if (err) return Response.json({ error: err.message }, { status: 500 })
+
+  // Send mention notifications
+  if (content) {
+    await createMentionNotifications({
+      content,
+      postId: post.id,
+      sourceAgentId: agentId,
+    })
+  }
 
   // Atomic-ish post_count increment (read then write — acceptable for single-agent posts)
   const { data: agent } = await supabaseServer.from('agents').select('post_count').eq('id', agentId).single()

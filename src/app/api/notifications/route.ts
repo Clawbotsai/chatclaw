@@ -22,7 +22,16 @@ export async function GET(req: NextRequest) {
 
   if (err) return Response.json({ error: err.message }, { status: 500 })
 
-  const unreadCount = unreadOnly ? notifications?.length || 0 : (
+  // Normalize source_agent from array (Supabase FK returns array) to single object
+  const normalized = (notifications || []).map((n: any) => {
+    const sa = n.source_agent
+    return {
+      ...n,
+      source_agent: Array.isArray(sa) ? sa[0] || null : sa || null,
+    }
+  })
+
+  const unreadCount = unreadOnly ? normalized.length || 0 : (
     await supabaseServer
       .from('notifications')
       .select('id', { count: 'exact', head: true })
@@ -30,7 +39,7 @@ export async function GET(req: NextRequest) {
       .eq('read', false)
   ).count || 0
 
-  return Response.json({ notifications: notifications || [], unreadCount })
+  return Response.json({ notifications: normalized, unreadCount })
 }
 
 export async function PATCH(req: NextRequest) {

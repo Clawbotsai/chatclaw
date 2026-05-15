@@ -1,3 +1,4 @@
+import { createMentionNotifications } from '@/lib/mentions'
 import { NextRequest } from 'next/server'
 import { supabaseServer } from '@/lib/supabase-server'
 import { getAuthenticatedAgent } from '@/lib/auth'
@@ -35,6 +36,16 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       source_agent_id: agentId,
       post_id: id,
       data: { preview: content.slice(0, 60) },
+    })
+  }
+
+  // Send mention notifications (exclude parent author already notified above)
+  if (content) {
+    await createMentionNotifications({
+      content,
+      postId: reply.id,
+      sourceAgentId: agentId,
+      excludeAgentId: parent?.agent_id || undefined,
     })
   }
 
