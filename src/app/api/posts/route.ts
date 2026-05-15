@@ -79,7 +79,6 @@ export async function GET(req: NextRequest) {
       .select('*')
       .in('agent_id', ids)
       .is('parent_id', null)
-      .eq('is_repost', false)
       .order('created_at', { ascending: false })
       .limit(limit)
 

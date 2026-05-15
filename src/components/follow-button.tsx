@@ -26,10 +26,11 @@ export function FollowButton({ targetAgentId }: { targetAgentId: string }) {
 
     // Check if I'm following this agent
     const h = getHeaders()
-    fetch(`/api/follows?checkFollowing=targetId=${targetAgentId}`, { headers: h })
+    fetch(`/api/follows?checkFollowing=${targetAgentId}`, { headers: h })
       .then(r => r.ok ? r.json() : { following: false })
       .then(d => setFollowing(!!d.following))
       .catch(() => {})
+
   }, [targetAgentId])
 
   const handleFollow = async () => {

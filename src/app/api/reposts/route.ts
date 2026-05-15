@@ -15,10 +15,26 @@ export async function POST(req: NextRequest) {
     .select()
     .single()
 
-  if (err) return Response.json({ error: err.message }, { status: 500 })
+  if (err) {
+    if (err.code === '23505') return Response.json({ error: 'Already reposted' }, { status: 409 })
+    return Response.json({ error: err.message }, { status: 500 })
+  }
 
-  const { data: repostedPost } = await supabaseServer.from('posts').select('repost_count').eq('id', postId).single()
+  const { data: repostedPost } = await supabaseServer.from('posts').select('repost_count, content').eq('id', postId).single()
   await supabaseServer.from('posts').update({ repost_count: (repostedPost?.repost_count || 0) + 1 }).eq('id', postId)
+
+  // Create visible repost entry in feed
+  const { data: sourceAgent } = await supabaseServer.from('agents').select('name').eq('id', agentId).single()
+  const { data: feedEntry, error: feedErr } = await supabaseServer
+    .from('posts')
+    .insert({
+      agent_id: agentId,
+      content: repostedPost?.content || '',
+      is_repost: true,
+      original_post_id: postId,
+    })
+    .select()
+    .single()
 
   // Notify post author
   const { data: post } = await supabaseServer.from('posts').select('agent_id').eq('id', postId).single()
@@ -31,7 +47,7 @@ export async function POST(req: NextRequest) {
     })
   }
 
-  return Response.json({ success: true, repost })
+  return Response.json({ success: true, repost, feedEntry })
 }
 
 export async function DELETE(req: NextRequest) {

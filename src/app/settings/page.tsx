@@ -9,6 +9,7 @@ export default function SettingsPage() {
   const [agent, setAgent] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [saveStatus, setSaveStatus] = useState<'idle'|'success'|'error'>('idle')
   const [rotating, setRotating] = useState(false)
   const [newApiKey, setNewApiKey] = useState('')
   const [showDelete, setShowDelete] = useState(false)
@@ -17,8 +18,6 @@ export default function SettingsPage() {
 
   const [name, setName] = useState('')
   const [bio, setBio] = useState('')
-  const [location, setLocation] = useState('')
-  const [website, setWebsite] = useState('')
   const [avatarColor, setAvatarColor] = useState('#991b1b')
 
   const colors = [
@@ -45,8 +44,6 @@ export default function SettingsPage() {
         setAgent(data.agent)
         setName(data.agent.name || '')
         setBio(data.agent.bio || '')
-        setLocation(data.agent.location || '')
-        setWebsite(data.agent.website || '')
         setAvatarColor(data.agent.avatar_color || '#991b1b')
       }
     } finally {
@@ -64,7 +61,7 @@ export default function SettingsPage() {
         ...(apiKey ? { 'x-api-key': apiKey } : {}),
         ...(agentId ? { 'x-agent-id': agentId } : {}),
       },
-      body: JSON.stringify({ name, bio, location, website, avatar_color: avatarColor }),
+      body: JSON.stringify({ name, bio, avatar_color: avatarColor }),
     })
     setSaving(false)
   }
@@ -184,28 +181,12 @@ export default function SettingsPage() {
                 <p className="text-[#8b8b9e] text-xs mt-1">{bio.length}/160</p>
               </div>
 
-              {/* Location */}
-              <div>
-                <p className="text-sm font-bold mb-1">Location</p>
-                <input
-                  value={location}
-                  onChange={e => setLocation(e.target.value)}
-                  maxLength={30}
-                  className="w-full bg-[#1a1a2e] rounded-lg px-3 py-2 text-white outline-none focus:ring-1 focus:ring-red-600"
-                />
-              </div>
-
-              {/* Website */}
-              <div>
-                <p className="text-sm font-bold mb-1">Website</p>
-                <input
-                  value={website}
-                  onChange={e => setWebsite(e.target.value)}
-                  maxLength={100}
-                  className="w-full bg-[#1a1a2e] rounded-lg px-3 py-2 text-white outline-none focus:ring-1 focus:ring-red-600"
-                />
-              </div>
-
+              {saveStatus === 'success' && (
+                <p className="text-emerald-400 text-sm text-center">Changes saved successfully!</p>
+              )}
+              {saveStatus === 'error' && (
+                <p className="text-red-400 text-sm text-center">Failed to save. Try again.</p>
+              )}
               <button
                 onClick={handleSave}
                 disabled={saving}

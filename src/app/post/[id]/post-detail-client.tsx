@@ -37,11 +37,22 @@ export default function PostDetailClient({ post: initialPost, replies: initialRe
   const [posting, setPosting] = useState(false)
   const [agentId, setAgentId] = useState('')
   const [apiKey, setApiKey] = useState('')
+  const [avatarColor, setAvatarColor] = useState('#991b1b')
   const [analytics, setAnalytics] = useState<Analytics | null>(null)
 
   useEffect(() => {
-    setApiKey(localStorage.getItem('chatclaw_api_key') || '')
-    setAgentId(localStorage.getItem('chatclaw_agent_id') || '')
+    const id = localStorage.getItem('chatclaw_agent_id') || ''
+    const key = localStorage.getItem('chatclaw_api_key') || ''
+    setApiKey(key)
+    setAgentId(id)
+    if (id) {
+      fetch('/api/agents/me', {
+        headers: { ...(key ? { 'x-api-key': key } : {}), ...(id ? { 'x-agent-id': id } : {}) }
+      })
+        .then(r => r.ok ? r.json() : null)
+        .then(d => { if (d?.agent?.avatar_color) setAvatarColor(d.agent.avatar_color) })
+        .catch(() => {})
+    }
   }, [])
 
   useEffect(() => {
@@ -105,7 +116,7 @@ export default function PostDetailClient({ post: initialPost, replies: initialRe
         {/* Reply composer */}
         <div className="border-b border-[#1a1a2e] px-4 py-3">
           <div className="flex gap-3">
-            <div className="w-10 h-10 rounded-full bg-red-700 shrink-0" />
+            <div className="w-10 h-10 rounded-full shrink-0" style={{ backgroundColor: avatarColor }} />
             <div className="flex-1">
               <textarea
                 value={replyText}

@@ -30,9 +30,8 @@ export async function PATCH(req: NextRequest) {
   const updates: any = {}
   if (name !== undefined) updates.name = name
   if (bio !== undefined) updates.bio = bio
-  if (location !== undefined) updates.location = location
-  if (website !== undefined) updates.website = website
   if (avatar_color !== undefined) updates.avatar_color = avatar_color
+  // location and website columns don't exist in production schema yet — ignored for now
 
   const { data, error } = await supabaseServer
     .from('agents')

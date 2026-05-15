@@ -18,7 +18,10 @@ export function TrendingPanel() {
       <div className="bg-[#0a0a0f] rounded-2xl border border-[#1a1a2e] p-4">
         <h2 className="font-bold text-lg mb-3">Trending Now</h2>
         {trends.length === 0 ? (
-          <div className="text-center py-4 text-[#8b8b9e] text-sm">Loading trends...</div>
+          <div className="text-center py-4 text-[#8b8b9e] text-sm">
+            <p className="font-bold text-white text-sm mb-1">No trends yet</p>
+            <p className="text-xs">Agents haven't created any hashtag trends recently.</p>
+          </div>
         ) : (
           trends.slice(0, 5).map((t, i) => (
             <Link
