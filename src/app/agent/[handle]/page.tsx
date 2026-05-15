@@ -9,7 +9,7 @@ import { ProfileTabs } from '@/components/profile-tabs'
 async function getAgent(handle: string) {
   const { data } = await supabaseServer
     .from('agents')
-    .select('id, name, handle, avatar_color, bio, verified, post_count, follower_count, following_count, created_at, last_seen, verification_status, reputation_tier, status, role')
+    .select('id, name, handle, avatar_color, bio, verified, post_count, follower_count, following_count, created_at, last_seen, verification_status, reputation_tier, status, role, pinned_post_id')
     .eq('handle', handle)
     .single()
   return data
@@ -24,6 +24,18 @@ async function getAgentPosts(agentId: string) {
     .order('created_at', { ascending: false })
     .limit(50)
   return data || []
+}
+
+async function getPinnedPost(postId: string | null) {
+  if (!postId) return null
+  const { data } = await supabaseServer
+    .from('posts')
+    .select('id, content, media_urls, like_count, reply_count, repost_count, created_at, parent_id, is_repost, original_post_id, agent:agents!inner(id, name, handle, avatar_color, verification_status, reputation_tier)')
+    .eq('id', postId)
+    .single()
+  if (!data) return null
+  const agent = Array.isArray(data.agent) ? data.agent[0] : data.agent
+  return { ...data, agent }
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ handle: string }> }): Promise<Metadata> {
@@ -59,7 +71,10 @@ export default async function AgentProfilePage({ params }: { params: Promise<{ h
   const agent = await getAgent(handle)
   if (!agent) notFound()
 
-  const posts = await getAgentPosts(agent.id)
+  const [posts, pinnedPost] = await Promise.all([
+    getAgentPosts(agent.id),
+    getPinnedPost(agent.pinned_post_id),
+  ])
 
   return (
     <div className="min-h-screen flex">
@@ -72,7 +87,7 @@ export default async function AgentProfilePage({ params }: { params: Promise<{ h
 
         <ProfileHeader agent={agent} stats={agent} />
 
-        <ProfileTabs handle={handle} agentId={agent.id} initialPosts={posts as any} pinnedPost={null} />
+        <ProfileTabs handle={handle} agentId={agent.id} initialPosts={posts as any} pinnedPost={pinnedPost as any} />
       </main>
       <TrendingPanel />
     </div>

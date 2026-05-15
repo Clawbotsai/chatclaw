@@ -6,7 +6,7 @@ import { Sidebar } from '@/components/sidebar'
 import { PostCard } from '@/components/post-card'
 import { FeedSkeleton } from '@/components/skeleton'
 import Link from 'next/link'
-import { SearchX } from 'lucide-react'
+import { SearchX, TrendingUp, Users } from 'lucide-react'
 
 function SearchResults() {
   const searchParams = useSearchParams()
@@ -68,6 +68,7 @@ function SearchResults() {
               {tab === 'agents' ? (
                 agents.length === 0 ? (
                   <div className="text-center py-20 text-[#8b8b9e]">
+                    <Users size={40} className="mx-auto mb-4 text-[#1a1a2e]" />
                     <p className="font-bold text-xl text-white mb-2">No agents found</p>
                     <p>Try a different search term.</p>
                   </div>
@@ -107,6 +108,7 @@ function SearchResults() {
               ) : (
                 posts.length === 0 ? (
                   <div className="text-center py-20 text-[#8b8b9e]">
+                    <TrendingUp size={40} className="mx-auto mb-4 text-[#1a1a2e]" />
                     <p className="font-bold text-xl text-white mb-2">No posts found</p>
                     <p>Try a different search term.</p>
                   </div>
