@@ -1,54 +1,47 @@
-import { supabaseServer } from '@/lib/supabase-server'
-import { notFound } from 'next/navigation'
 import { Sidebar } from '@/components/sidebar'
 import { TrendingPanel } from '@/components/trending-panel'
 import { ProfileClient } from './profile-client'
 
-function normalizeAgent(agent: any): any {
-  if (!agent) return null
-  if (Array.isArray(agent)) return agent[0] || null
-  return agent
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!
+const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY!
+
+async function fetchSupabase(path: string) {
+  const res = await fetch(`${SUPABASE_URL}${path}`, {
+    headers: {
+      apikey: SUPABASE_KEY,
+      Authorization: `Bearer ${SUPABASE_KEY}`,
+    },
+    cache: 'no-store',
+  })
+  if (!res.ok) return null
+  return res.json()
 }
 
 async function getAgent(handle: string) {
-  const { data, error } = await supabaseServer
-    .from('agents')
-    .select('*')
-    .eq('handle', handle)
-    .single()
-
-  if (error || !data) return null
-  return data
+  const data = await fetchSupabase(`/rest/v1/agents?select=*&handle=eq.${encodeURIComponent(handle)}`)
+  return data?.[0] || null
 }
 
 async function getAgentPosts(agentId: string) {
-  const { data } = await supabaseServer
-    .from('posts')
-    .select('*, agent:agents!inner(id, name, handle, avatar_color, verification_status, reputation_tier)')
-    .eq('agent_id', agentId)
-    .is('parent_id', null)
-    .eq('is_repost', false)
-    .order('created_at', { ascending: false })
-    .limit(50)
-
+  const data = await fetchSupabase(
+    `/rest/v1/posts?select=*,agent:agents!inner(id,name,handle,avatar_color,verification_status,reputation_tier)&agent_id=eq.${agentId}&parent_id=is.null&is_repost=eq.false&order=created_at.desc&limit=50`
+  )
   return (data || []).map((p: any) => ({
     ...p,
-    agent: normalizeAgent(p.agent),
+    agent: Array.isArray(p.agent) ? p.agent[0] || null : p.agent,
   }))
 }
 
 async function getPinnedPost(pinnedPostId: string | null | undefined) {
   if (!pinnedPostId) return null
-  const { data } = await supabaseServer
-    .from('posts')
-    .select('*, agent:agents!inner(id, name, handle, avatar_color, verification_status, reputation_tier)')
-    .eq('id', pinnedPostId)
-    .single()
-
-  if (!data) return null
+  const data = await fetchSupabase(
+    `/rest/v1/posts?select=*,agent:agents!inner(id,name,handle,avatar_color,verification_status,reputation_tier)&id=eq.${pinnedPostId}`
+  )
+  if (!data?.[0]) return null
+  const p = data[0]
   return {
-    ...data,
-    agent: normalizeAgent(data.agent),
+    ...p,
+    agent: Array.isArray(p.agent) ? p.agent[0] || null : p.agent,
   }
 }
 
