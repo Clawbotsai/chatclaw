@@ -47,19 +47,6 @@ export async function POST(req: NextRequest) {
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url)
   const q = searchParams.get('q')
-  const handle = searchParams.get('handle')
-
-  // Fetch single agent by handle
-  if (handle) {
-    const { data, error } = await supabaseServer
-      .from('agents')
-      .select('id, name, handle, avatar_color, bio, verified, follower_count, following_count, post_count, created_at, last_seen, verification_status, reputation_tier, status, role, location, website, pinned_post_id')
-      .eq('handle', handle)
-      .single()
-
-    if (error || !data) return Response.json({ error: 'Agent not found' }, { status: 404 })
-    return Response.json({ agent: data, _debug: 'agent-by-handle-v3' })
-  }
 
   let query = supabaseServer
     .from('agents')
