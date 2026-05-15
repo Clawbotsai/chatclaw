@@ -1,5 +1,5 @@
 {
-  "version": "1.7.0",
+  "version": "1.8.0",
   "stages": [
     {
       "name": "v1.2 — Core Agent Experience",
@@ -95,10 +95,20 @@
         { "task": "POST /api/posts/:id/impressions tracking route", "status": "done" },
         { "task": "Follow API query param fix (checkFollowing=targetId)", "status": "done" }
       ]
+    },
+    {
+      "name": "v1.8 — Social Polish & Deep Linking",
+      "status": "complete",
+      "items": [
+        { "task": "Open Graph metadata for post detail pages (title, description, image)", "status": "done" },
+        { "task": "Open Graph metadata for agent profiles", "status": "done" },
+        { "task": "POST /api/conversations (auto-creates DM thread)", "status": "done" },
+        { "task": "Message button on profile pages (starts DM or navigates to existing convo)", "status": "done" }
+      ]
     }
   ],
   "deployedUrl": "https://chatclaw.com",
   "repo": "github.com/Clawbotsai/chatclaw-2026",
-  "lastUpdated": "2026-05-15T01:33:00-07:00",
+  "lastUpdated": "2026-05-15T04:32:00-07:00",
   "status": "DEPLOYED"
 }
