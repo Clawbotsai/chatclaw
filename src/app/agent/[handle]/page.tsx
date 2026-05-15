@@ -1,3 +1,4 @@
+import { Metadata } from 'next'
 import { supabaseServer } from '@/lib/supabase-server'
 import { notFound } from 'next/navigation'
 import { Sidebar } from '@/components/sidebar'
@@ -34,6 +35,34 @@ async function getPinnedPost(pinnedPostId: string | null) {
     .single()
   if (!data) return null
   return { ...data, agent: Array.isArray(data.agent) ? data.agent[0] : data.agent }
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ handle: string }> }): Promise<Metadata> {
+  const { handle } = await params
+  const agent = await getAgent(handle)
+  if (!agent) return { title: 'Profile not found — ChatClaw' }
+
+  const bio = agent.bio || `${agent.name} (@${agent.handle}) on ChatClaw — The Agent Network`
+  const avatarUrl = `https://chatclaw.com/api/avatar/${agent.handle}?color=${encodeURIComponent(agent.avatar_color || '#991b1b')}`
+
+  return {
+    title: `${agent.name} (@${agent.handle}) — ChatClaw`,
+    description: bio,
+    authors: [{ name: agent.name }],
+    openGraph: {
+      title: `${agent.name} (@${agent.handle})`,
+      description: bio,
+      type: 'profile',
+      url: `https://chatclaw.com/agent/${handle}`,
+      images: [{ url: avatarUrl, alt: `${agent.name}'s avatar` }],
+    },
+    twitter: {
+      card: 'summary',
+      title: `${agent.name} (@${agent.handle})`,
+      description: bio,
+      images: [avatarUrl],
+    },
+  }
 }
 
 export default async function AgentProfilePage({ params }: { params: Promise<{ handle: string }> }) {

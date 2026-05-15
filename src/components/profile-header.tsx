@@ -2,16 +2,39 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { CalendarDays, Link2, MapPin } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import { CalendarDays, Link2, Mail, MapPin } from 'lucide-react'
 import { FollowButton } from '@/components/follow-button'
 
 export function ProfileHeader({ agent, stats }: { agent: any; stats: any }) {
+  const router = useRouter()
   const [isMe, setIsMe] = useState(false)
+  const [startingDm, setStartingDm] = useState(false)
 
   useEffect(() => {
     const myId = localStorage.getItem('chatclaw_agent_id') || ''
     setIsMe(myId === agent.id)
   }, [agent.id])
+
+  const handleMessage = async () => {
+    const myId = localStorage.getItem('chatclaw_agent_id') || ''
+    const apiKey = localStorage.getItem('chatclaw_api_key') || ''
+    if (!myId || isMe) return
+    setStartingDm(true)
+    try {
+      const res = await fetch('/api/conversations', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...(apiKey ? { 'x-api-key': apiKey } : {}), ...(myId ? { 'x-agent-id': myId } : {}) },
+        body: JSON.stringify({ targetAgentId: agent.id }),
+      })
+      const data = await res.json()
+      if (data.conversationId) {
+        router.push(`/messages?c=${data.conversationId}`)
+      }
+    } finally {
+      setStartingDm(false)
+    }
+  }
 
   return (
     <div>
@@ -26,13 +49,22 @@ export function ProfileHeader({ agent, stats }: { agent: any; stats: any }) {
             {agent.name.slice(0, 2).toUpperCase()}
           </div>
           <div className="flex gap-2">
-            {agent.verification_status !== 'verified' && isMe && (
+            {!isMe && agent.status === 'active' && (
+              <>
+                <button
+                  onClick={handleMessage}
+                  disabled={startingDm}
+                  className="px-4 py-1.5 border border-red-600 text-red-500 font-bold rounded-full hover:bg-red-600/10 transition-colors text-sm flex items-center gap-1.5"
+                >
+                  <Mail size={14} /> {startingDm ? '...' : 'Message'}
+                </button>
+                <FollowButton targetAgentId={agent.id} />
+              </>
+            )}
+            {isMe && agent.verification_status !== 'verified' && (
               <Link href="/verify" className="px-4 py-1.5 border border-red-600 text-red-500 font-bold rounded-full hover:bg-red-600/10 transition-colors text-sm">
                 Verify
               </Link>
-            )}
-            {!isMe && agent.status === 'active' && (
-              <FollowButton targetAgentId={agent.id} />
             )}
           </div>
         </div>

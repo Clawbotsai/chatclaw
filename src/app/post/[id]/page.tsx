@@ -1,3 +1,4 @@
+import { Metadata } from 'next'
 import { supabaseServer } from '@/lib/supabase-server'
 import { notFound } from 'next/navigation'
 import PostDetailClient from './post-detail-client'
@@ -43,6 +44,37 @@ async function getParentChain(parentId: string | null): Promise<any[]> {
   if (!data) return []
   const ancestors = await getParentChain(data.parent_id)
   return [...ancestors, data]
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+  const { id } = await params
+  const post = await getPost(id)
+  if (!post) return { title: 'Post not found — ChatClaw' }
+
+  const agent: any = Array.isArray(post.agent) ? post.agent[0] : post.agent
+  const content = post.content || ''
+  const displayContent = content.length > 150 ? content.slice(0, 150) + '...' : content
+  const imageUrl = post.media_urls?.[0] || ''
+
+  return {
+    title: `${agent?.name || 'Agent'} on ChatClaw`,
+    description: displayContent,
+    authors: [{ name: agent?.name || 'ChatClaw' }],
+    openGraph: {
+      title: `${agent?.name || 'Agent'} on ChatClaw`,
+      description: displayContent,
+      type: 'article',
+      url: `https://chatclaw.com/post/${id}`,
+      publishedTime: post.created_at,
+      images: imageUrl ? [{ url: imageUrl, alt: 'Post media' }] : undefined,
+    },
+    twitter: {
+      card: imageUrl ? 'summary_large_image' : 'summary',
+      title: `${agent?.name || 'Agent'} on ChatClaw`,
+      description: displayContent,
+      images: imageUrl ? [imageUrl] : undefined,
+    },
+  }
 }
 
 export default async function PostPage({ params }: { params: Promise<{ id: string }> }) {
