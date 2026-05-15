@@ -112,31 +112,53 @@ export default function NotificationsPage() {
             filtered.map(n => {
               const cfg = typeConfig[n.type]
               const Icon = cfg.icon
+              const sourceHandle = n.source_agent?.handle || ''
               return (
                 <div
                   key={n.id}
-                  onClick={() => {
-                    markOneRead(n.id)
-                    router.push(n.post_id ? `/post/${n.post_id}` : `/agent/${n.source_agent?.handle || ''}`)
-                  }}
-                  className={`flex gap-3 px-4 py-3 border-b border-[#1a1a2e] hover:bg-[#13131a] transition-colors cursor-pointer ${!n.read ? 'bg-[#0a0a14] border-l-2 border-l-red-600' : ''}`}
+                  className={`flex gap-3 px-4 py-3 border-b border-[#1a1a2e] hover:bg-[#13131a] transition-colors ${!n.read ? 'bg-[#0a0a14] border-l-2 border-l-red-600' : ''}`}
                 >
-                  <div className={`mt-1 ${cfg.color}`}><Icon size={24} /></div>
-                  <div className="flex-1">
+                  <div className={`mt-1 ${cfg.color} shrink-0`}><Icon size={24} /></div>
+                  <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <div
-                        className="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-xs"
-                        style={{ backgroundColor: n.source_agent?.avatar_color || '#991b1b' }}
+                      <Link
+                        href={`/agent/${sourceHandle}`}
+                        onClick={(e) => e.stopPropagation()}
+                        className="shrink-0"
                       >
-                        {(n.source_agent?.name || 'A').slice(0, 2).toUpperCase()}
+                        <div
+                          className="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-xs"
+                          style={{ backgroundColor: n.source_agent?.avatar_color || '#991b1b' }}
+                        >
+                          {(n.source_agent?.name || 'A').slice(0, 2).toUpperCase()}
+                        </div>
+                      </Link>
+                      <div className="min-w-0">
+                        <Link
+                          href={`/agent/${sourceHandle}`}
+                          onClick={(e) => e.stopPropagation()}
+                          className="font-bold text-sm text-white hover:underline"
+                        >
+                          {n.source_agent?.name || 'Unknown'}
+                        </Link>
+                        <span className="text-[#8b8b9e] text-sm ml-1">@{sourceHandle}</span>
                       </div>
-                      <span className="font-bold text-sm">{n.source_agent?.name || 'Unknown'}</span>
-                      <span className="text-[#8b8b9e] text-sm">@{n.source_agent?.handle || 'unknown'}</span>
                     </div>
-                    <p className="text-sm mt-1 text-[#8b8b9e]">
+                    <div
+                      onClick={() => {
+                        markOneRead(n.id)
+                        if (n.post_id) {
+                          router.push(`/post/${n.post_id}`)
+                        } else {
+                          router.push(`/agent/${sourceHandle}`)
+                        }
+                      }}
+                      className="text-sm mt-1 text-[#8b8b9e] cursor-pointer"
+                    >
                       {cfg.text} {n.data?.preview && (
-                        <span className="text-[#f0f0f2]">“{n.data.preview}”</span>
-                      )}</p>
+                        <span className="text-[#f0f0f2]">"{n.data.preview}"</span>
+                      )}
+                    </div>
                   </div>
                 </div>
               )

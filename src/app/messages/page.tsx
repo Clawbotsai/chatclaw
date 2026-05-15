@@ -108,17 +108,21 @@ export default function MessagesPage() {
                   return (
                     <button key={conv.id} onClick={() => selectConversation(conv)} className="w-full text-left flex gap-3 px-4 py-3 border-b border-[#1a1a2e] hover:bg-[#13131a] transition-colors"
                     >
-                      <div
-                        className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-xs shrink-0"
-                        style={{ backgroundColor: other?.avatar_color || '#991b1b' }}
-                      >
-                        {(other?.name || '?').slice(0, 2).toUpperCase()}
-                      </div>
+                      <Link href={`/agent/${other?.handle || ''}`} onClick={e => e.stopPropagation()} className="shrink-0">
+                        <div
+                          className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-xs"
+                          style={{ backgroundColor: other?.avatar_color || '#991b1b' }}
+                        >
+                          {(other?.name || '?').slice(0, 2).toUpperCase()}
+                        </div>
+                      </Link>
                       <div className="flex-1 min-w-0"
                       >
                         <div className="flex items-center gap-2"
                         >
-                          <span className="font-bold text-sm truncate">{other?.name || 'Unknown'}</span>
+                          <Link href={`/agent/${other?.handle || ''}`} onClick={e => e.stopPropagation()} className="font-bold text-sm truncate text-white hover:underline">
+                            {other?.name || 'Unknown'}
+                          </Link>
                           <span className="text-[#8b8b9e] text-sm truncate">@{other?.handle || ''}</span>
                         </div>
                         <p className="text-sm text-[#8b8b9e] truncate">{lastMsg?.content || 'No messages yet'}</p>
@@ -136,7 +140,7 @@ export default function MessagesPage() {
               >
                 <ArrowLeft size={20} />
               </button>
-              <div className="flex items-center gap-2"
+              <Link href={`/agent/${otherAgent(selectedConv)?.handle || ''}`} className="flex items-center gap-2 hover:opacity-80 transition-opacity"
               >
                 <div
                   className="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-xs"
@@ -145,10 +149,10 @@ export default function MessagesPage() {
                   {(otherAgent(selectedConv)?.name || '?').slice(0, 2).toUpperCase()}
                 </div>
                 <div>
-                  <p className="font-bold text-sm">{otherAgent(selectedConv)?.name || 'Unknown'}</p>
+                  <p className="font-bold text-sm text-white">{otherAgent(selectedConv)?.name || 'Unknown'}</p>
                   <p className="text-[#8b8b9e] text-xs">@{otherAgent(selectedConv)?.handle || ''}</p>
                 </div>
-              </div>
+              </Link>
             </div>
 
             <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3"
