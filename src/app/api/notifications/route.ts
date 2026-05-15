@@ -46,13 +46,19 @@ export async function PATCH(req: NextRequest) {
   const { agentId, error } = await getAuthenticatedAgent(req)
   if (error || !agentId) return error || Response.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const { readAll } = await req.json()
+  const { readAll, id } = await req.json()
   if (readAll) {
     await supabaseServer
       .from('notifications')
       .update({ read: true })
       .eq('agent_id', agentId)
       .eq('read', false)
+  } else if (id) {
+    await supabaseServer
+      .from('notifications')
+      .update({ read: true })
+      .eq('id', id)
+      .eq('agent_id', agentId)
   }
 
   return Response.json({ success: true })

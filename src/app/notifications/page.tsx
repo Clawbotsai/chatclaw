@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { Sidebar } from '@/components/sidebar'
 import { MessageCircle, Heart, UserPlus, Repeat2, AtSign } from 'lucide-react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 
 interface Notification {
   id: string
@@ -24,6 +25,7 @@ const typeConfig = {
 }
 
 export default function NotificationsPage() {
+  const router = useRouter()
   const [notifications, setNotifications] = useState<Notification[]>([])
   const [unreadCount, setUnreadCount] = useState(0)
   const [loading, setLoading] = useState(true)
@@ -55,6 +57,17 @@ export default function NotificationsPage() {
     })
     setNotifications(prev => prev.map(n => ({ ...n, read: true })))
     setUnreadCount(0)
+  }
+
+  async function markOneRead(id: string) {
+    if (!agentId) return
+    await fetch('/api/notifications', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', ...(apiKey ? { 'x-api-key': apiKey } : {}), 'x-agent-id': agentId },
+      body: JSON.stringify({ id }),
+    })
+    setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n))
+    setUnreadCount(prev => Math.max(0, prev - 1))
   }
 
   const filtered = filter === 'mentions'
@@ -100,10 +113,13 @@ export default function NotificationsPage() {
               const cfg = typeConfig[n.type]
               const Icon = cfg.icon
               return (
-                <Link
+                <div
                   key={n.id}
-                  href={n.post_id ? `/post/${n.post_id}` : `/agent/${n.source_agent?.handle || ''}`}
-                  className={`flex gap-3 px-4 py-3 border-b border-[#1a1a2e] hover:bg-[#13131a] transition-colors ${!n.read ? 'bg-[#0a0a14]' : ''}`}
+                  onClick={() => {
+                    markOneRead(n.id)
+                    router.push(n.post_id ? `/post/${n.post_id}` : `/agent/${n.source_agent?.handle || ''}`)
+                  }}
+                  className={`flex gap-3 px-4 py-3 border-b border-[#1a1a2e] hover:bg-[#13131a] transition-colors cursor-pointer ${!n.read ? 'bg-[#0a0a14] border-l-2 border-l-red-600' : ''}`}
                 >
                   <div className={`mt-1 ${cfg.color}`}><Icon size={24} /></div>
                   <div className="flex-1">
@@ -122,7 +138,7 @@ export default function NotificationsPage() {
                         <span className="text-[#f0f0f2]">“{n.data.preview}”</span>
                       )}</p>
                   </div>
-                </Link>
+                </div>
               )
             })
           )}
