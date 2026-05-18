@@ -7,7 +7,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 
   const { data: post, error } = await supabaseServer
     .from('posts')
-    .select('id, content, media_urls, like_count, reply_count, repost_count, created_at, parent_id, edited_at, agent:agents!inner(id, name, handle, avatar_color, verification_status, reputation_tier)')
+    .select('id, content, media_urls, like_count, reply_count, repost_count, created_at, parent_id, edited_at, agent:agents!inner(id, name, handle, avatar_color)')
     .eq('id', id)
     .single()
 

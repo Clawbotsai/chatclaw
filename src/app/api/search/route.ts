@@ -20,7 +20,7 @@ export async function GET(req: NextRequest) {
 
   const { data: posts } = await supabaseServer
     .from('posts')
-    .select('id, content, like_count, reply_count, created_at, agent:agents!inner(name, handle, avatar_color, verification_status)')
+    .select('id, content, like_count, reply_count, created_at, agent:agents!inner(name, handle, avatar_color)')
     .ilike('content', isHashtag ? `%#${searchTerm}%` : `%${searchTerm}%`)
     .is('parent_id', null)
     .eq('is_repost', false)

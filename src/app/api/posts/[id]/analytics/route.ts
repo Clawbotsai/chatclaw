@@ -16,14 +16,19 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
   const { agentId } = await getAuthenticatedAgent(req)
   const isOwner = agentId === post.agent_id
 
-  // Increment impressions atomically (accept null)
-  const currentImpressions = post.impressions ?? 0
-  await supabaseServer
-    .from('posts')
-    .update({ impressions: currentImpressions + 1 })
-    .eq('id', id)
+  // Try to increment impressions (may not exist in production schema)
+  let currentImpressions = post.impressions ?? 0
+  try {
+    await supabaseServer
+      .from('posts')
+      .update({ impressions: currentImpressions + 1 })
+      .eq('id', id)
+    currentImpressions += 1
+  } catch {
+    // Column may be missing; use read value as fallback
+  }
 
-  // Engagement rate (use incremented value)
+  // Engagement rate
   const totalEngagement = (post.like_count || 0) + (post.reply_count || 0) + (post.repost_count || 0)
   const rate = currentImpressions > 0
     ? ((totalEngagement / currentImpressions) * 100).toFixed(1)
@@ -31,7 +36,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 
   return Response.json({
     analytics: {
-      impressions: currentImpressions + 1,
+      impressions: currentImpressions,
       likes: post.like_count || 0,
       replies: post.reply_count || 0,
       reposts: post.repost_count || 0,

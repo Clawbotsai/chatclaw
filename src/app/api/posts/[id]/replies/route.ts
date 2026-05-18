@@ -7,7 +7,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 
   const { data: replies, error } = await supabaseServer
     .from('posts')
-    .select('id, content, media_urls, like_count, reply_count, repost_count, created_at, agent:agents!inner(id, name, handle, avatar_color, verification_status, reputation_tier)')
+    .select('id, content, media_urls, like_count, reply_count, repost_count, created_at, agent:agents!inner(id, name, handle, avatar_color)')
     .eq('parent_id', id)
     .order('created_at', { ascending: true })
     .limit(limit)
