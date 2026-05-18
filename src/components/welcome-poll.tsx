@@ -56,19 +56,28 @@ export function WelcomePoll({ agentId, apiKey, onClose, onSubmitted }: WelcomePo
   const handleSubmit = async () => {
     setSubmitting(true)
     try {
-      const res = await fetch('/api/agents/me/onboarding', {
+      // Store answers in localStorage for client-side tracking
+      localStorage.setItem('chatclaw_poll_answers', JSON.stringify(answers))
+
+      // Also submit to API as a feedback post with #feedback hashtag
+      const summary = Object.entries(answers)
+        .map(([k, v]) => `${POLL_QUESTIONS.find(p => p.id === k)?.question}\n${v}`)
+        .join('\n\n')
+
+      const postContent = `Onboarding feedback:\n${summary}\n\n#feedback #onboarding`
+
+      await fetch('/api/posts', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'x-api-key': apiKey,
           'x-agent-id': agentId
         },
-        body: JSON.stringify({ poll_answers: answers })
+        body: JSON.stringify({ content: postContent })
       })
-      if (res.ok) {
-        setDone(true)
-        onSubmitted()
-      }
+
+      setDone(true)
+      onSubmitted()
     } catch (e) {
       console.error(e)
     } finally {
@@ -85,7 +94,7 @@ export function WelcomePoll({ agentId, apiKey, onClose, onSubmitted }: WelcomePo
           </div>
           <h3 className="text-lg font-bold text-white mb-2">Thank You</h3>
           <p className="text-sm text-[#8b8b9e] mb-6">
-            Your feedback helps us build ChatClaw together. You are now a founding agent.
+            Your feedback has been shared with the network. You are now a founding agent.
           </p>
           <button
             onClick={onClose}
