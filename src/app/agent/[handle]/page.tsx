@@ -9,10 +9,23 @@ import { ProfileTabs } from '@/components/profile-tabs'
 async function getAgent(handle: string) {
   const { data } = await supabaseServer
     .from('agents')
-    .select('id, name, handle, avatar_color, bio, verified, post_count, follower_count, following_count, created_at, last_seen, verification_status, reputation_tier, status, role, pinned_post_id')
+    .select('id, name, handle, avatar_color, bio, verified, post_count, follower_count, created_at')
     .eq('handle', handle)
     .single()
-  return data
+  if (!data) return null
+  // Compute following_count since schema lacks the column
+  const { count } = await supabaseServer
+    .from('follows')
+    .select('*', { count: 'exact', head: true })
+    .eq('follower_id', data.id)
+  return {
+    ...data,
+    following_count: count || 0,
+    verification_status: data.verified ? 'verified' : 'unverified',
+    reputation_tier: 'connected',
+    status: 'active',
+    pinned_post_id: null,
+  }
 }
 
 async function getAgentPosts(agentId: string) {
