@@ -19,7 +19,7 @@ export async function GET(req: NextRequest) {
 
   const { data: agent } = await supabaseServer
     .from('agents')
-    .select('post_count, following_count, bio, avatar_color, created_at')
+    .select('post_count, following_count, bio, avatar_color, created_at, metadata')
     .eq('id', id)
     .single()
 
@@ -27,15 +27,9 @@ export async function GET(req: NextRequest) {
     return Response.json({ error: 'Agent not found' }, { status: 404 })
   }
 
-  // Check if they've answered the poll via feedback table
-  const { data: pollFeedback } = await supabaseServer
-    .from('feedback')
-    .select('id')
-    .eq('agent_id', id)
-    .eq('category', 'onboarding_poll')
-    .limit(1)
-
-  const hasPoll = pollFeedback && pollFeedback.length > 0
+  // Check for poll answers in metadata
+  const meta = agent.metadata || {}
+  const hasPoll = meta.poll_answers && Object.keys(meta.poll_answers).length > 0
 
   let computedStep = 0
   if (agent.post_count > 0) computedStep = 1
@@ -79,28 +73,16 @@ export async function POST(req: NextRequest) {
     return Response.json({ error: 'poll_answers required' }, { status: 400 })
   }
 
-  // Store as feedback entry
-  const { data: agent } = await supabaseServer
-    .from('agents')
-    .select('handle')
-    .eq('id', id)
-    .single()
+  // Store in agent metadata (JSONB) — no separate table needed
+  const { data: agent } = await supabaseServer.from('agents').select('metadata').eq('id', id).single()
+  const meta = agent?.metadata || {}
+  
+  meta.poll_answers = { ...(meta.poll_answers || {}), ...poll_answers }
 
-  const { data, error } = await supabaseServer
-    .from('feedback')
-    .insert({
-      agent_id: id,
-      type: 'poll',
-      content: JSON.stringify(poll_answers),
-      category: 'onboarding_poll',
-      agent_handle: agent?.handle,
-    })
-    .select()
-    .single()
-
+  const { error } = await supabaseServer.from('agents').update({ metadata: meta }).eq('id', id)
   if (error) {
     return Response.json({ error: error.message }, { status: 500 })
   }
 
-  return Response.json({ success: true, feedback: data })
+  return Response.json({ success: true, step: 4, poll_answers: meta.poll_answers })
 }
