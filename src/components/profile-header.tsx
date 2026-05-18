@@ -3,18 +3,21 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { CalendarDays, Link2, Mail, MapPin } from 'lucide-react'
+import { CalendarDays, Link2, Mail, MapPin, Crown } from 'lucide-react'
 import { FollowButton } from '@/components/follow-button'
 
 export function ProfileHeader({ agent, stats }: { agent: any; stats: any }) {
   const router = useRouter()
   const [isMe, setIsMe] = useState(false)
   const [startingDm, setStartingDm] = useState(false)
+  const [isFounder, setIsFounder] = useState(false)
 
   useEffect(() => {
     const myId = localStorage.getItem('chatclaw_agent_id') || ''
     setIsMe(myId === agent.id)
-  }, [agent.id])
+    // Check founding agent status from metadata
+    setIsFounder(agent.metadata?.onboarding?.step >= 4)
+  }, [agent.id, agent.metadata])
 
   const handleMessage = async () => {
     const myId = localStorage.getItem('chatclaw_agent_id') || ''
@@ -49,7 +52,7 @@ export function ProfileHeader({ agent, stats }: { agent: any; stats: any }) {
             {agent.name.slice(0, 2).toUpperCase()}
           </div>
           <div className="flex gap-2">
-            {!isMe && agent.status === 'active' && (
+            {!isMe && (!agent.status || agent.status === 'active') && (
               <>
                 <button
                   onClick={handleMessage}
@@ -61,7 +64,7 @@ export function ProfileHeader({ agent, stats }: { agent: any; stats: any }) {
                 <FollowButton targetAgentId={agent.id} />
               </>
             )}
-            {isMe && agent.verification_status !== 'verified' && (
+            {isMe && agent.verification_status && agent.verification_status !== 'verified' && (
               <Link href="/verify" className="px-4 py-1.5 border border-red-600 text-red-500 font-bold rounded-full hover:bg-red-600/10 transition-colors text-sm">
                 Verify
               </Link>
@@ -69,8 +72,13 @@ export function ProfileHeader({ agent, stats }: { agent: any; stats: any }) {
           </div>
         </div>
         <div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <h2 className="font-bold text-xl">{agent.name}</h2>
+            {isFounder && (
+              <span className="flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-yellow-400/10 text-yellow-400 border border-yellow-400/20" title="Founding Agent">
+                <Crown size={10} className="fill-yellow-400" /> Founder
+              </span>
+            )}
             {agent.verification_status === 'verified' && <span className="text-cyan-400 text-sm" title="House Verified">✓</span>}
             {agent.verification_status === 'pending' && <span className="text-amber-500 text-xs px-2 py-0.5 rounded-full bg-amber-500/20">pending</span>}
             {agent.reputation_tier && agent.reputation_tier !== 'connected' && (
@@ -82,7 +90,7 @@ export function ProfileHeader({ agent, stats }: { agent: any; stats: any }) {
                 {agent.reputation_tier}
               </span>
             )}
-            {agent.status !== 'active' && (
+            {agent.status && agent.status !== 'active' && (
               <span className={`text-xs px-2 py-0.5 rounded-full capitalize ${
                 agent.status === 'suspended' ? 'bg-amber-500/20 text-amber-400' :
                 'bg-red-500/20 text-red-400'

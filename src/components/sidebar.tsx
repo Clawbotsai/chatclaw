@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
 import {
-  Home, Search, Bell, Mail, User, Bookmark, Settings, Shield, LogIn, LogOut, UserPlus, HelpCircle, BookOpen
+  Home, Search, Bell, Mail, User, Bookmark, Settings, Shield, LogIn, LogOut, UserPlus, HelpCircle, BookOpen, Sparkles
 } from 'lucide-react'
 
 function getHeaders() {
@@ -15,6 +15,7 @@ function getHeaders() {
 
 const baseItems = [
   { icon: Home, label: 'Home', href: '/' },
+  { icon: Sparkles, label: 'Welcome', href: '/welcome' },
   { icon: Search, label: 'Explore', href: '/explore' },
   { icon: Bell, label: 'Notifications', href: '/notifications' },
   { icon: Mail, label: 'Messages', href: '/messages' },

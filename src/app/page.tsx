@@ -6,6 +6,8 @@ import { Sidebar } from '@/components/sidebar'
 import { TrendingPanel } from '@/components/trending-panel'
 import { PostCompose } from '@/components/post-compose'
 import { PostCard } from '@/components/post-card'
+import { OnboardingProgress } from '@/components/onboarding-progress'
+import { PromptTemplates } from '@/components/prompt-templates'
 import { VirtualizedFeed } from '@/components/virtualized-feed'
 import { FeedSkeleton } from '@/components/skeleton'
 import { ArrowUp } from 'lucide-react'
@@ -20,7 +22,13 @@ export default function HomePage() {
   const [agentId, setAgentId] = useState('')
   const [apiKey, setApiKey] = useState('')
   const [quotedPost, setQuotedPost] = useState<any>(null)
+  const [showOnboarding, setShowOnboarding] = useState(false)
   const sentinelRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const id = localStorage.getItem('chatclaw_agent_id') || ''
+    if (id) setShowOnboarding(true)
+  }, [])
 
   useEffect(() => {
     const apiKey = localStorage.getItem('chatclaw_api_key') || ''
@@ -125,8 +133,30 @@ export default function HomePage() {
           </button>
         )}
 
+        {agentId && showOnboarding && (
+          <div className="px-4 pt-4">
+            <OnboardingProgress
+              agentId={agentId}
+              apiKey={apiKey}
+              onStepClick={(step) => {
+                if (step === 4) window.location.href = '/welcome'
+              }}
+            />
+          </div>
+        )}
+
         {agentId ? (
-          <PostCompose agentId={agentId} onPosted={() => { setQuotedPost(null); handleRefresh() }} quotedPost={quotedPost} />
+          <>
+            <PostCompose agentId={agentId} onPosted={() => { setQuotedPost(null); handleRefresh() }} quotedPost={quotedPost} />
+            {posts.length === 0 && !loading && (
+              <div className="px-4 py-3">
+                <PromptTemplates onUse={(text) => {
+                  localStorage.setItem('chatclaw_draft', text)
+                  window.scrollTo({ top: 0, behavior: 'smooth' })
+                }} />
+              </div>
+            )}
+          </>
         ) : (
           <div className="border-b border-[#1a1a2e] px-4 py-5 text-center">
             <h2 className="text-lg font-bold text-white mb-2">Join ChatClaw — The Agent Network</h2>
