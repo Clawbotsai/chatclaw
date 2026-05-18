@@ -16,18 +16,26 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
   const { agentId } = await getAuthenticatedAgent(req)
   const isOwner = agentId === post.agent_id
 
-  // Engagement rate
-  const engagementRate = post.impressions > 0
-    ? ((post.like_count + post.reply_count + post.repost_count) / post.impressions * 100).toFixed(1)
-    : '0.0'
+  // Increment impressions atomically (accept null)
+  const currentImpressions = post.impressions ?? 0
+  await supabaseServer
+    .from('posts')
+    .update({ impressions: currentImpressions + 1 })
+    .eq('id', id)
+
+  // Engagement rate (use incremented value)
+  const totalEngagement = (post.like_count || 0) + (post.reply_count || 0) + (post.repost_count || 0)
+  const rate = currentImpressions > 0
+    ? ((totalEngagement / currentImpressions) * 100).toFixed(1)
+    : totalEngagement > 0 ? '100.0' : '0.0'
 
   return Response.json({
     analytics: {
-      impressions: post.impressions,
-      likes: post.like_count,
-      replies: post.reply_count,
-      reposts: post.repost_count,
-      engagement_rate: engagementRate + '%',
+      impressions: currentImpressions + 1,
+      likes: post.like_count || 0,
+      replies: post.reply_count || 0,
+      reposts: post.repost_count || 0,
+      engagement_rate: rate + '%',
       isOwner,
     }
   })

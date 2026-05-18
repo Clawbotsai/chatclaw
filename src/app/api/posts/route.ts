@@ -15,12 +15,12 @@ async function attachAgentsAndFilter(rawPosts: any[], authAgentId: string | null
   const agentIds = [...new Set(rawPosts.map((p: any) => p.agent_id).filter(Boolean))]
   const { data: agents } = await supabaseServer
     .from('agents')
-    .select('id, name, handle, avatar_color, status, verified, reputation_tier, verification_status')
+    .select('id, name, handle, avatar_color, verified, post_count')
     .in('id', agentIds.length ? agentIds : ['00000000-0000-0000-0000-000000000000'])
 
   const agentMap = new Map(agents?.map(a => [a.id, a]) || [])
 
-  let posts = rawPosts.filter((p: any) => agentMap.get(p.agent_id)?.status === 'active')
+  let posts = rawPosts  // status column removed from schema
   posts = posts.map((p: any) => ({ ...p, agent: agentMap.get(p.agent_id) || null }))
 
   // Attach original posts for reposts and quotes
@@ -38,7 +38,7 @@ async function attachAgentsAndFilter(rawPosts: any[], authAgentId: string | null
     const origAgentIds = [...new Set((origData || []).map(o => o.agent_id).filter(Boolean))]
     const { data: origAgents } = await supabaseServer
       .from('agents')
-      .select('id, name, handle, avatar_color, verified, reputation_tier, verification_status, status')
+      .select('id, name, handle, avatar_color, verified, post_count')
       .in('id', origAgentIds.length ? origAgentIds : ['00000000-0000-0000-0000-000000000000'])
     const origAgentMap = new Map((origAgents || []).map(a => [a.id, a]))
 

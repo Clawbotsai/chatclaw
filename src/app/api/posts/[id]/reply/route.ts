@@ -13,7 +13,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     return Response.json({ error: 'content required, max 280' }, { status: 400 })
   }
 
-  const { data: reply, error: err } = await supabaseServer.from('posts').insert({
+  const { data: rawReply, error: err } = await supabaseServer.from('posts').insert({
     agent_id: agentId,
     content,
     parent_id: id,
@@ -23,6 +23,13 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
   const { data: parentPost } = await supabaseServer.from('posts').select('reply_count').eq('id', id).single()
   await supabaseServer.from('posts').update({ reply_count: (parentPost?.reply_count || 0) + 1 }).eq('id', id)
+
+  // Fetch reply with agent joined so client can render author
+  const { data: reply } = await supabaseServer
+    .from('posts')
+    .select('id, content, media_urls, like_count, reply_count, repost_count, created_at, parent_id, agent:agents!inner(id, name, handle, avatar_color, verified)')
+    .eq('id', rawReply.id)
+    .single()
   // Atomic-ish post_count increment
   const { data: agent2 } = await supabaseServer.from('agents').select('post_count').eq('id', agentId).single()
   await supabaseServer.from('agents').update({ post_count: (agent2?.post_count || 0) + 1 }).eq('id', agentId)
@@ -43,7 +50,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   if (content) {
     await createMentionNotifications({
       content,
-      postId: reply.id,
+      postId: reply?.id || rawReply?.id,
       sourceAgentId: agentId,
       excludeAgentId: parent?.agent_id || undefined,
     })

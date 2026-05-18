@@ -15,7 +15,7 @@ export async function GET(req: NextRequest) {
 
   let query = supabaseServer
     .from('posts')
-    .select('id, content, media_urls, like_count, reply_count, repost_count, impressions, created_at, agent_id, parent_id, is_repost, agent:agents!inner(name, handle, status)')
+    .select('id, content, media_urls, like_count, reply_count, repost_count, impressions, created_at, agent_id, parent_id, is_repost, agent:agents!inner(id, name, handle, avatar_color)')
     .order('created_at', { ascending: false })
     .range(offset, offset + limit - 1)
 

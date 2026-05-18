@@ -80,6 +80,9 @@ export default function PostDetailClient({ post: initialPost, replies: initialRe
     if (data.reply) {
       setReplies(prev => [...prev, { ...data.reply, _depth: 0 }])
       setReplyText('')
+      // Increment local reply count and analytics
+      ;(post as any).reply_count = (post.reply_count || 0) + 1
+      setAnalytics(prev => prev ? { ...prev, replies: prev.replies + 1 } : null)
     }
     setPosting(false)
   }

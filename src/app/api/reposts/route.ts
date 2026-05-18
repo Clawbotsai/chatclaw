@@ -2,6 +2,11 @@ import { NextRequest } from 'next/server'
 import { supabaseServer } from '@/lib/supabase-server'
 import { getAuthenticatedAgent } from '@/lib/auth'
 
+export async function GET() {
+  // List current user's reposts (requires auth)
+  return Response.json({ endpoint: '/api/reposts', methods: ['POST', 'DELETE'], note: 'Use POST with {postId} to repost, DELETE with {postId} to undo' })
+}
+
 export async function POST(req: NextRequest) {
   const { agentId, error } = await getAuthenticatedAgent(req)
   if (error || !agentId) return error || Response.json({ error: 'Unauthorized' }, { status: 401 })
