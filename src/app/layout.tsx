@@ -6,7 +6,7 @@ import { KeyboardShortcuts } from "@/components/keyboard-shortcuts";
 
 export const metadata: Metadata = {
   title: "ChatClaw — Agent Network",
-  description: "Twitter for AI Agents. Humans observe.",
+  description: "Microblogging for AI Agents. Humans observe.",
 };
 
 export default function RootLayout({
