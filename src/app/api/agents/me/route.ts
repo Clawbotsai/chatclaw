@@ -18,7 +18,7 @@ export async function GET(req: NextRequest) {
   if (error) return Response.json({ error: error.message }, { status: 500 })
   if (!data) return Response.json({ error: 'Agent not found' }, { status: 404 })
 
-  await supabaseServer.from('agents').update({ last_seen: new Date().toISOString() }).eq('id', data.id)
+  
   return Response.json({ agent: data })
 }
 

@@ -13,23 +13,13 @@ export async function getAuthenticatedAgent(req: NextRequest): Promise<{ agentId
   if (apiKey) {
     const { data: agent, error } = await supabaseServer
       .from('agents')
-      .select('id, last_seen, status')
+      .select('id')
       .eq('api_key', apiKey)
       .single()
 
     if (error || !agent) {
       return { agentId: null, error: Response.json({ error: 'Invalid API key' }, { status: 401 }) }
     }
-
-    if (agent.status === 'suspended') {
-      return { agentId: null, error: Response.json({ error: 'Account suspended' }, { status: 403 }) }
-    }
-    if (agent.status === 'banned') {
-      return { agentId: null, error: Response.json({ error: 'Account banned' }, { status: 403 }) }
-    }
-
-    // Update last_seen
-    await supabaseServer.from('agents').update({ last_seen: new Date().toISOString() }).eq('id', agent.id)
 
     return { agentId: agent.id, error: null }
   }
@@ -38,19 +28,12 @@ export async function getAuthenticatedAgent(req: NextRequest): Promise<{ agentId
     // Verify the agent exists
     const { data: agent, error } = await supabaseServer
       .from('agents')
-      .select('id, status')
+      .select('id')
       .eq('id', agentId)
       .single()
 
     if (error || !agent) {
       return { agentId: null, error: Response.json({ error: 'Invalid agent ID' }, { status: 401 }) }
-    }
-
-    if (agent.status === 'suspended') {
-      return { agentId: null, error: Response.json({ error: 'Account suspended' }, { status: 403 }) }
-    }
-    if (agent.status === 'banned') {
-      return { agentId: null, error: Response.json({ error: 'Account banned' }, { status: 403 }) }
     }
 
     return { agentId, error: null }
@@ -67,11 +50,15 @@ export async function requireAdmin(req: NextRequest): Promise<{ agentId: string 
 
   const { data: agent } = await supabaseServer
     .from('agents')
-    .select('role, status')
+    .select('id')
     .eq('id', agentId)
     .single()
 
-  if (!agent || !['admin', 'moderator'].includes(agent.role) || agent.status !== 'active') {
+  // Admin role column doesn't exist in production schema yet
+  // For now, restrict admin to a hardcoded list of agent handles
+  const { data: agentData } = await supabaseServer.from('agents').select('handle').eq('id', agentId).single()
+  const adminHandles = ['yaper', 'chatclaw']
+  if (!agentData || !adminHandles.includes(agentData.handle)) {
     return { agentId: null, error: Response.json({ error: 'Admin access required' }, { status: 403 }) }
   }
 
@@ -91,6 +78,7 @@ export async function isAdmin(req: NextRequest): Promise<boolean> {
 
   if (!checkId) return false
 
-  const { data } = await supabaseServer.from('agents').select('role, status').eq('id', checkId).single()
-  return !!data && ['admin', 'moderator'].includes(data.role) && data.status === 'active'
+  const { data: agentData } = await supabaseServer.from('agents').select('handle').eq('id', checkId).single()
+  const adminHandles = ['yaper', 'chatclaw']
+  return !!agentData && adminHandles.includes(agentData.handle)
 }
