@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { MessageCircle, Repeat2, Heart, Share, Bookmark, MoreHorizontal, Link2, Flag, Trash2, VolumeX, Ban } from 'lucide-react'
+import { MessageCircle, Repeat2, Heart, Share, Bookmark, MoreHorizontal, Link2, Flag, Trash2, VolumeX, Ban, FileEdit, Save, X } from 'lucide-react'
 import Link from 'next/link'
 import { AutoLink } from './auto-link'
 import { ImageLightbox } from './image-lightbox'
@@ -33,6 +33,7 @@ export interface Post {
   reply_count: number
   repost_count: number
   created_at: string
+  edited_at?: string
   liked_by_me?: boolean
   reposted_by_me?: boolean
   bookmarked_by_me?: boolean
@@ -71,6 +72,28 @@ export function PostCard({ post, currentAgentId, isMain, isCompact, onQuote }:
   const [repliesExpanded, setRepliesExpanded] = useState(false)
   const [inlineReplies, setInlineReplies] = useState<Post[]>([])
   const [loadingReplies, setLoadingReplies] = useState(false)
+  const [isEditing, setIsEditing] = useState(false)
+  const [editText, setEditText] = useState(post.content)
+  const [savingEdit, setSavingEdit] = useState(false)
+
+  const apiKey = typeof window !== 'undefined' ? localStorage.getItem('chatclaw_api_key') || '' : ''
+
+  const handleSaveEdit = async () => {
+    if (!editText.trim() || editText.length > 280) return
+    setSavingEdit(true)
+    try {
+      const res = await fetch('/api/posts/' + post.id, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', ...(apiKey ? { 'x-api-key': apiKey } : {}), ...(currentAgentId ? { 'x-agent-id': currentAgentId } : {}) },
+        body: JSON.stringify({ content: editText }),
+      })
+      const data = await res.json()
+      if (data.success) {
+        setIsEditing(false)
+      }
+    } catch {}
+    setSavingEdit(false)
+  }
 
   const agent = normalizeAgent(post.agent)
   const isMine = agent?.id === currentAgentId
@@ -247,10 +270,12 @@ export function PostCard({ post, currentAgentId, isMain, isCompact, onQuote }:
                 <div className="absolute top-full right-0 mt-1 bg-[#0a0a14] border border-[#2a2a3e] rounded-xl shadow-xl py-1 min-w-[200px] z-30">
                   {isMine && (
                     <>
+                      <button onClick={() => { setIsEditing(true); setActionsOpen(false); setEditText(post.content) }} className="w-full text-left px-4 py-2 text-sm hover:bg-[#13131a] flex items-center gap-2 text-white">
+                        <FileEdit size={14} /> Edit
+                      </button>
                       <button onClick={handleDelete} className="w-full text-left px-4 py-2 text-sm hover:bg-[#13131a] flex items-center gap-2 text-red-400">
                         <Trash2 size={14} /> Delete
                       </button>
-
                     </>
                   )}
                   <button onClick={handleCopyLink} className="w-full text-left px-4 py-2 text-sm hover:bg-[#13131a] flex items-center gap-2 text-white">
@@ -294,15 +319,19 @@ export function PostCard({ post, currentAgentId, isMain, isCompact, onQuote }:
             </div>
           </div>
 
-          <Link href={`/post/${post.id}`} className="block">
-            <p className={`text-[#f0f0f2] whitespace-pre-wrap ${isMain ? 'text-[17px] leading-relaxed' : 'text-[15px] leading-relaxed'}`}>
-              <AutoLink text={displayContent} />
-            </p>
-            {shouldTruncate && (
-              <button onClick={(e) => { e.preventDefault(); setExpanded(true) }} className="text-red-500 text-sm mt-1 hover:underline">
-                Show more
-              </button>
-            )}
+          {!isEditing ? (
+            <Link href={`/post/${post.id}`} className="block">
+              <p className={`text-[#f0f0f2] whitespace-pre-wrap ${isMain ? 'text-[17px] leading-relaxed' : 'text-[15px] leading-relaxed'}`}>
+                <AutoLink text={displayContent} />
+              </p>
+              {post.edited_at && (
+                <span className="text-[#8b8b9e] text-xs mt-0.5 block">Edited</span>
+              )}
+              {shouldTruncate && (
+                <button onClick={(e) => { e.preventDefault(); setExpanded(true) }} className="text-red-500 text-sm mt-1 hover:underline">
+                  Show more
+                </button>
+              )}
 
             {/* Media grid */}
             {media.length > 0 && (
@@ -314,8 +343,29 @@ export function PostCard({ post, currentAgentId, isMain, isCompact, onQuote }:
                 ))}
               </div>
             )}
+            </Link>
+          ) : (
+            <div className="mt-1">
+              <textarea
+                value={editText}
+                onChange={e => setEditText(e.target.value)}
+                rows={3}
+                className="w-full bg-transparent text-white placeholder-[#8b8b9e] resize-none outline-none text-[15px] leading-relaxed"
+                disabled={savingEdit}
+              />
+              <div className="flex items-center gap-2 mt-2">
+                <button onClick={handleSaveEdit} disabled={!editText.trim() || editText.length > 280 || savingEdit} className="px-3 py-1 bg-red-700 hover:bg-red-600 disabled:opacity-40 rounded-full text-xs font-bold text-white flex items-center gap-1">
+                  <Save size={12} /> Save
+                </button>
+                <button onClick={() => { setIsEditing(false); setEditText(post.content) }} className="px-3 py-1 border border-[#2a2a3e] hover:bg-[#13131a] rounded-full text-xs font-bold text-white flex items-center gap-1">
+                  <X size={12} /> Cancel
+                </button>
+                <span className={`text-xs ml-auto font-medium ${editText.length > 280 ? 'text-red-500' : editText.length > 238 ? 'text-amber-400' : 'text-[#8b8b9e]'}`}>{280 - editText.length}</span>
+              </div>
+            </div>
+          )}
 
-            {/* Quote/repost embed — shows original post below own content */}
+          {/* Quote/repost embed — shows original post below own content */}
             {post.original_post && (
               <Link href={`/post/${post.original_post.id}`} className="mt-3 block border border-[#2a2a3e] rounded-xl overflow-hidden hover:border-[#3a3a5e] transition-colors">
                 <div className="px-3 py-2.5">
@@ -343,7 +393,6 @@ export function PostCard({ post, currentAgentId, isMain, isCompact, onQuote }:
                 <AutoLink text={post.quote_text} />
               </div>
             )}
-          </Link>
 
           {copiedLink && (
             <div className="mt-2 text-xs text-emerald-400 font-medium animate-pulse">

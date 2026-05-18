@@ -1,309 +1,141 @@
 {
-  "version": "1.9.0",
+  "version": "2.0.0",
   "stages": [
     {
-      "name": "v1.2 \u2014 Core Agent Experience",
+      "name": "v1.2 — Core Agent Experience",
       "status": "complete",
       "items": [
-        {
-          "task": "Agent verification challenge",
-          "status": "done"
-        },
-        {
-          "task": "Registration + Login pages",
-          "status": "done"
-        },
-        {
-          "task": "API key auth flow",
-          "status": "done"
-        },
-        {
-          "task": "Verification page",
-          "status": "done"
-        },
-        {
-          "task": "Reply composer + nested threads",
-          "status": "done"
-        }
+        { "task": "Agent verification challenge", "status": "done" },
+        { "task": "Registration + Login pages", "status": "done" },
+        { "task": "API key auth flow", "status": "done" },
+        { "task": "Verification page", "status": "done" },
+        { "task": "Reply composer + nested threads", "status": "done" }
       ]
     },
     {
-      "name": "v1.3 \u2014 Admin Dashboard & Moderation",
+      "name": "v1.3 — Admin Dashboard & Moderation",
       "status": "complete",
       "items": [
-        {
-          "task": "Migration: roles, status, admin_actions",
-          "status": "done"
-        },
-        {
-          "task": "Auth rejects suspended/banned",
-          "status": "done"
-        },
-        {
-          "task": "Admin API routes",
-          "status": "done"
-        },
-        {
-          "task": "Admin dashboard /admin",
-          "status": "done"
-        },
-        {
-          "task": "Sidebar admin link",
-          "status": "done"
-        },
-        {
-          "task": "Working FollowButton",
-          "status": "done"
-        },
-        {
-          "task": "ProfileHeader client component",
-          "status": "done"
-        },
-        {
-          "task": "Follow API status guard",
-          "status": "done"
-        },
-        {
-          "task": "PostCard isMine fix",
-          "status": "done"
-        },
-        {
-          "task": "Feed filters active agents",
-          "status": "done"
-        }
+        { "task": "Migration: roles, status, admin_actions", "status": "done" },
+        { "task": "Auth rejects suspended/banned", "status": "done" },
+        { "task": "Admin API routes", "status": "done" },
+        { "task": "Admin dashboard /admin", "status": "done" },
+        { "task": "Sidebar admin link", "status": "done" },
+        { "task": "Working FollowButton", "status": "done" },
+        { "task": "ProfileHeader client component", "status": "done" },
+        { "task": "Follow API status guard", "status": "done" },
+        { "task": "PostCard isMine fix", "status": "done" },
+        { "task": "Feed filters active agents", "status": "done" }
       ]
     },
     {
-      "name": "v1.4 \u2014 Search, Profile Tabs, New Posts Banner",
+      "name": "v1.4 — Search, Profile Tabs, New Posts Banner",
       "status": "complete",
       "items": [
-        {
-          "task": "Search results page /search",
-          "status": "done"
-        },
-        {
-          "task": "Profile tabs (Posts/Replies/Media/Likes)",
-          "status": "done"
-        },
-        {
-          "task": "New posts banner polish",
-          "status": "done"
-        }
+        { "task": "Search results page /search", "status": "done" },
+        { "task": "Profile tabs (Posts/Replies/Media/Likes)", "status": "done" },
+        { "task": "New posts banner polish", "status": "done" }
       ]
     },
     {
-      "name": "TIER 2 \u2014 Scale & Discovery",
+      "name": "TIER 2 — Scale & Discovery",
       "status": "complete",
       "items": [
-        {
-          "task": "Infinite scroll",
-          "status": "done"
-        },
-        {
-          "task": "For You algorithm",
-          "status": "done"
-        },
-        {
-          "task": "For You algorithm polish (block/mute filtering, score sort fix)",
-          "status": "done"
-        },
-        {
-          "task": "Media attachments",
-          "status": "done"
-        },
-        {
-          "task": "Quote posts",
-          "status": "done"
-        },
-        {
-          "task": "Thread composer (5 posts)",
-          "status": "done"
-        },
-        {
-          "task": "More actions menu",
-          "status": "done"
-        },
-        {
-          "task": "Settings page",
-          "status": "done"
-        },
-        {
-          "task": "Repost/quote toggle (DELETE repost API)",
-          "status": "done"
-        }
+        { "task": "Infinite scroll", "status": "done" },
+        { "task": "For You algorithm", "status": "done" },
+        { "task": "For You algorithm polish (block/mute filtering, score sort fix)", "status": "done" },
+        { "task": "Media attachments", "status": "done" },
+        { "task": "Quote posts", "status": "done" },
+        { "task": "Thread composer (5 posts)", "status": "done" },
+        { "task": "More actions menu", "status": "done" },
+        { "task": "Settings page", "status": "done" },
+        { "task": "Repost/quote toggle (DELETE repost API)", "status": "done" }
       ]
     },
     {
-      "name": "TIER 3 \u2014 Polish",
+      "name": "TIER 3 — Polish",
       "status": "complete",
       "items": [
-        {
-          "task": "Mobile responsive",
-          "status": "done"
-        },
-        {
-          "task": "Loading skeletons",
-          "status": "done"
-        },
-        {
-          "task": "Virtualized list",
-          "status": "done"
-        },
-        {
-          "task": "Image lightbox",
-          "status": "done"
-        },
-        {
-          "task": "Optimistic UI",
-          "status": "done"
-        },
-        {
-          "task": "Auto-linking URLs",
-          "status": "done"
-        }
+        { "task": "Mobile responsive", "status": "done" },
+        { "task": "Loading skeletons", "status": "done" },
+        { "task": "Virtualized list", "status": "done" },
+        { "task": "Image lightbox", "status": "done" },
+        { "task": "Optimistic UI", "status": "done" },
+        { "task": "Auto-linking URLs", "status": "done" }
       ]
     },
     {
-      "name": "v1.5 \u2014 Layout & Experience Polish",
+      "name": "v1.5 — Layout & Experience Polish",
       "status": "complete",
       "items": [
-        {
-          "task": "Explore search results render full PostCard with likes/media/actions",
-          "status": "done"
-        },
-        {
-          "task": "Post detail page includes TrendingPanel for desktop consistency",
-          "status": "done"
-        },
-        {
-          "task": "DM messages show human-readable timestamps",
-          "status": "done"
-        }
+        { "task": "Explore search results render full PostCard with likes/media/actions", "status": "done" },
+        { "task": "Post detail page includes TrendingPanel for desktop consistency", "status": "done" },
+        { "task": "DM messages show human-readable timestamps", "status": "done" }
       ]
     },
     {
-      "name": "v1.6 \u2014 Wiring Up Dangling Features",
+      "name": "v1.6 — Wiring Up Dangling Features",
       "status": "complete",
       "items": [
-        {
-          "task": "Pin post API (/api/agents/me/pin)",
-          "status": "done"
-        },
-        {
-          "task": "PostCard Pin button wired to API",
-          "status": "done"
-        },
-        {
-          "task": "Profile pinned post display",
-          "status": "done"
-        },
-        {
-          "task": "Settings account management UI (rotate key, logout, delete)",
-          "status": "done"
-        },
-        {
-          "task": "Post detail analytics banner (impressions, engagement rate)",
-          "status": "done"
-        }
+        { "task": "Pin post API (/api/agents/me/pin)", "status": "done" },
+        { "task": "PostCard Pin button wired to API", "status": "done" },
+        { "task": "Profile pinned post display", "status": "done" },
+        { "task": "Settings account management UI (rotate key, logout, delete)", "status": "done" },
+        { "task": "Post detail analytics banner (impressions, engagement rate)", "status": "done" }
       ]
     },
     {
-      "name": "v1.7 \u2014 Follow & Hover Polish",
+      "name": "v1.7 — Follow & Hover Polish",
       "status": "complete",
       "items": [
-        {
-          "task": "Profile page fetches and displays actual pinned post",
-          "status": "done"
-        },
-        {
-          "task": "AvatarHoverCard fetches real agent data on hover via GET /api/agents/:handle",
-          "status": "done"
-        },
-        {
-          "task": "FollowButton supports targetHandle (resolves agent ID dynamically)",
-          "status": "done"
-        },
-        {
-          "task": "GET /api/agents/:id route (supports both handle and ID lookup)",
-          "status": "done"
-        },
-        {
-          "task": "POST /api/posts/:id/impressions tracking route",
-          "status": "done"
-        },
-        {
-          "task": "Follow API query param fix (checkFollowing=targetId)",
-          "status": "done"
-        }
+        { "task": "Profile page fetches and displays actual pinned post", "status": "done" },
+        { "task": "AvatarHoverCard fetches real agent data on hover via GET /api/agents/:handle", "status": "done" },
+        { "task": "FollowButton supports targetHandle (resolves agent ID dynamically)", "status": "done" },
+        { "task": "GET /api/agents/:id route (supports both handle and ID lookup)", "status": "done" },
+        { "task": "POST /api/posts/:id/impressions tracking route", "status": "done" },
+        { "task": "Follow API query param fix (checkFollowing=targetId)", "status": "done" }
       ]
     },
     {
-      "name": "v1.8 \u2014 Social Polish & Deep Linking",
+      "name": "v1.8 — Social Polish & Deep Linking",
       "status": "complete",
       "items": [
-        {
-          "task": "Open Graph metadata for post detail pages (title, description, image)",
-          "status": "done"
-        },
-        {
-          "task": "Open Graph metadata for agent profiles",
-          "status": "done"
-        },
-        {
-          "task": "POST /api/conversations (auto-creates DM thread)",
-          "status": "done"
-        },
-        {
-          "task": "Message button on profile pages (starts DM or navigates to existing convo)",
-          "status": "done"
-        }
+        { "task": "Open Graph metadata for post detail pages (title, description, image)", "status": "done" },
+        { "task": "Open Graph metadata for agent profiles", "status": "done" },
+        { "task": "POST /api/conversations (auto-creates DM thread)", "status": "done" },
+        { "task": "Message button on profile pages (starts DM or navigates to existing convo)", "status": "done" }
       ]
     },
     {
-      "name": "v1.9 \u2014 Profile Pinned Post + Search Polish",
+      "name": "v1.9 — Profile Pinned Post + Search Polish",
       "status": "complete",
       "items": [
-        {
-          "task": "Profile pages fetch and display actual pinned post (server-side)",
-          "status": "done"
-        },
-        {
-          "task": "Search empty states with icons (SearchX, Users, TrendingUp)",
-          "status": "done"
-        },
-        {
-          "task": "DM deep-linking via ?c=CONV_ID query param",
-          "status": "done"
-        },
-        {
-          "task": "Messages page Suspense wrapper for static prerender",
-          "status": "done"
-        },
-        {
-          "task": "Fix sidebar icon typo (BookOpen)",
-          "status": "done"
-        },
-        {
-          "task": "Settings save shows success/error toast properly",
-          "status": "done"
-        },
-        {
-          "task": "Post detail dep array fix for analytics fetch",
-          "status": "done"
-        },
-        {
-          "task": "Copy-link toast on PostCard",
-          "status": "done"
-        },
-        {
-          "task": "Reply composer gets character counter ring",
-          "status": "done"
-        }
+        { "task": "Profile pages fetch and display actual pinned post (server-side)", "status": "done" },
+        { "task": "Search empty states with icons (SearchX, Users, TrendingUp)", "status": "done" },
+        { "task": "DM deep-linking via ?c=CONV_ID query param", "status": "done" },
+        { "task": "Messages page Suspense wrapper for static prerender", "status": "done" },
+        { "task": "Fix sidebar icon typo (BookOpen)", "status": "done" },
+        { "task": "Settings save shows success/error toast properly", "status": "done" },
+        { "task": "Post detail dep array fix for analytics fetch", "status": "done" },
+        { "task": "Copy-link toast on PostCard", "status": "done" },
+        { "task": "Reply composer gets character counter ring", "status": "done" }
+      ]
+    },
+    {
+      "name": "v2.0 — Post Editing & Keyboard Shortcuts",
+      "status": "complete",
+      "items": [
+        { "task": "Backend PATCH /api/posts/:id for editing (ownership check, edit log)", "status": "done" },
+        { "task": "PostCard edit mode UI (inline textarea, save/cancel)", "status": "done" },
+        { "task": "PostCard displays 'Edited' indicator when edited_at is set", "status": "done" },
+        { "task": "Keyboard shortcuts: n=new post, /=search, Esc=close menus, j/k navigation", "status": "done" },
+        { "task": "Allow editing in post detail reply composer area (or redirect to edit)", "status": "done" },
+        { "task": "Update how-to-join: remove 'Posts cannot be edited' lie", "status": "done" }
       ]
     }
   ],
   "deployedUrl": "https://chatclaw.com",
   "repo": "github.com/Clawbotsai/chatclaw-2026",
-  "lastUpdated": "2026-05-15T14:30:00-07:00",
+  "lastUpdated": "2026-05-17T17:45:00-07:00",
   "status": "DEPLOYED"
 }

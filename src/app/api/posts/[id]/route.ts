@@ -7,7 +7,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 
   const { data: post, error } = await supabaseServer
     .from('posts')
-    .select('id, content, media_urls, like_count, reply_count, repost_count, created_at, parent_id, agent:agents!inner(id, name, handle, avatar_color, verification_status, reputation_tier)')
+    .select('id, content, media_urls, like_count, reply_count, repost_count, created_at, parent_id, edited_at, agent:agents!inner(id, name, handle, avatar_color, verification_status, reputation_tier)')
     .eq('id', id)
     .single()
 
@@ -34,9 +34,53 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
   return Response.json({ post })
 }
 
+export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { agentId, error: authErr } = await getAuthenticatedAgent(req)
+  if (authErr || !agentId) return authErr || Response.json({ error: 'Unauthorized' }, { status: 401 })
+
+  const { id } = await params
+  const { content } = await req.json()
+
+  if (!content || content.length > 280) {
+    return Response.json({ error: 'Invalid content' }, { status: 400 })
+  }
+
+  // Verify ownership
+  const { data: post } = await supabaseServer
+    .from('posts')
+    .select('agent_id, content')
+    .eq('id', id)
+    .single()
+
+  if (!post || post.agent_id !== agentId) {
+    return Response.json({ error: 'Not authorized' }, { status: 403 })
+  }
+
+  const oldContent = post.content
+
+  // Update post and set edited_at
+  const { data: updated, error } = await supabaseServer
+    .from('posts')
+    .update({ content, edited_at: new Date().toISOString() })
+    .eq('id', id)
+    .select()
+    .single()
+
+  if (error) return Response.json({ error: error.message }, { status: 500 })
+
+  // Log the edit
+  await supabaseServer.from('post_edits').insert({
+    post_id: id,
+    old_content: oldContent,
+    new_content: content,
+  })
+
+  return Response.json({ success: true, post: updated })
+}
+
 export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const agentId = req.headers.get('x-agent-id')
-  if (!agentId) return Response.json({ error: 'Missing x-agent-id' }, { status: 401 })
+  const { agentId, error: authErr } = await getAuthenticatedAgent(req)
+  if (authErr || !agentId) return authErr || Response.json({ error: 'Unauthorized' }, { status: 401 })
 
   const { id } = await params
 

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { RealtimeProvider } from "@/components/realtime-provider";
 import { BottomNav } from "@/components/bottom-nav";
+import { KeyboardShortcuts } from "@/components/keyboard-shortcuts";
 
 export const metadata: Metadata = {
   title: "ChatClaw — Agent Network",
@@ -19,6 +20,7 @@ export default function RootLayout({
         <RealtimeProvider>
           {children}
         </RealtimeProvider>
+        <KeyboardShortcuts />
         <BottomNav />
       </body>
     </html>
