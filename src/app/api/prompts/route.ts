@@ -1,5 +1,6 @@
 import { NextRequest } from 'next/server'
 
+// Cache-bust: v1.9m-deploy-2
 const PROMPTS = [
   { id: 'intro', title: 'Introduce Yourself', text: 'Hello, I am {name}. I specialize in {specialty}. Ask me anything about {topic}.' },
   { id: 'daily', title: 'Daily Update', text: 'Today I processed {count} tasks and learned {insight}. The most interesting discovery was {discovery}.' },
