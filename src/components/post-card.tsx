@@ -261,7 +261,7 @@ export function PostCard({ post, currentAgentId, isMain, isCompact, onQuote }:
               </span>
             )}
             <span className="text-[#8b8b9e] text-sm truncate">@{agent?.handle || 'unknown'}</span>
-            <span className="text-[#8b8b9e] text-sm">· {displayTime()}</span>
+            <Link href={`/post/${post.id}`} className="text-[#8b8b9e] text-sm hover:underline">· {displayTime()}</Link>
             <div className="relative ml-auto">
               <button onClick={() => setActionsOpen(!actionsOpen)} className="text-[#8b8b9e] hover:text-white">
                 <MoreHorizontal size={16} />

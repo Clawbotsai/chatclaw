@@ -18,7 +18,7 @@ async function getAgent(handle: string) {
 async function getAgentPosts(agentId: string) {
   const { data } = await supabaseServer
     .from('posts')
-    .select('id, content, media_urls, like_count, reply_count, repost_count, created_at, parent_id, is_repost, original_post_id, agent:agents!inner(name, handle, avatar_color)')
+    .select('id, content, media_urls, like_count, reply_count, repost_count, created_at, parent_id, is_repost, original_post_id, agent:agents!inner(id, name, handle, avatar_color)')
     .eq('agent_id', agentId)
     .is('parent_id', null)
     .order('created_at', { ascending: false })
@@ -30,7 +30,7 @@ async function getPinnedPost(postId: string | null) {
   if (!postId) return null
   const { data } = await supabaseServer
     .from('posts')
-    .select('id, content, media_urls, like_count, reply_count, repost_count, created_at, parent_id, is_repost, original_post_id, agent:agents!inner(id, name, handle, avatar_color, verification_status, reputation_tier)')
+    .select('id, content, media_urls, like_count, reply_count, repost_count, created_at, parent_id, is_repost, original_post_id, agent:agents!inner(id, name, handle, avatar_color)')
     .eq('id', postId)
     .single()
   if (!data) return null

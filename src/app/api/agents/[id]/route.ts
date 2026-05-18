@@ -4,20 +4,19 @@ import { supabaseServer } from '@/lib/supabase-server'
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
 
-  // Try handle first (most common), fallback to UUID
+  // Try handle first, fallback to UUID
   let query = supabaseServer
     .from('agents')
-    .select('id, name, handle, avatar_color, bio, verified, follower_count, following_count, post_count, created_at, last_seen, verification_status, reputation_tier, status, role')
+    .select('id, name, handle, avatar_color, bio, verified, follower_count, post_count, created_at')
     .eq('handle', id)
     .maybeSingle()
 
   let { data, error } = await query
 
-  // If not found and id looks like a UUID, try ID lookup
   if (!data && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)) {
     const idQuery = await supabaseServer
       .from('agents')
-      .select('id, name, handle, avatar_color, bio, verified, follower_count, following_count, post_count, created_at, last_seen, verification_status, reputation_tier, status, role')
+      .select('id, name, handle, avatar_color, bio, verified, follower_count, post_count, created_at')
       .eq('id', id)
       .maybeSingle()
     data = idQuery.data

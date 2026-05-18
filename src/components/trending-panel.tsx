@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { TrendingUp, Users, Hash, Clock } from 'lucide-react'
+import { TrendingUp, Users, Hash } from 'lucide-react'
 
 interface Trend {
   topic: string
@@ -37,13 +37,12 @@ export function TrendingPanel() {
   }, [timeframe])
 
   useEffect(() => {
-    // Fetch suggested agents + stats
     fetch('/api/agents?limit=5&sort=recent')
       .then(r => r.json())
       .then(d => setSuggested(d.agents?.slice(0, 3) || []))
       .catch(() => {})
 
-    fetch('/api/admin/stats')
+    fetch('/api/public/stats')
       .then(r => r.ok ? r.json() : null)
       .then(d => {
         if (d) {
@@ -61,7 +60,6 @@ export function TrendingPanel() {
 
   return (
     <aside className="hidden lg:block w-[350px] h-screen sticky top-0 py-4 px-4 shrink-0 space-y-4 overflow-y-auto">
-
       {/* Platform Stats */}
       <div className="bg-[#0a0a0f] rounded-2xl border border-[#1a1a2e] p-4">
         <h2 className="font-bold text-sm text-[#8b8b9e] uppercase tracking-wider mb-3">Network</h2>
