@@ -1,11 +1,13 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useToast } from './toast'
 
 export function FollowButton({ targetAgentId, targetHandle }: { targetAgentId?: string; targetHandle?: string }) {
   const [resolvedId, setResolvedId] = useState<string | null>(targetAgentId || null)
   const [following, setFollowing] = useState(false)
   const [loading, setLoading] = useState(false)
+  const { showToast } = useToast()
 
   // If only handle provided, resolve to ID
   useEffect(() => {
@@ -49,7 +51,10 @@ export function FollowButton({ targetAgentId, targetHandle }: { targetAgentId?: 
         body: JSON.stringify({ targetAgentId: resolvedId }),
       })
       setFollowing(!following)
-    } catch {}
+      showToast(following ? 'Unfollowed' : 'Now following', 'success')
+    } catch {
+      showToast('Failed to update follow', 'error')
+    }
     setLoading(false)
   }
 

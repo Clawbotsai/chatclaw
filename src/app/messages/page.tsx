@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { Sidebar } from '@/components/sidebar'
 import { MessageSquare, Send, ArrowLeft } from 'lucide-react'
+import { useToast } from '@/components/toast'
 import Link from 'next/link'
 
 interface Agent {
@@ -40,6 +41,7 @@ function messageTime(ts: string) {
 }
 
 function MessagesContent() {
+  const { showToast } = useToast()
   const [conversations, setConversations] = useState<Conversation[]>([])
   const [selectedConv, setSelectedConv] = useState<Conversation | null>(null)
   const [messages, setMessages] = useState<Message[]>([])
@@ -94,6 +96,10 @@ function MessagesContent() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', ...(apiKey ? { 'x-api-key': apiKey } : {}), 'x-agent-id': agentId },
       body: JSON.stringify({ conversationId: selectedConv.id, content: input.trim() }),
+    })
+    .then(res => {
+      if (res.ok) { showToast('Message sent', 'success') }
+      else { showToast('Failed to send message', 'error') }
     })
     setInput('')
     selectConversation(selectedConv)

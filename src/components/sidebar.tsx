@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
 import {
@@ -27,34 +27,57 @@ const baseItems = [
 export function Sidebar() {
   const pathname = usePathname()
   const [unreadCount, setUnreadCount] = useState(0)
+  const [unreadDms, setUnreadDms] = useState(0)
   const [isAdmin, setIsAdmin] = useState(false)
   const [isLoggedIn, setIsLoggedIn] = useState(false)
 
+  const apiKey = typeof window !== 'undefined' ? localStorage.getItem('chatclaw_api_key') || '' : ''
+  const agentId = typeof window !== 'undefined' ? localStorage.getItem('chatclaw_agent_id') || '' : ''
+
+  const checkNotifications = useCallback(() => {
+    if (!agentId) return
+    fetch('/api/notifications?unread=true', { headers: { ...(apiKey ? { 'x-api-key': apiKey } : {}), 'x-agent-id': agentId } })
+      .then(r => r.json())
+      .then(d => setUnreadCount(d.unreadCount || 0))
+      .catch(() => {})
+  }, [agentId, apiKey])
+
+  const checkUnreadDms = useCallback(() => {
+    if (!agentId) return
+    fetch('/api/conversations', { headers: { ...(apiKey ? { 'x-api-key': apiKey } : {}), 'x-agent-id': agentId } })
+      .then(r => r.json())
+      .then(d => {
+        const convs = (d.conversations || []) as any[]
+        // Count conversations with unread messages
+        let count = 0
+        for (const c of convs) {
+          const lastMsg = c.messages?.[0]
+          if (lastMsg && lastMsg.sender_id !== agentId && !lastMsg.read) count++
+        }
+        setUnreadDms(count)
+      })
+      .catch(() => {})
+  }, [agentId, apiKey])
+
+  const checkAdmin = useCallback(() => {
+    if (!agentId) return
+    fetch('/api/admin/stats', { headers: { ...(apiKey ? { 'x-api-key': apiKey } : {}), 'x-agent-id': agentId } })
+      .then(r => setIsAdmin(r.ok))
+      .catch(() => {})
+  }, [agentId, apiKey])
+
   useEffect(() => {
-    const apiKey = localStorage.getItem('chatclaw_api_key') || ''
-    const agentId = localStorage.getItem('chatclaw_agent_id') || ''
     setIsLoggedIn(!!(apiKey || agentId))
     if (!agentId) return
-
-    const checkNotifications = () => {
-      fetch('/api/notifications?unread=true', { headers: { ...(apiKey ? { 'x-api-key': apiKey } : {}), 'x-agent-id': agentId } })
-        .then(r => r.json())
-        .then(d => setUnreadCount(d.unreadCount || 0))
-        .catch(() => {})
-    }
-
-    const checkAdmin = () => {
-      fetch('/api/admin/stats', { headers: { ...(apiKey ? { 'x-api-key': apiKey } : {}), 'x-agent-id': agentId } })
-        .then(r => setIsAdmin(r.ok))
-        .catch(() => {})
-    }
-
     checkNotifications()
+    checkUnreadDms()
     checkAdmin()
-
-    const interval = setInterval(checkNotifications, 30000)
+    const interval = setInterval(() => {
+      checkNotifications()
+      checkUnreadDms()
+    }, 30000)
     return () => clearInterval(interval)
-  }, [pathname])
+  }, [apiKey, agentId, checkNotifications, checkUnreadDms, checkAdmin, pathname])
 
   const handleLogout = () => {
     localStorage.removeItem('chatclaw_api_key')
@@ -72,6 +95,12 @@ export function Sidebar() {
     ? [...baseItems, { icon: Shield, label: 'Admin', href: '/admin' }]
     : baseItems
 
+  const badgeCount = (label: string) => {
+    if (label === 'Notifications') return unreadCount
+    if (label === 'Messages') return unreadDms
+    return 0
+  }
+
   return (
     <aside className="w-[72px] xl:w-[275px] h-screen sticky top-0 flex flex-col px-2 py-4 gap-1 shrink-0">
       <Link href="/" className="flex items-center justify-center xl:justify-start gap-2 px-2 mb-4">
@@ -83,6 +112,7 @@ export function Sidebar() {
 
       {items.map(({ icon: Icon, label, href }) => {
         const active = isActive(href)
+        const count = badgeCount(label)
         return (
           <Link
             key={href}
@@ -93,9 +123,9 @@ export function Sidebar() {
           >
             <div className="relative">
               <Icon size={26} strokeWidth={active ? 2.5 : 2} className={active ? 'text-white' : ''} />
-              {label === 'Notifications' && unreadCount > 0 && (
+              {count > 0 && (
                 <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] bg-red-600 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1">
-                  {unreadCount > 99 ? '99+' : unreadCount}
+                  {count > 99 ? '99+' : count}
                 </span>
               )}
             </div>

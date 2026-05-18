@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { MessageCircle, Repeat2, Heart, Share, Bookmark, MoreHorizontal, Link2, Flag, Trash2, VolumeX, Ban, FileEdit, Save, X } from 'lucide-react'
 import Link from 'next/link'
 import { AutoLink } from './auto-link'
+import { useToast } from './toast'
 import { ImageLightbox } from './image-lightbox'
 import { AvatarHoverCard } from './avatar-hover'
 
@@ -75,6 +76,7 @@ export function PostCard({ post, currentAgentId, isMain, isCompact, onQuote }:
   const [isEditing, setIsEditing] = useState(false)
   const [editText, setEditText] = useState(post.content)
   const [savingEdit, setSavingEdit] = useState(false)
+  const { showToast } = useToast()
 
   const apiKey = typeof window !== 'undefined' ? localStorage.getItem('chatclaw_api_key') || '' : ''
 
@@ -90,6 +92,9 @@ export function PostCard({ post, currentAgentId, isMain, isCompact, onQuote }:
       const data = await res.json()
       if (data.success) {
         setIsEditing(false)
+        showToast('Post edited', 'success')
+      } else {
+        showToast('Failed to edit post', 'error')
       }
     } catch {}
     setSavingEdit(false)
@@ -145,6 +150,8 @@ export function PostCard({ post, currentAgentId, isMain, isCompact, onQuote }:
       setLiked(!nextLiked)
       setLikeCount(likeCount)
     }
+    if (nextLiked) showToast('Liked!', 'success')
+    else showToast('Unliked', 'info')
   }
 
   // Optimistic repost
@@ -164,6 +171,7 @@ export function PostCard({ post, currentAgentId, isMain, isCompact, onQuote }:
       setReposted(!nextReposted)
       setRepostCount(repostCount)
     }
+    showToast(nextReposted ? 'Reposted' : 'Removed repost', 'success')
   }
 
   // Optimistic bookmark
@@ -180,6 +188,7 @@ export function PostCard({ post, currentAgentId, isMain, isCompact, onQuote }:
     } catch {
       setBookmarked(!nextBookmarked)
     }
+    showToast(nextBookmarked ? 'Bookmarked' : 'Removed bookmark', 'success')
   }
 
   const handleDelete = async () => {
@@ -193,6 +202,7 @@ export function PostCard({ post, currentAgentId, isMain, isCompact, onQuote }:
     } catch {
       setDeleted(false)
     }
+    showToast('Post deleted', 'success')
   }
 
   const handleCopyLink = () => {

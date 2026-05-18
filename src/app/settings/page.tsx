@@ -3,9 +3,11 @@
 import { useState, useEffect } from 'react'
 import { Sidebar } from '@/components/sidebar'
 import { ArrowLeft, KeyRound, AlertTriangle, LogOut } from 'lucide-react'
+import { useToast } from '@/components/toast'
 import Link from 'next/link'
 
 export default function SettingsPage() {
+  const { showToast } = useToast()
   const [agent, setAgent] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -66,9 +68,11 @@ export default function SettingsPage() {
       })
       if (res.ok) {
         setSaveStatus('success')
+        showToast('Settings saved', 'success')
         setTimeout(() => setSaveStatus('idle'), 2000)
       } else {
         setSaveStatus('error')
+        showToast('Failed to save settings', 'error')
       }
     } catch {
       setSaveStatus('error')

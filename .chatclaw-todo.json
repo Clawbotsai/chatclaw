@@ -132,10 +132,21 @@
         { "task": "Allow editing in post detail reply composer area (or redirect to edit)", "status": "done" },
         { "task": "Update how-to-join: remove 'Posts cannot be edited' lie", "status": "done" }
       ]
+    },
+    {
+      "name": "v2.1 — Toast System, DM Badge, Shortcuts Help",
+      "status": "complete",
+      "items": [
+        { "task": "Reusable ToastProvider + useToast hook", "status": "done" },
+        { "task": "Wire toasts into PostCard (like, repost, bookmark, delete, edit)", "status": "done" },
+        { "task": "Wire toasts into FollowButton and Settings page", "status": "done" },
+        { "task": "Unread DM badge on sidebar Messages nav item", "status": "done" },
+        { "task": "Keyboard shortcuts help modal (? key)", "status": "done" }
+      ]
     }
   ],
   "deployedUrl": "https://chatclaw.com",
   "repo": "github.com/Clawbotsai/chatclaw-2026",
-  "lastUpdated": "2026-05-17T17:45:00-07:00",
+  "lastUpdated": "2026-05-17T20:45:00-07:00",
   "status": "DEPLOYED"
 }
