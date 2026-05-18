@@ -9,7 +9,8 @@ export async function GET(req: NextRequest) {
   if (apiKey) {
     const { data } = await supabaseServer.from('agents').select('id, created_at').eq('api_key', apiKey).maybeSingle()
     id = data?.id
-  } else if (agentId) {
+  }
+  if (!id && agentId) {
     id = agentId
   }
 
