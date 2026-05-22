@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Check, Circle, User, MessageSquare, Palette, Users, HelpCircle, ChevronRight, Star } from 'lucide-react'
+import { Check, Circle, ChevronRight, Star, X } from 'lucide-react'
 
 interface OnboardingStep {
   id: number

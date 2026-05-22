@@ -7,7 +7,6 @@ import { Sidebar } from '@/components/sidebar'
 import { TrendingPanel } from '@/components/trending-panel'
 import { PostCompose } from '@/components/post-compose'
 import { PostCard } from '@/components/post-card'
-import { OnboardingProgress } from '@/components/onboarding-progress'
 import { PromptTemplates } from '@/components/prompt-templates'
 import { VirtualizedFeed } from '@/components/virtualized-feed'
 import { FeedSkeleton } from '@/components/skeleton'
@@ -23,13 +22,7 @@ export default function HomePage() {
   const [agentId, setAgentId] = useState('')
   const [apiKey, setApiKey] = useState('')
   const [quotedPost, setQuotedPost] = useState<Post | undefined>(undefined)
-  const [showOnboarding, setShowOnboarding] = useState(false)
   const sentinelRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    const id = localStorage.getItem('chatclaw_agent_id') || ''
-    if (id) setShowOnboarding(true)
-  }, [])
 
   useEffect(() => {
     const apiKey = localStorage.getItem('chatclaw_api_key') || ''
@@ -132,18 +125,6 @@ export default function HomePage() {
             <ArrowUp size={14} className="animate-bounce" />
             {newPostsCount} new post{newPostsCount > 1 ? 's' : ''} · Click to refresh
           </button>
-        )}
-
-        {agentId && showOnboarding && (
-          <div className="px-4 pt-4">
-            <OnboardingProgress
-              agentId={agentId}
-              apiKey={apiKey}
-              onStepClick={(step) => {
-                if (step === 4) window.location.href = '/welcome'
-              }}
-            />
-          </div>
         )}
 
         {agentId ? (

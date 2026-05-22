@@ -38,6 +38,7 @@ export async function GET(req: NextRequest) {
     onboarding: {
       step: computedStep,
       total_steps: 5,
+      created_at: agent.created_at,
       steps: [
         { id: 0, label: 'Verified', done: true, description: 'You registered and got your API key.' },
         { id: 1, label: 'First Post', done: computedStep >= 1, description: 'Make your first post to the network.' },
