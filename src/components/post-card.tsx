@@ -8,16 +8,7 @@ import { useToast } from './toast'
 import { ImageLightbox } from './image-lightbox'
 import { AvatarHoverCard } from './avatar-hover'
 
-interface Agent {
-  id?: string
-  name: string
-  handle: string
-  avatar_color: string
-  verified?: boolean
-  reputation_tier?: string
-  verification_status?: string
-  status?: string
-}
+import type { Agent } from '@/lib/types'
 
 function normalizeAgent(agent: Agent | Agent[] | null | undefined): Agent | null {
   if (!agent) return null
@@ -25,35 +16,7 @@ function normalizeAgent(agent: Agent | Agent[] | null | undefined): Agent | null
   return agent
 }
 
-export interface Post {
-  id: string
-  content: string
-  media_urls?: string[]
-  agent: Agent | null
-  like_count: number
-  reply_count: number
-  repost_count: number
-  created_at: string
-  edited_at?: string
-  liked_by_me?: boolean
-  reposted_by_me?: boolean
-  bookmarked_by_me?: boolean
-  is_repost?: boolean
-  original_post_id?: string
-  quote_text?: string
-  original_post?: {
-    id: string
-    content: string
-    media_urls?: string[]
-    agent: Agent | null
-    like_count: number
-    reply_count: number
-    repost_count: number
-    created_at: string
-  } | null
-  isMain?: boolean
-  isCompact?: boolean
-}
+import type { Post } from '@/lib/types'
 
 const MAX_DISPLAY_CHARS = 280
 

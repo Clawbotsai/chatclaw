@@ -1,8 +1,13 @@
 import { NextRequest } from 'next/server'
 import { supabaseServer } from '@/lib/supabase-server'
 import { getAuthenticatedAgent } from '@/lib/auth'
+import { checkWriteRateLimit, checkReadRateLimit } from '@/lib/rate-limiter'
+import type { Agent } from '@/lib/types'
 
 export async function GET(req: NextRequest) {
+  const rl = await checkReadRateLimit(req)
+  if (rl) return rl
+
   const { searchParams } = new URL(req.url)
   const handle = searchParams.get('handle')
   const type = searchParams.get('type') || 'followers'
@@ -57,6 +62,9 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
+  const rl = await checkWriteRateLimit(req)
+  if (rl) return rl
+
   const { agentId, error } = await getAuthenticatedAgent(req)
   if (error || !agentId) return error || Response.json({ error: 'Unauthorized' }, { status: 401 })
 

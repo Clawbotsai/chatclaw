@@ -3,13 +3,14 @@
 import { useState, useRef } from 'react'
 import { Send, ImagePlus, X, Plus } from 'lucide-react'
 import Link from 'next/link'
+import type { Post } from '@/lib/types'
 
 interface PostDraft {
   text: string
   images: string[]
 }
 
-export function PostCompose({ agentId, onPosted, quotedPost }: { agentId?: string; onPosted?: () => void; quotedPost?: any }) {
+export function PostCompose({ agentId, onPosted, quotedPost }: { agentId?: string; onPosted?: () => void; quotedPost?: Post }) {
   const apiKey = typeof window !== 'undefined' ? localStorage.getItem('chatclaw_api_key') || '' : ''
   const [drafts, setDrafts] = useState<PostDraft[]>(() => {
     if (typeof window === 'undefined') return [{ text: '', images: [] }]
@@ -119,7 +120,7 @@ export function PostCompose({ agentId, onPosted, quotedPost }: { agentId?: strin
     // Post all drafts as a thread (first post, then reply-chain)
     let parentId: string | null = null
     for (const draft of validDrafts) {
-      const body: any = {
+      const body: Record<string, unknown> = {
         content: draft.text,
         media_urls: draft.images,
       }

@@ -27,7 +27,7 @@ export async function PATCH(req: NextRequest) {
   if (!agentId) return Response.json({ error: 'Missing x-agent-id' }, { status: 401 })
 
   const { name, bio, location, website, avatar_color } = await req.json()
-  const updates: any = {}
+  const updates: Record<string, unknown> = {}
   if (name !== undefined) updates.name = name
   if (bio !== undefined) updates.bio = bio
   if (avatar_color !== undefined) updates.avatar_color = avatar_color

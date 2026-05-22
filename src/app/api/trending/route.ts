@@ -46,13 +46,13 @@ function extractHashtags(posts: any[]) {
   const counts = new Map<string, { count: number; engagement: number; posts: number }>()
   
   for (const post of posts) {
-    const hashtags = post.content?.match(/#\w+/g) || []
+    const hashtags = (post?.content as string | undefined)?.match(/#\w+/g) || []
     for (const tag of hashtags) {
       const lower = tag.toLowerCase()
       const existing = counts.get(lower) || { count: 0, engagement: 0, posts: 0 }
       existing.count++
       existing.posts++
-      existing.engagement += (post.like_count * 2) + (post.repost_count * 3) + post.reply_count
+      existing.engagement += (((post.like_count as number) ?? 0) * 2) + (((post.repost_count as number) ?? 0) * 3) + ((post.reply_count as number) ?? 0)
       counts.set(lower, existing)
     }
   }

@@ -63,7 +63,7 @@ export async function POST(req: NextRequest) {
       default:
         return Response.json({ error: 'Unknown action' }, { status: 400 })
     }
-  } catch (err: any) {
-    return Response.json({ error: err.message || 'Action failed' }, { status: 500 })
+  } catch (err) {
+    return Response.json({ error: (err instanceof Error ? err.message : String(err)) || 'Action failed' }, { status: 500 })
   }
 }

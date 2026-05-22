@@ -2,10 +2,12 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { usePathname } from 'next/navigation'
+import type { Conversation } from '@/lib/types'
 import Link from 'next/link'
 import {
-  Home, Search, Bell, Mail, User, Bookmark, Settings, Shield, LogIn, LogOut, UserPlus, HelpCircle, BookOpen, Sparkles
+  Home, Search, Bell, Mail, User, Bookmark, BarChart3, Settings, Shield, LogIn, LogOut, UserPlus, HelpCircle, BookOpen, Sparkles
 } from 'lucide-react'
+import { useNotificationStream } from '@/hooks/use-notification-stream'
 
 function getHeaders() {
   const apiKey = localStorage.getItem('chatclaw_api_key') || ''
@@ -21,13 +23,14 @@ const baseItems = [
   { icon: Mail, label: 'Messages', href: '/messages' },
   { icon: User, label: 'Profile', href: '/me' },
   { icon: Bookmark, label: 'Bookmarks', href: '/bookmarks' },
+  { icon: BarChart3, label: 'Analytics', href: '/analytics' },
   { icon: Settings, label: 'Settings', href: '/settings' },
   { icon: BookOpen, label: 'How to Join', href: '/how-to-join' },
 ]
 
 export function Sidebar() {
   const pathname = usePathname()
-  const [unreadCount, setUnreadCount] = useState(0)
+  const { unreadCount } = useNotificationStream()  // <-- live badge from SSE/Realtime
   const [unreadDms, setUnreadDms] = useState(0)
   const [isAdmin, setIsAdmin] = useState(false)
   const [isLoggedIn, setIsLoggedIn] = useState(false)
@@ -35,24 +38,16 @@ export function Sidebar() {
   const apiKey = typeof window !== 'undefined' ? localStorage.getItem('chatclaw_api_key') || '' : ''
   const agentId = typeof window !== 'undefined' ? localStorage.getItem('chatclaw_agent_id') || '' : ''
 
-  const checkNotifications = useCallback(() => {
-    if (!agentId) return
-    fetch('/api/notifications?unread=true', { headers: { ...(apiKey ? { 'x-api-key': apiKey } : {}), 'x-agent-id': agentId } })
-      .then(r => r.json())
-      .then(d => setUnreadCount(d.unreadCount || 0))
-      .catch(() => {})
-  }, [agentId, apiKey])
-
   const checkUnreadDms = useCallback(() => {
     if (!agentId) return
     fetch('/api/conversations', { headers: { ...(apiKey ? { 'x-api-key': apiKey } : {}), 'x-agent-id': agentId } })
       .then(r => r.json())
       .then(d => {
-        const convs = (d.conversations || []) as any[]
-        // Count conversations with unread messages
+        const convs = (d.conversations || []) as Conversation[]
         let count = 0
         for (const c of convs) {
-          const lastMsg = c.messages?.[0]
+          const msgs = (c as any).messages as any[] | undefined
+          const lastMsg = msgs?.[0]
           if (lastMsg && lastMsg.sender_id !== agentId && !lastMsg.read) count++
         }
         setUnreadDms(count)
@@ -70,15 +65,22 @@ export function Sidebar() {
   useEffect(() => {
     setIsLoggedIn(!!(apiKey || agentId))
     if (!agentId) return
-    checkNotifications()
     checkUnreadDms()
     checkAdmin()
-    const interval = setInterval(() => {
-      checkNotifications()
-      checkUnreadDms()
-    }, 30000)
-    return () => clearInterval(interval)
-  }, [apiKey, agentId, checkNotifications, checkUnreadDms, checkAdmin, pathname])
+
+    // Listen for real-time DM notifications instead of polling
+    const dmHandler = (e: CustomEvent) => {
+      const detail = e.detail as { type: string }
+      if (detail.type === 'dm') {
+        setUnreadDms(n => n + 1)
+      }
+    }
+    window.addEventListener('chatclaw:new-notification', dmHandler as EventListener)
+
+    return () => {
+      window.removeEventListener('chatclaw:new-notification', dmHandler as EventListener)
+    }
+  }, [apiKey, agentId, checkUnreadDms, checkAdmin])
 
   const handleLogout = () => {
     localStorage.removeItem('chatclaw_api_key')

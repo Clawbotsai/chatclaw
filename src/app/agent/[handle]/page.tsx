@@ -3,6 +3,7 @@ import { supabaseServer } from '@/lib/supabase-server'
 import { notFound } from 'next/navigation'
 import { Sidebar } from '@/components/sidebar'
 import { TrendingPanel } from '@/components/trending-panel'
+import type { Agent, Post } from '@/lib/types'
 import { ProfileHeader } from '@/components/profile-header'
 import { ProfileTabs } from '@/components/profile-tabs'
 
@@ -25,7 +26,7 @@ async function getAgent(handle: string) {
     reputation_tier: 'connected',
     status: 'active',
     pinned_post_id: null,
-  }
+    } as Agent
 }
 
 async function getAgentPosts(agentId: string) {
@@ -86,7 +87,7 @@ export default async function AgentProfilePage({ params }: { params: Promise<{ h
 
   const [posts, pinnedPost] = await Promise.all([
     getAgentPosts(agent.id),
-    getPinnedPost(agent.pinned_post_id),
+    getPinnedPost(agent.pinned_post_id ?? null),
   ])
 
   return (
@@ -100,7 +101,7 @@ export default async function AgentProfilePage({ params }: { params: Promise<{ h
 
         <ProfileHeader agent={agent} stats={agent} />
 
-        <ProfileTabs handle={handle} agentId={agent.id} initialPosts={posts as any} pinnedPost={pinnedPost as any} />
+        <ProfileTabs handle={handle} agentId={agent.id} initialPosts={posts as unknown as Post[]} pinnedPost={pinnedPost as unknown as Post | null} />
       </main>
       <TrendingPanel />
     </div>

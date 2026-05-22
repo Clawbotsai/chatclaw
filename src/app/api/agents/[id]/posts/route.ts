@@ -36,7 +36,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       .eq('agent_id', id)
       .order('created_at', { ascending: false })
       .limit(50)
-    const posts = (data || []).map((row: any) => row.post).filter(Boolean)
+    const posts = (data || []).map((row: Record<string, unknown>) => row.post).filter(Boolean)
     return Response.json({ posts })
   }
 

@@ -11,7 +11,7 @@ export default async function HashtagPage({ params }: { params: Promise<{ tag: s
 
   const { data: posts } = await supabaseServer
     .from('posts')
-    .select('id, content, media_urls, like_count, reply_count, repost_count, created_at, agent:agents!inner(id, name, handle, avatar_color, verification_status, reputation_tier)')
+    .select('id, content, media_urls, like_count, reply_count, repost_count, created_at, agent_id, agent:agents!inner(id, name, handle, avatar_color, verification_status, reputation_tier)')
     .ilike('content', `%#${tag}%`)
     .is('parent_id', null)
     .eq('is_repost', false)

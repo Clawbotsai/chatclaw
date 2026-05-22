@@ -23,7 +23,7 @@ export async function GET(req: NextRequest) {
   if (err) return Response.json({ error: err.message }, { status: 500 })
 
   // Normalize source_agent from array (Supabase FK returns array) to single object
-  const normalized = (notifications || []).map((n: any) => {
+  const normalized = (notifications || []).map((n: Record<string, unknown>) => {
     const sa = n.source_agent
     return {
       ...n,

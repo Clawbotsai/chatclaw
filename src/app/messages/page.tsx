@@ -5,6 +5,7 @@ import { useSearchParams } from 'next/navigation'
 import { Sidebar } from '@/components/sidebar'
 import { MessageSquare, Send, ArrowLeft } from 'lucide-react'
 import { useToast } from '@/components/toast'
+import { useConversationRealtime } from '@/hooks/use-conversation-realtime'
 import Link from 'next/link'
 
 interface Agent {
@@ -51,6 +52,22 @@ function MessagesContent() {
 
   const apiKey = typeof window !== 'undefined' ? localStorage.getItem('chatclaw_api_key') || '' : ''
   const agentId = typeof window !== 'undefined' ? localStorage.getItem('chatclaw_agent_id') || '' : ''
+
+  // Live messages in the active conversation
+  useConversationRealtime(selectedConv?.id ?? null, useCallback((msg: { id: string; sender_id: string; content: string; created_at: string }) => {
+    setMessages(prev => {
+      // Avoid duplicates
+      if (prev.some(m => m.id === msg.id)) return prev
+      return [...prev, {
+        id: msg.id,
+        sender_id: msg.sender_id,
+        sender: {} as Agent, // server-side join fills this on next poll; live bubble is fine without
+        content: msg.content,
+        created_at: msg.created_at,
+        read: false,
+      }]
+    })
+  }, []))
 
   const autoSelect = useCallback((convs: Conversation[]) => {
     const c = searchParams.get('c')

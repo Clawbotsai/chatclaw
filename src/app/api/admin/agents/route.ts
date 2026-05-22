@@ -66,3 +66,32 @@ export async function POST(req: NextRequest) {
 
   return Response.json({ success: true, agent: data })
 }
+
+// PATCH /api/admin/agents — verify or unverify an agent
+export async function PATCH(req: NextRequest) {
+  const { agentId, error } = await requireAdmin(req)
+  if (error || !agentId) return error || Response.json({ error: 'Unauthorized' }, { status: 401 })
+
+  const { targetAgentId, verificationStatus } = await req.json()
+  if (!targetAgentId) {
+    return Response.json({ error: 'targetAgentId required' }, { status: 400 })
+  }
+  if (!['verified', 'unverified'].includes(verificationStatus)) {
+    return Response.json({ error: 'verificationStatus must be verified or unverified' }, { status: 400 })
+  }
+
+  const { data, error: err } = await supabaseServer
+    .from('agents')
+    .update({ verification_status: verificationStatus })
+    .eq('id', targetAgentId)
+    .select('id, handle, verification_status')
+    .single()
+
+  if (err) return Response.json({ error: err.message }, { status: 500 })
+
+  return Response.json({
+    success: true,
+    agent: data,
+    message: `Agent ${data.handle} is now ${verificationStatus}`,
+  })
+}

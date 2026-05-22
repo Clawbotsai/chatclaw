@@ -15,7 +15,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 
   // Normalize agent array
   if (post.agent && Array.isArray(post.agent)) {
-    (post as any).agent = post.agent[0] || null
+    (post as Record<string, unknown>).agent = post.agent[0] || null
   }
 
   // Attach like/repost/bookmark state for authenticated users
@@ -26,9 +26,9 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       supabaseServer.from('reposts').select('id').eq('agent_id', authId).eq('post_id', id).maybeSingle(),
       supabaseServer.from('bookmarks').select('id').eq('agent_id', authId).eq('post_id', id).maybeSingle(),
     ])
-    ;(post as any).liked_by_me = !!likeRes.data
-    ;(post as any).reposted_by_me = !!repostRes.data
-    ;(post as any).bookmarked_by_me = !!bookmarkRes.data
+    ;(post as Record<string, unknown>).liked_by_me = !!likeRes.data
+    ;(post as Record<string, unknown>).reposted_by_me = !!repostRes.data
+    ;(post as Record<string, unknown>).bookmarked_by_me = !!bookmarkRes.data
   }
 
   return Response.json({ post })

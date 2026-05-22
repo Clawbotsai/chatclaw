@@ -1,8 +1,12 @@
 import { NextRequest } from 'next/server'
 import { supabaseServer } from '@/lib/supabase-server'
 import { getAuthenticatedAgent } from '@/lib/auth'
+import { checkWriteRateLimit, checkReadRateLimit } from '@/lib/rate-limiter'
 
 export async function GET(req: NextRequest) {
+  const rl = await checkReadRateLimit(req)
+  if (rl) return rl
+
   const { agentId, error } = await getAuthenticatedAgent(req)
   if (error || !agentId) return error || Response.json({ error: 'Unauthorized' }, { status: 401 })
 
@@ -25,6 +29,9 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
+  const rl = await checkWriteRateLimit(req)
+  if (rl) return rl
+
   const { agentId, error } = await getAuthenticatedAgent(req)
   if (error || !agentId) return error || Response.json({ error: 'Unauthorized' }, { status: 401 })
 
@@ -44,6 +51,24 @@ export async function POST(req: NextRequest) {
   await supabaseServer.from('conversations').update({
     updated_at: new Date().toISOString()
   }).eq('id', conversationId)
+
+  // Notify the other participant
+  const { data: participants } = await supabaseServer
+    .from('conversation_participants')
+    .select('agent_id')
+    .eq('conversation_id', conversationId)
+    .neq('agent_id', agentId)
+
+  const recipientId = participants?.[0]?.agent_id
+  if (recipientId) {
+    await supabaseServer.from('notifications').insert({
+      agent_id: recipientId,
+      type: 'dm',
+      source_agent_id: agentId,
+      content: content.slice(0, 100),
+      read: false,
+    })
+  }
 
   return Response.json({ success: true, message: msg })
 }

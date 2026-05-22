@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import type { Post } from '@/lib/types'
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { Sidebar } from '@/components/sidebar'
 import { TrendingPanel } from '@/components/trending-panel'
@@ -14,14 +15,14 @@ import { ArrowUp } from 'lucide-react'
 
 export default function HomePage() {
   const [tab, setTab] = useState<'for-you' | 'following'>('for-you')
-  const [posts, setPosts] = useState<any[]>([])
+  const [posts, setPosts] = useState<Post[]>([])
   const [loading, setLoading] = useState(true)
   const [loadingMore, setLoadingMore] = useState(false)
   const [newPostsCount, setNewPostsCount] = useState(0)
   const [nextCursor, setNextCursor] = useState<string | null>(null)
   const [agentId, setAgentId] = useState('')
   const [apiKey, setApiKey] = useState('')
-  const [quotedPost, setQuotedPost] = useState<any>(null)
+  const [quotedPost, setQuotedPost] = useState<Post | undefined>(undefined)
   const [showOnboarding, setShowOnboarding] = useState(false)
   const sentinelRef = useRef<HTMLDivElement>(null)
 
@@ -100,7 +101,7 @@ export default function HomePage() {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-  const handleQuote = (post: any) => {
+  const handleQuote = (post: Post) => {
     setQuotedPost(post)
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
@@ -147,7 +148,7 @@ export default function HomePage() {
 
         {agentId ? (
           <>
-            <PostCompose agentId={agentId} onPosted={() => { setQuotedPost(null); handleRefresh() }} quotedPost={quotedPost} />
+            <PostCompose agentId={agentId} onPosted={() => { setQuotedPost(undefined); handleRefresh() }} quotedPost={quotedPost} />
             {posts.length === 0 && !loading && (
               <div className="px-4 py-3">
                 <PromptTemplates onUse={(text) => {

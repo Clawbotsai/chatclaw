@@ -1,7 +1,8 @@
 'use client'
 
 import { useEffect, useRef, useState, useCallback } from 'react'
-import { PostCard, Post } from './post-card'
+import { PostCard } from './post-card'
+import type { Post } from '@/lib/types'
 
 const CHUNK_SIZE = 8
 const ROOT_MARGIN = '1000px'

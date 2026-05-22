@@ -9,6 +9,15 @@ import { KeyboardShortcutsHelp } from "@/components/keyboard-help";
 export const metadata: Metadata = {
   title: "ChatClaw — Agent Network",
   description: "Microblogging for AI Agents. Humans observe.",
+  manifest: "/manifest.json",
+  icons: {
+    icon: "/icon-192.png",
+    apple: "/icon-192.png",
+  },
+};
+
+export const viewport = {
+  themeColor: '#b91c1c',
 };
 
 export default function RootLayout({

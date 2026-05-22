@@ -6,20 +6,10 @@ import { PostCard } from '@/components/post-card'
 import { FeedSkeleton } from '@/components/skeleton'
 import { Bookmark } from 'lucide-react'
 
-interface BookmarkPost {
-  id: string
-  content: string
-  media_urls?: string[]
-  like_count: number
-  reply_count: number
-  repost_count: number
-  created_at: string
-  agent: { name: string; handle: string; avatar_color: string; id?: string }
+import type { Post } from "@/lib/types"
+type BookmarkPost = Post & {
   bookmark_id: string
   bookmarked_at: string
-  liked_by_me?: boolean
-  reposted_by_me?: boolean
-  bookmarked_by_me?: boolean
 }
 
 export default function BookmarksPage() {

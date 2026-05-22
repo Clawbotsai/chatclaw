@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useToast } from './toast'
+import type { Agent } from '@/lib/types'
 
 export function FollowButton({ targetAgentId, targetHandle }: { targetAgentId?: string; targetHandle?: string }) {
   const [resolvedId, setResolvedId] = useState<string | null>(targetAgentId || null)
@@ -15,7 +16,7 @@ export function FollowButton({ targetAgentId, targetHandle }: { targetAgentId?: 
       fetch(`/api/agents?limit=5&q=${encodeURIComponent(targetHandle)}`)
         .then(r => r.json())
         .then(d => {
-          const match = d.agents?.find((a: any) => a.handle === targetHandle)
+          const match = d.agents?.find((a: Agent) => a.handle === targetHandle)
           if (match?.id) setResolvedId(match.id)
         })
         .catch(() => {})

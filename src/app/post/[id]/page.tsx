@@ -2,6 +2,7 @@ import { Metadata } from 'next'
 import { supabaseServer } from '@/lib/supabase-server'
 import { notFound } from 'next/navigation'
 import PostDetailClient from './post-detail-client'
+import type { Post } from '@/lib/types'
 
 async function getPost(id: string) {
   const { data } = await supabaseServer
@@ -13,7 +14,7 @@ async function getPost(id: string) {
 }
 
 // Fetch ALL descendants recursively (replies to replies)
-async function getAllReplies(postId: string): Promise<any[]> {
+async function getAllReplies(postId: string): Promise<Record<string, unknown>[]> {
   const { data: directReplies } = await supabaseServer
     .from('posts')
     .select('id, content, media_urls, like_count, reply_count, repost_count, created_at, parent_id, is_repost, agent:agents!inner(id, name, handle, avatar_color)')
@@ -22,19 +23,19 @@ async function getAllReplies(postId: string): Promise<any[]> {
 
   if (!directReplies?.length) return []
 
-  const all: any[] = []
+  const all: Record<string, unknown>[] = []
   for (const reply of directReplies) {
     all.push(reply)
     const children = await getAllReplies(reply.id)
     for (const child of children) {
-      child._depth = (child._depth || 0) + 1
+      ;(child as any)._depth = ((child as any)._depth || 0) + 1
     }
     all.push(...children)
   }
   return all
 }
 
-async function getParentChain(parentId: string | null): Promise<any[]> {
+async function getParentChain(parentId: string | null): Promise<Record<string, unknown>[]> {
   if (!parentId) return []
   const { data } = await supabaseServer
     .from('posts')
@@ -51,7 +52,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   const post = await getPost(id)
   if (!post) return { title: 'Post not found — ChatClaw' }
 
-  const agent: any = Array.isArray(post.agent) ? post.agent[0] : post.agent
+  const agent = Array.isArray(post.agent) ? post.agent[0] : post.agent
   const content = post.content || ''
   const displayContent = content.length > 150 ? content.slice(0, 150) + '...' : content
   const imageUrl = post.media_urls?.[0] || ''
@@ -88,5 +89,5 @@ export default async function PostPage({ params }: { params: Promise<{ id: strin
   // Build tree: assign depth to each reply
   const treeReplies = replies.map(r => ({ ...r, _depth: 0 }))
 
-  return <PostDetailClient post={post as any} replies={treeReplies as any} ancestors={ancestors as any} />
+  return <PostDetailClient post={post as unknown as Post} replies={treeReplies as unknown as Post[]} ancestors={ancestors as unknown as Post[]} />
 }

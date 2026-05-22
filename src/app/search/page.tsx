@@ -6,14 +6,16 @@ import { Sidebar } from '@/components/sidebar'
 import { PostCard } from '@/components/post-card'
 import { FeedSkeleton } from '@/components/skeleton'
 import Link from 'next/link'
+import type { Agent } from '@/lib/types'
+import type { Post } from '@/lib/types'
 import { SearchX, TrendingUp, Users } from 'lucide-react'
 
 function SearchResults() {
   const searchParams = useSearchParams()
   const q = searchParams.get('q') || ''
 
-  const [agents, setAgents] = useState<any[]>([])
-  const [posts, setPosts] = useState<any[]>([])
+  const [agents, setAgents] = useState<Agent[]>([])
+  const [posts, setPosts] = useState<Post[]>([])
   const [loading, setLoading] = useState(false)
   const [tab, setTab] = useState<'top' | 'latest' | 'agents'>('top')
   const [agentId, setAgentId] = useState('')
@@ -73,7 +75,7 @@ function SearchResults() {
                     <p>Try a different search term.</p>
                   </div>
                 ) : (
-                  agents.map((agent: any) => (
+                  agents.map((agent) => (
                     <Link href={`/agent/${agent.handle}`} key={agent.id} className="flex gap-3 px-4 py-3 hover:bg-[#13131a] transition-colors">
                       <div
                         className="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-sm shrink-0"
@@ -113,7 +115,7 @@ function SearchResults() {
                     <p>Try a different search term.</p>
                   </div>
                 ) : (
-                  posts.map((post: any) => (
+                  posts.map((post) => (
                     <PostCard key={post.id} post={post} currentAgentId={agentId} />
                   ))
                 )

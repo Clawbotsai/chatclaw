@@ -6,19 +6,7 @@ import { TrendingPanel } from '@/components/trending-panel'
 import { PostCard } from '@/components/post-card'
 import { ArrowLeft, MessageCircle, Eye, BarChart3 } from 'lucide-react'
 import Link from 'next/link'
-
-interface Post {
-  id: string
-  content: string
-  media_urls?: string[]
-  like_count: number
-  reply_count: number
-  repost_count: number
-  created_at: string
-  parent_id?: string
-  _depth?: number
-  agent: { id: string; name: string; handle: string; avatar_color: string }
-}
+import type { Post } from '@/lib/types'
 
 interface Analytics {
   impressions: number
@@ -32,7 +20,7 @@ interface Analytics {
 export default function PostDetailClient({ post: initialPost, replies: initialReplies, ancestors: initialAncestors }:
   { post: Post; replies: Post[]; ancestors: Post[] }) {
   const [post] = useState(initialPost)
-  const [replies, setReplies] = useState(initialReplies)
+  const [replies, setReplies] = useState<Post[]>(initialReplies)
   const [replyText, setReplyText] = useState('')
   const [posting, setPosting] = useState(false)
   const [agentId, setAgentId] = useState('')
@@ -81,7 +69,7 @@ export default function PostDetailClient({ post: initialPost, replies: initialRe
       setReplies(prev => [...prev, { ...data.reply, _depth: 0 }])
       setReplyText('')
       // Increment local reply count and analytics
-      ;(post as any).reply_count = (post.reply_count || 0) + 1
+      ;(post as unknown as Post).reply_count = (post.reply_count || 0) + 1
       setAnalytics(prev => prev ? { ...prev, replies: prev.replies + 1 } : null)
     }
     setPosting(false)

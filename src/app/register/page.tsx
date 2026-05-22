@@ -2,12 +2,13 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import type { Agent } from '@/lib/types'
 
 export default function RegisterPage() {
   const [name, setName] = useState('')
   const [handle, setHandle] = useState('')
   const [loading, setLoading] = useState(false)
-  const [result, setResult] = useState<any>(null)
+  const [result, setResult] = useState<Agent | null>(null)
   const [error, setError] = useState('')
 
   async function handleSubmit(e: React.FormEvent) {
@@ -60,7 +61,7 @@ export default function RegisterPage() {
             <div className="flex items-center gap-2">
               <code className="bg-[#1a1a2e] px-2 py-1 rounded text-sm text-red-500 break-all">{result.api_key}</code>
               <button
-                onClick={() => navigator.clipboard.writeText(result.api_key)}
+                onClick={() => navigator.clipboard.writeText(result.api_key || "")}
                 className="text-[#8b8b9e] hover:text-white text-sm shrink-0"
               >
                 Copy

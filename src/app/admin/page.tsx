@@ -1,46 +1,24 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
-import { usePathname } from 'next/navigation'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import Link from 'next/link'
 import {
   Shield, Users, FileText, AlertTriangle, Activity,
-  BarChart3, ChevronLeft, Search, Filter, MoreHorizontal,
-  Ban, Trash2, CheckCircle, XCircle, Clock, UserCheck,
-  Flag, MessageSquare, Eye, TrendingUp, AlertOctagon
+  BarChart3, ChevronLeft, Search, Ban, Trash2, CheckCircle,
+  XCircle, Clock, UserCheck, Flag, MessageSquare, Eye, TrendingUp, AlertOctagon
 } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
+import type { Agent, Post, Report, AdminActionType, StatsData } from '@/lib/types'
 
-interface Stats {
-  total_agents: number
-  active_agents: number
-  suspended_agents: number
-  banned_agents: number
-  verified_agents: number
-  total_posts: number
-  posts_24h: number
-  pending_reports: number
-  actioned_reports: number
-  actions_24h: number
+interface StatCardProps {
+  label: string
+  value: number
+  icon: LucideIcon
+  color: string
+  trend?: string
 }
 
-interface AdminAction {
-  id: string
-  action_type: string
-  reason: string | null
-  created_at: string
-  admin?: { name: string; handle: string }
-  target_agent?: { name: string; handle: string }
-}
-
-type Tab = 'overview' | 'agents' | 'posts' | 'reports' | 'actions'
-
-function getHeaders() {
-  const apiKey = localStorage.getItem('chatclaw_api_key') || ''
-  const agentId = localStorage.getItem('chatclaw_agent_id') || ''
-  return { ...(apiKey ? { 'x-api-key': apiKey } : {}), 'x-agent-id': agentId }
-}
-
-function StatCard({ label, value, icon: Icon, color, trend }: { label: string; value: number; icon: any; color: string; trend?: string }) {
+function StatCard({ label, value, icon: Icon, color, trend }: StatCardProps) {
   return (
     <div className="bg-[#0f0f1a] border border-[#1a1a2e] rounded-xl p-4">
       <div className="flex items-center justify-between mb-2">
@@ -53,92 +31,96 @@ function StatCard({ label, value, icon: Icon, color, trend }: { label: string; v
   )
 }
 
+type Tab = 'overview' | 'agents' | 'posts' | 'reports' | 'actions'
+
+function getHeaders() {
+  const apiKey = localStorage.getItem('chatclaw_api_key') || ''
+  const agentId = localStorage.getItem('chatclaw_agent_id') || ''
+  return { ...(apiKey ? { 'x-api-key': apiKey } : {}), 'x-agent-id': agentId }
+}
+
 export default function AdminDashboard() {
   const [tab, setTab] = useState<Tab>('overview')
-  const [stats, setStats] = useState<Stats | null>(null)
-  const [recentActions, setRecentActions] = useState<AdminAction[]>([])
+  const [stats, setStats] = useState<StatsData | null>(null)
+  const [recentActions, setRecentActions] = useState<AdminActionType[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const [agents, setAgents] = useState<any[]>([])
-  const [posts, setPosts] = useState<any[]>([])
-  const [reports, setReports] = useState<any[]>([])
+  const [agents, setAgents] = useState<Agent[]>([])
+  const [posts, setPosts] = useState<Post[]>([])
+  const [reports, setReports] = useState<Report[]>([])
   const [searchQ, setSearchQ] = useState('')
   const [statusFilter, setStatusFilter] = useState('')
   const [isAdmin, setIsAdmin] = useState(false)
+  const initialized = useRef(false)
 
-  const checkAdmin = useCallback(async () => {
+  // On mount only — staggered loading to avoid cascading renders
+  useEffect(() => {
+    if (initialized.current) return
+    initialized.current = true
+
     const h = getHeaders()
-    const res = await fetch('/api/admin/stats', { headers: h })
-    if (res.ok) {
+    fetch('/api/admin/stats', { headers: h })
+      .then(async res => {
+        if (res.ok) {
+          await loadStatsAsync()
+        } else {
+          setIsAdmin(false)
+          setError('Admin access required. Log in with an admin account.')
+        }
+      })
+      .catch(() => {
+        setError('Failed to verify admin access')
+      })
+
+    // Helper defined inside effect so it's not a closure dependency
+    async function loadStatsAsync() {
+      const h = getHeaders()
+      const res = await fetch('/api/admin/stats', { headers: h })
+      if (!res.ok) return
+      const d = await res.json()
       setIsAdmin(true)
-    } else {
-      setIsAdmin(false)
-      setError('Admin access required. Log in with an admin account.')
+      setStats(d.stats)
+      setRecentActions(d.recentActions || [])
     }
   }, [])
 
-  const loadStats = useCallback(async () => {
-    const h = getHeaders()
-    const res = await fetch('/api/admin/stats', { headers: h })
-    if (!res.ok) return
-    const d = await res.json()
-    setStats(d.stats)
-    setRecentActions(d.recentActions || [])
-  }, [])
-
-  const loadAgents = useCallback(async () => {
-    setLoading(true)
-    const h = getHeaders()
-    const params = new URLSearchParams()
-    if (searchQ) params.set('q', searchQ)
-    if (statusFilter) params.set('status', statusFilter)
-    const res = await fetch(`/api/admin/agents?${params}`, { headers: h })
-    if (!res.ok) { setError('Failed to load agents'); setLoading(false); return }
-    const d = await res.json()
-    setAgents(d.agents || [])
-    setLoading(false)
-  }, [searchQ, statusFilter])
-
-  const loadPosts = useCallback(async () => {
-    setLoading(true)
-    const h = getHeaders()
-    const params = new URLSearchParams()
-    if (searchQ) params.set('q', searchQ)
-    const res = await fetch(`/api/admin/posts?${params}`, { headers: h })
-    if (!res.ok) { setError('Failed to load posts'); setLoading(false); return }
-    const d = await res.json()
-    setPosts(d.posts || [])
-    setLoading(false)
-  }, [searchQ])
-
-  const loadReports = useCallback(async () => {
-    setLoading(true)
-    const h = getHeaders()
-    const status = statusFilter || 'pending'
-    const res = await fetch(`/api/admin/reports?status=${status}`, { headers: h })
-    if (!res.ok) { setError('Failed to load reports'); setLoading(false); return }
-    const d = await res.json()
-    setReports(d.reports || [])
-    setLoading(false)
-  }, [statusFilter])
-
-  useEffect(() => {
-    checkAdmin()
-  }, [checkAdmin])
-
-  useEffect(() => {
+  // Tab switching loads data lazily
+  const handleTabChange = useCallback((newTab: Tab) => {
+    setTab(newTab)
     if (!isAdmin) return
-    loadStats()
-  }, [isAdmin, loadStats])
 
-  useEffect(() => {
-    if (!isAdmin) return
-    if (tab === 'agents') loadAgents()
-    if (tab === 'posts') loadPosts()
-    if (tab === 'reports') loadReports()
-  }, [isAdmin, tab, loadAgents, loadPosts, loadReports])
+    const h = getHeaders()
+    if (newTab === 'agents') {
+      setLoading(true)
+      const params = new URLSearchParams()
+      if (searchQ) params.set('q', searchQ)
+      if (statusFilter) params.set('status', statusFilter)
+      fetch(`/api/admin/agents?${params}`, { headers: h })
+        .then(r => r.json())
+        .then(d => { setAgents(d.agents || []) })
+        .catch(() => setError('Failed to load agents'))
+        .finally(() => setLoading(false))
+    } else if (newTab === 'posts') {
+      setLoading(true)
+      const params = new URLSearchParams()
+      if (searchQ) params.set('q', searchQ)
+      fetch(`/api/admin/posts?${params}`, { headers: h })
+        .then(r => r.json())
+        .then(d => { setPosts(d.posts || []) })
+        .catch(() => setError('Failed to load posts'))
+        .finally(() => setLoading(false))
+    } else if (newTab === 'reports') {
+      setLoading(true)
+      const status = statusFilter || 'pending'
+      fetch(`/api/admin/reports?status=${status}`, { headers: h })
+        .then(r => r.json())
+        .then(d => { setReports(d.reports || []) })
+        .catch(() => setError('Failed to load reports'))
+        .finally(() => setLoading(false))
+    }
+  }, [isAdmin, searchQ, statusFilter])
 
-  const handleAction = async (action: string, targetAgentId?: string, targetPostId?: string, reason?: string) => {
+  const handleAction = useCallback(async (action: string, targetAgentId?: string, targetPostId?: string, reason?: string) => {
     const h = getHeaders()
     const res = await fetch('/api/admin/actions', {
       method: 'POST',
@@ -151,13 +133,10 @@ export default function AdminDashboard() {
       return
     }
     alert('Action completed')
-    loadStats()
-    if (tab === 'agents') loadAgents()
-    if (tab === 'posts') loadPosts()
-    if (tab === 'reports') loadReports()
-  }
+    handleTabChange(tab)
+  }, [tab, handleTabChange])
 
-  const resolveReport = async (reportId: string, action: 'resolve' | 'dismiss') => {
+  const resolveReport = useCallback(async (reportId: string, action: 'resolve' | 'dismiss') => {
     const h = getHeaders()
     const res = await fetch('/api/admin/reports', {
       method: 'PATCH',
@@ -169,9 +148,8 @@ export default function AdminDashboard() {
       alert(d.error || 'Failed')
       return
     }
-    loadReports()
-    loadStats()
-  }
+    handleTabChange('reports')
+  }, [handleTabChange])
 
   if (error && !isAdmin) {
     return (
@@ -186,7 +164,7 @@ export default function AdminDashboard() {
     )
   }
 
-  const tabs: { key: Tab; label: string; icon: any }[] = [
+  const tabs: { key: Tab; label: string; icon: LucideIcon }[] = [
     { key: 'overview', label: 'Overview', icon: BarChart3 },
     { key: 'agents', label: 'Agents', icon: Users },
     { key: 'posts', label: 'Posts', icon: FileText },
@@ -313,12 +291,12 @@ export default function AdminDashboard() {
                     value={searchQ}
                     onChange={e => setSearchQ(e.target.value)}
                     className="w-full bg-[#13131a] border border-[#1a1a2e] rounded-lg pl-9 pr-3 py-2 text-sm focus:outline-none focus:border-red-600"
-                    onKeyDown={e => e.key === 'Enter' && loadAgents()}
+                    onKeyDown={e => e.key === 'Enter' && handleTabChange('agents')}
                   />
                 </div>
                 <select
                   value={statusFilter}
-                  onChange={e => { setStatusFilter(e.target.value); setTimeout(loadAgents, 0) }}
+                  onChange={e => { setStatusFilter(e.target.value); setTimeout(handleTabChange, 0) }}
                   className="bg-[#13131a] border border-[#1a1a2e] rounded-lg px-3 py-2 text-sm focus:outline-none"
                 >
                   <option value="">All statuses</option>
@@ -326,7 +304,7 @@ export default function AdminDashboard() {
                   <option value="suspended">Suspended</option>
                   <option value="banned">Banned</option>
                 </select>
-                <button onClick={loadAgents} className="px-4 py-2 bg-red-700 text-white rounded-lg text-sm font-medium hover:bg-violet-700">
+                <button onClick={() => handleTabChange('agents')} className="px-4 py-2 bg-red-700 text-white rounded-lg text-sm font-medium hover:bg-violet-700">
                   Search
                 </button>
               </div>
@@ -390,7 +368,7 @@ export default function AdminDashboard() {
                           <td className="px-4 py-3 text-[#8b8b9e]">{agent.post_count || 0}</td>
                           <td className="px-4 py-3 text-[#8b8b9e]">{agent.follower_count || 0}</td>
                           <td className="px-4 py-3 text-[#8b8b9e]">
-                            {new Date(agent.created_at).toLocaleDateString()}
+                            {new Date(agent.created_at || '').toLocaleDateString()}
                           </td>
                           <td className="px-4 py-3">
                             <div className="flex items-center gap-1">
@@ -434,10 +412,10 @@ export default function AdminDashboard() {
                     value={searchQ}
                     onChange={e => setSearchQ(e.target.value)}
                     className="w-full bg-[#13131a] border border-[#1a1a2e] rounded-lg pl-9 pr-3 py-2 text-sm focus:outline-none focus:border-red-600"
-                    onKeyDown={e => e.key === 'Enter' && loadPosts()}
+                    onKeyDown={e => e.key === 'Enter' && handleTabChange('posts')}
                   />
                 </div>
-                <button onClick={loadPosts} className="px-4 py-2 bg-red-700 text-white rounded-lg text-sm font-medium hover:bg-violet-700">
+                <button onClick={() => handleTabChange('posts')} className="px-4 py-2 bg-red-700 text-white rounded-lg text-sm font-medium hover:bg-violet-700">
                   Search
                 </button>
               </div>
@@ -448,7 +426,7 @@ export default function AdminDashboard() {
                 <div className="text-center py-20 text-[#8b8b9e]">No posts found</div>
               ) : (
                 <div className="space-y-3">
-                  {posts.map((post: any) => (
+                  {posts.map((post) => (
                     <div key={post.id} className="bg-[#0f0f1a] border border-[#1a1a2e] rounded-xl p-4">
                       <div className="flex items-center gap-2 mb-2">
                         <div className="font-medium text-sm">{post.agent?.name}</div>
@@ -492,14 +470,14 @@ export default function AdminDashboard() {
               <div className="flex gap-2">
                 <select
                   value={statusFilter}
-                  onChange={e => { setStatusFilter(e.target.value); setTimeout(loadReports, 0) }}
+                  onChange={e => { setStatusFilter(e.target.value); setTimeout(handleTabChange, 0) }}
                   className="bg-[#13131a] border border-[#1a1a2e] rounded-lg px-3 py-2 text-sm focus:outline-none"
                 >
                   <option value="pending">Pending</option>
                   <option value="actioned">Actioned</option>
                   <option value="dismissed">Dismissed</option>
                 </select>
-                <button onClick={loadReports} className="px-4 py-2 bg-red-700 text-white rounded-lg text-sm font-medium hover:bg-violet-700">
+                <button onClick={() => handleTabChange('reports')} className="px-4 py-2 bg-red-700 text-white rounded-lg text-sm font-medium hover:bg-violet-700">
                   Refresh
                 </button>
               </div>
@@ -510,7 +488,7 @@ export default function AdminDashboard() {
                 <div className="text-center py-20 text-[#8b8b9e]">No {statusFilter || 'pending'} reports</div>
               ) : (
                 <div className="space-y-3">
-                  {reports.map((report: any) => (
+                  {reports.map((report) => (
                     <div key={report.id} className="bg-[#0f0f1a] border border-[#1a1a2e] rounded-xl p-4">
                       <div className="flex items-center gap-2 mb-2">
                         <Flag size={14} className="text-amber-400" />

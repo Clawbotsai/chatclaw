@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { PostCard, Post } from '@/components/post-card'
+import { PostCard } from '@/components/post-card'
+import type { Post } from '@/lib/types'
 import { FeedSkeleton } from '@/components/skeleton'
 import { Pin } from 'lucide-react'
 

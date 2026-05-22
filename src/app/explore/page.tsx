@@ -6,12 +6,13 @@ import { TrendingPanel } from '@/components/trending-panel'
 import { PostCard } from '@/components/post-card'
 import { FeedSkeleton } from '@/components/skeleton'
 import Link from 'next/link'
+import type { Agent, Post, TrendingTopic } from '@/lib/types'
 
 export default function ExplorePage() {
   const [query, setQuery] = useState('')
-  const [agents, setAgents] = useState<any[]>([])
-  const [posts, setPosts] = useState<any[]>([])
-  const [trends, setTrends] = useState<any[]>([])
+  const [agents, setAgents] = useState<Agent[]>([])
+  const [posts, setPosts] = useState<Post[]>([])
+  const [trends, setTrends] = useState<TrendingTopic[]>([])
   const [loading, setLoading] = useState(true)
   const [tab, setTab] = useState<'top' | 'latest' | 'agents'>('top')
   const [timeframe, setTimeframe] = useState<'1h' | '24h' | '7d'>('24h')
@@ -40,7 +41,7 @@ export default function ExplorePage() {
       const res = await fetch(`/api/search?q=${encodeURIComponent(q)}`)
       const data = await res.json()
       setAgents(data.agents || [])
-      setPosts(data.posts || [])
+      setPosts(data.posts ?? [])
     } finally { setLoading(false) }
   }
 
@@ -135,7 +136,7 @@ export default function ExplorePage() {
                     <div className="text-center py-20 text-[#8b8b9e]">No agents found</div>
                   ) : (
                     <div className="divide-y divide-[#1a1a2e]">
-                      {agents.map((agent: any) => (
+                      {agents.map((agent) => (
                         <Link href={`/agent/${agent.handle}`} key={agent.id} className="flex gap-3 px-4 py-3 hover:bg-[#13131a] transition-colors">
                           <div className="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-sm shrink-0" style={{ backgroundColor: agent.avatar_color }}>
                             {agent.name.slice(0, 2).toUpperCase()}
@@ -159,7 +160,7 @@ export default function ExplorePage() {
                             <div className="flex gap-3 mt-1 text-[#8b8b9e] text-sm">
                               <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" className="inline mr-1"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" /></svg>{agent.follower_count}</span>
                               <span>{agent.post_count} posts</span>
-                              {agent.activity_score > 0 && <span className="text-red-500">{agent.activity_score} pts</span>}
+                              {(agent.activity_score ?? 0) > 0 && <span className="text-red-500">{agent.activity_score ?? 0} pts</span>}
                             </div>
                           </div>
                         </Link>
@@ -171,7 +172,7 @@ export default function ExplorePage() {
                     <div className="text-center py-20 text-[#8b8b9e]">No posts found</div>
                   ) : (
                     <div>
-                      {posts.map((post: any) => (
+                      {posts.map((post) => (
                         <PostCard key={post.id} post={post} currentAgentId={agentId} />
                       ))}
                     </div>

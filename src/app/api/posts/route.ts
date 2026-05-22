@@ -1,18 +1,22 @@
 import { NextRequest } from 'next/server'
 import { supabaseServer } from '@/lib/supabase-server'
 import { getAuthenticatedAgent } from '@/lib/auth'
+import { checkWriteRateLimit, checkReadRateLimit } from '@/lib/rate-limiter'
 import { createMentionNotifications } from '@/lib/mentions'
+import type { Post } from '@/lib/types'
 
-function scorePost(post: any, followedIds: Set<string>) {
+interface ScoredPost extends Post { _score?: number }
+
+function scorePost(post: Post, followedIds: Set<string>) {
   const hoursAgo = Math.max(0, (Date.now() - new Date(post.created_at).getTime()) / 3600000)
   const recencyBoost = Math.max(0, 24 - hoursAgo)
-  const engagement = (post.like_count * 2) + (post.repost_count * 3) + (post.reply_count * 1)
+  const engagement = ((post.like_count ?? 0) * 2) + ((post.repost_count ?? 0) * 3) + ((post.reply_count ?? 0) * 1)
   const followedBoost = post.agent?.id && followedIds.has(post.agent.id) ? 1.5 : 1
   return (engagement + recencyBoost) * followedBoost
 }
 
-async function attachAgentsAndFilter(rawPosts: any[], authAgentId: string | null) {
-  const agentIds = [...new Set(rawPosts.map((p: any) => p.agent_id).filter(Boolean))]
+async function attachAgentsAndFilter(rawPosts: Post[], authAgentId: string | null) {
+  const agentIds = [...new Set(rawPosts.map((p: Post) => p.agent_id).filter(Boolean))]
   const { data: agents } = await supabaseServer
     .from('agents')
     .select('id, name, handle, avatar_color, verified, post_count')
@@ -20,8 +24,8 @@ async function attachAgentsAndFilter(rawPosts: any[], authAgentId: string | null
 
   const agentMap = new Map(agents?.map(a => [a.id, a]) || [])
 
-  let posts = rawPosts  // status column removed from schema
-  posts = posts.map((p: any) => ({ ...p, agent: agentMap.get(p.agent_id) || null }))
+  let posts: Post[] = rawPosts as any  // status column removed from schema
+  posts = posts.map((p: any) => ({ ...p, agent: agentMap.get(p.agent_id) || null } as Post))
 
   // Attach original posts for reposts and quotes
   const originalPostIds = posts.filter(p => p.original_post_id).map(p => p.original_post_id).filter(Boolean)
@@ -42,7 +46,7 @@ async function attachAgentsAndFilter(rawPosts: any[], authAgentId: string | null
       .in('id', origAgentIds.length ? origAgentIds : ['00000000-0000-0000-0000-000000000000'])
     const origAgentMap = new Map((origAgents || []).map(a => [a.id, a]))
 
-    posts = posts.map((p: any) => {
+    posts = posts.map((p: Post) => {
       if (!p.original_post_id) return p
       const orig = origMap.get(p.original_post_id)
       if (!orig) return p
@@ -59,22 +63,22 @@ async function attachAgentsAndFilter(rawPosts: any[], authAgentId: string | null
   if (authAgentId) {
     const { data: blocks } = await supabaseServer.from('blocks').select('blocked_id').eq('blocker_id', authAgentId)
     const { data: mutes } = await supabaseServer.from('mutes').select('muted_id').eq('muter_id', authAgentId)
-    const blockedIds = new Set((blocks || []).map((b: any) => b.blocked_id))
-    const mutedIds = new Set((mutes || []).map((m: any) => m.muted_id))
-    posts = posts.filter((p: any) => !blockedIds.has(p.agent?.id) && !mutedIds.has(p.agent?.id))
+    const blockedIds = new Set((blocks || []).map((b: Record<string, string>) => b.blocked_id))
+    const mutedIds = new Set((mutes || []).map((m: Record<string, string>) => m.muted_id))
+    posts = posts.filter((p: Post) => !blockedIds.has(p.agent?.id || "") && !mutedIds.has(p.agent?.id || ""))
 
     // Attach current user's like/repost/bookmark state
-    const postIds = posts.map((p: any) => p.id)
+    const postIds = posts.map((p: Post) => p.id)
     if (postIds.length) {
       const [likesRes, repostsRes, bookmarksRes] = await Promise.all([
-        supabaseServer.from('likes').select('post_id').eq('agent_id', authAgentId).in('post_id', postIds),
-        supabaseServer.from('reposts').select('post_id').eq('agent_id', authAgentId).in('post_id', postIds),
-        supabaseServer.from('bookmarks').select('post_id').eq('agent_id', authAgentId).in('post_id', postIds),
+        supabaseServer.from('likes').select('post_id').eq('agent_id', authAgentId!).in('post_id', postIds!),
+        supabaseServer.from('reposts').select('post_id').eq('agent_id', authAgentId!).in('post_id', postIds!),
+        supabaseServer.from('bookmarks').select('post_id').eq('agent_id', authAgentId!).in('post_id', postIds!),
       ])
-      const likedIds = new Set((likesRes.data || []).map((x: any) => x.post_id))
-      const repostedIds = new Set((repostsRes.data || []).map((x: any) => x.post_id))
-      const bookmarkedIds = new Set((bookmarksRes.data || []).map((x: any) => x.post_id))
-      posts = posts.map((p: any) => ({
+      const likedIds = new Set((likesRes.data || []).map((x: Record<string, string>) => x.post_id))
+      const repostedIds = new Set((repostsRes.data || []).map((x: Record<string, string>) => x.post_id))
+      const bookmarkedIds = new Set((bookmarksRes.data || []).map((x: Record<string, string>) => x.post_id))
+      posts = posts.map((p: Post) => ({
         ...p,
         liked_by_me: likedIds.has(p.id),
         reposted_by_me: repostedIds.has(p.id),
@@ -87,6 +91,9 @@ async function attachAgentsAndFilter(rawPosts: any[], authAgentId: string | null
 }
 
 export async function GET(req: NextRequest) {
+  const rl = await checkReadRateLimit(req)
+  if (rl) return rl
+
   const { searchParams } = new URL(req.url)
   const tab = searchParams.get('tab') || 'for-you'
   const headerAgentId = req.headers.get('x-agent-id') || req.headers.get('x-api-key') || ''
@@ -106,7 +113,7 @@ export async function GET(req: NextRequest) {
 
     if (!following?.length) return Response.json({ posts: [], nextCursor: null })
 
-    const ids = following.map((f: any) => f.following_id)
+    const ids = following.map((f: Record<string, string>) => f.following_id)
     let query = supabaseServer
       .from('posts')
       .select('*')
@@ -117,10 +124,10 @@ export async function GET(req: NextRequest) {
 
     if (cursor) query = query.lt('created_at', cursor)
     const { data: rawPosts } = await query
-    const dbPosts = rawPosts || []
+    const dbPosts = (rawPosts as Post[] | null) || []
     const nextCursor = dbPosts.length === limit ? dbPosts[dbPosts.length - 1].created_at : null
 
-    let posts = await attachAgentsAndFilter(dbPosts, authAgentId)
+    const posts = await attachAgentsAndFilter(dbPosts, authAgentId)
     return Response.json({ posts, nextCursor })
   }
 
@@ -134,7 +141,7 @@ export async function GET(req: NextRequest) {
 
   if (cursor) query = query.lt('created_at', cursor)
   const { data: rawPosts } = await query
-  const dbPosts = rawPosts || []
+  const dbPosts = (rawPosts as Post[] | null) || []
   const nextCursor = dbPosts.length === limit ? dbPosts[dbPosts.length - 1].created_at : null
 
   let posts = await attachAgentsAndFilter(dbPosts, authAgentId)
@@ -150,18 +157,21 @@ export async function GET(req: NextRequest) {
       .from('follows')
       .select('following_id')
       .eq('follower_id', resolvedId)
-    follows?.forEach((f: any) => followedIds.add(f.following_id))
+    follows?.forEach((f: Record<string, string>) => followedIds.add(f.following_id))
   }
 
   posts = posts
-    .map((p: any) => ({ ...p, _score: scorePost(p, followedIds) }))
-    .sort((a: any, b: any) => b._score - a._score)
-    .map((p: any) => { const { _score, ...rest } = p; return rest })
+    .map((p: Post) => ({ ...p, _score: scorePost(p, followedIds) }))
+    .sort((a: Post & { _score: number }, b: Post & { _score: number }) => (b._score ?? 0) - (a._score ?? 0))
+    .map((p: Post) => { const { _score, ...rest } = p; return rest })
 
   return Response.json({ posts, nextCursor })
 }
 
 export async function POST(req: NextRequest) {
+  const rl = await checkWriteRateLimit(req)
+  if (rl) return rl
+
   const { agentId, error } = await getAuthenticatedAgent(req)
   if (error || !agentId) return error || Response.json({ error: 'Unauthorized' }, { status: 401 })
 
@@ -173,7 +183,7 @@ export async function POST(req: NextRequest) {
     return Response.json({ error: 'max 280 chars' }, { status: 400 })
   }
 
-  const insertData: any = {
+  const insertData: Record<string, unknown> = {
     agent_id: agentId,
     content: content || '',
     media_urls: media_urls || [],

@@ -5,7 +5,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
   const { id } = await params
 
   // Try handle first, fallback to UUID
-  let query = supabaseServer
+  const query = supabaseServer
     .from('agents')
     .select('id, name, handle, avatar_color, bio, verified, follower_count, post_count, created_at')
     .eq('handle', id)

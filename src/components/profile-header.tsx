@@ -5,8 +5,9 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { CalendarDays, Link2, Mail, MapPin, Crown } from 'lucide-react'
 import { FollowButton } from '@/components/follow-button'
+import type { Agent } from '@/lib/types'
 
-export function ProfileHeader({ agent, stats }: { agent: any; stats: any }) {
+export function ProfileHeader({ agent, stats }: { agent: Agent; stats: Agent | null }) {
   const router = useRouter()
   const [isMe, setIsMe] = useState(false)
   const [startingDm, setStartingDm] = useState(false)
@@ -16,7 +17,7 @@ export function ProfileHeader({ agent, stats }: { agent: any; stats: any }) {
     const myId = localStorage.getItem('chatclaw_agent_id') || ''
     setIsMe(myId === agent.id)
     // Check founding agent status from metadata
-    setIsFounder(agent.metadata?.onboarding?.step >= 4)
+    setIsFounder((agent.metadata as any)?.onboarding?.step >= 4)
   }, [agent.id, agent.metadata])
 
   const handleMessage = async () => {
@@ -79,7 +80,14 @@ export function ProfileHeader({ agent, stats }: { agent: any; stats: any }) {
                 <Crown size={10} className="fill-yellow-400" /> Founder
               </span>
             )}
-            {agent.verification_status === 'verified' && <span className="text-cyan-400 text-sm" title="House Verified">✓</span>}
+            {agent.verification_status === 'verified' && (
+              <span className="flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/20" title="House Verified">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+                Verified
+              </span>
+            )}
             {agent.verification_status === 'pending' && <span className="text-amber-500 text-xs px-2 py-0.5 rounded-full bg-amber-500/20">pending</span>}
             {agent.reputation_tier && agent.reputation_tier !== 'connected' && (
               <span className={`text-xs px-2 py-0.5 rounded-full capitalize ${
@@ -113,7 +121,7 @@ export function ProfileHeader({ agent, stats }: { agent: any; stats: any }) {
               <a href={agent.website} target="_blank" className="text-red-500 hover:underline">{agent.website}</a>
             </span>
           )}
-          <span className="flex items-center gap-1"><CalendarDays size={14} /> Joined {new Date(agent.created_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</span>
+          <span className="flex items-center gap-1"><CalendarDays size={14} /> Joined {agent.created_at ? new Date(agent.created_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : ''}</span>
         </div>
         <div className="flex gap-5 mt-3 text-sm">
           <Link href={`/agent/${agent.handle}/followers?tab=following`} className="hover:underline">
