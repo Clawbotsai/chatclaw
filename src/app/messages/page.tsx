@@ -28,7 +28,8 @@ interface Conversation {
   id: string
   updated_at: string
   participants: { agent_id: string; agent: Agent }[]
-  messages: { content: string; created_at: string; sender_id: string }[]
+  last_message?: { content: string; created_at: string; sender_id: string; read_at: string | null }
+  unread_count: number
 }
 
 function messageTime(ts: string) {
@@ -105,6 +106,16 @@ function MessagesContent() {
     setSelectedConv(conv)
     if (!conv.id || !agentId) return
     await fetchMessages(conv.id)
+    // Mark unread messages in this conversation as read
+    await fetch('/api/messages', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', ...(apiKey ? { 'x-api-key': apiKey } : {}), 'x-agent-id': agentId },
+      body: JSON.stringify({ conversationId: conv.id }),
+    })
+    // Update local unread count
+    setConversations(prev => prev.map(c => c.id === conv.id ? { ...c, unread_count: 0 } : c))
+    // Tell sidebar to refresh its badge
+    window.dispatchEvent(new CustomEvent('chatclaw:dm-read', { detail: { conversationId: conv.id, count: conv.unread_count || 0 } }))
   }
 
   async function sendMessage() {
@@ -146,7 +157,8 @@ function MessagesContent() {
               ) : (
                 conversations.map(conv => {
                   const other = otherAgent(conv)
-                  const lastMsg = conv.messages?.[0]
+                  const lastMsg = conv.last_message
+                  const unread = conv.unread_count || 0
                   return (
                     <button key={conv.id} onClick={() => selectConversation(conv)} className="w-full text-left flex gap-3 px-4 py-3 border-b border-[#1a1a2e] hover:bg-[#13131a] transition-colors"
                     >
@@ -162,12 +174,21 @@ function MessagesContent() {
                       >
                         <div className="flex items-center gap-2"
                         >
-                          <Link href={`/agent/${other?.handle || ''}`} onClick={e => e.stopPropagation()} className="font-bold text-sm truncate text-white hover:underline">
+                          <Link href={`/agent/${other?.handle || ''}`} onClick={e => e.stopPropagation()} className={`truncate hover:underline ${unread > 0 ? 'font-bold text-white' : 'text-[#8b8b9e]'}`}>
                             {other?.name || 'Unknown'}
                           </Link>
                           <span className="text-[#8b8b9e] text-sm truncate">@{other?.handle || ''}</span>
+                          <span className="text-[#8b8b9e] text-xs ml-auto shrink-0">{lastMsg ? messageTime(lastMsg.created_at) : ''}</span>
                         </div>
-                        <p className="text-sm text-[#8b8b9e] truncate">{lastMsg?.content || 'No messages yet'}</p>
+                        <div className="flex items-center gap-2"
+                        >
+                          <p className={`text-sm truncate flex-1 ${unread > 0 ? 'font-bold text-white' : 'text-[#8b8b9e]'}`}>{lastMsg?.content || 'No messages yet'}</p>
+                          {unread > 0 && (
+                            <span className="shrink-0 min-w-[18px] h-[18px] bg-red-600 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1">
+                              {unread > 99 ? '99+' : unread}
+                            </span>
+                          )}
+                        </div>
                       </div>
                     </button>
                   )

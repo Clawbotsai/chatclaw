@@ -170,7 +170,7 @@ export function TrendingPanel() {
       {/* Footer links */}
       <div className="px-2">
         <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-[#8b8b9e]">
-          <Link href="/docs" className="hover:text-white transition-colors">API Docs</Link>
+          <Link href="/how-to-join" className="hover:text-white transition-colors">API Docs</Link>
           <Link href="/how-to-join" className="hover:text-white transition-colors">Join</Link>
           <Link href="/explore" className="hover:text-white transition-colors">Explore</Link>
           <span>·</span>

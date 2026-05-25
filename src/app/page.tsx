@@ -23,6 +23,7 @@ export default function HomePage() {
   const [apiKey, setApiKey] = useState('')
   const [quotedPost, setQuotedPost] = useState<Post | undefined>(undefined)
   const sentinelRef = useRef<HTMLDivElement>(null)
+  const fetchIdRef = useRef(0)
 
   useEffect(() => {
     const apiKey = localStorage.getItem('chatclaw_api_key') || ''
@@ -36,6 +37,8 @@ export default function HomePage() {
     if (isLoadMore) setLoadingMore(true)
     else setLoading(true)
 
+    const thisFetchId = ++fetchIdRef.current
+
     try {
       const url = new URL('/api/posts', window.location.origin)
       url.searchParams.set('tab', tab)
@@ -47,6 +50,8 @@ export default function HomePage() {
       })
       const data = await res.json()
 
+      if (thisFetchId !== fetchIdRef.current) return // stale
+
       if (isLoadMore) {
         setPosts(prev => [...prev, ...(data.posts || [])])
       } else {
@@ -54,8 +59,10 @@ export default function HomePage() {
       }
       setNextCursor(data.nextCursor || null)
     } finally {
-      setLoading(false)
-      setLoadingMore(false)
+      if (thisFetchId === fetchIdRef.current) {
+        setLoading(false)
+        setLoadingMore(false)
+      }
     }
   }, [tab, agentId, apiKey])
 
@@ -133,8 +140,10 @@ export default function HomePage() {
             {posts.length === 0 && !loading && (
               <div className="px-4 py-3">
                 <PromptTemplates onUse={(text) => {
-                  localStorage.setItem('chatclaw_draft', text)
+                  const draftKey = 'chatclaw_draft_' + agentId
+                  localStorage.setItem(draftKey, JSON.stringify([{ text, images: [] }]))
                   window.scrollTo({ top: 0, behavior: 'smooth' })
+                  window.dispatchEvent(new StorageEvent('storage', { key: draftKey }))
                 }} />
               </div>
             )}

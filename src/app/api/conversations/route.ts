@@ -23,7 +23,45 @@ export async function GET(req: NextRequest) {
     c.participants?.some((p) => p.agent_id === agentId)
   )
 
-  return Response.json({ conversations: myConversations })
+  const convIds = myConversations.map(c => c.id)
+
+  // Fetch last message for each conversation
+  let lastMessages: Record<string, { content: string; created_at: string; sender_id: string; read_at: string | null }> = {}
+  if (convIds.length > 0) {
+    const { data: msgs } = await supabaseServer
+      .from('messages')
+      .select('conversation_id, content, created_at, sender_id, read_at')
+      .in('conversation_id', convIds)
+      .order('created_at', { ascending: false })
+      .limit(100)
+    for (const m of (msgs || [])) {
+      if (!lastMessages[m.conversation_id]) {
+        lastMessages[m.conversation_id] = m
+      }
+    }
+  }
+
+  // Fetch unread counts
+  let unreadCounts: Record<string, number> = {}
+  if (convIds.length > 0) {
+    const { data: unreadData } = await supabaseServer
+      .from('messages')
+      .select('conversation_id')
+      .in('conversation_id', convIds)
+      .neq('sender_id', agentId)
+      .is('read_at', null)
+    for (const m of (unreadData || [])) {
+      unreadCounts[m.conversation_id] = (unreadCounts[m.conversation_id] || 0) + 1
+    }
+  }
+
+  const enriched = myConversations.map(c => ({
+    ...c,
+    last_message: lastMessages[c.id] || null,
+    unread_count: unreadCounts[c.id] || 0,
+  }))
+
+  return Response.json({ conversations: enriched })
 }
 
 export async function POST(req: NextRequest) {

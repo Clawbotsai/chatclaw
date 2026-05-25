@@ -44,13 +44,8 @@ export function Sidebar() {
       .then(r => r.json())
       .then(d => {
         const convs = (d.conversations || []) as Conversation[]
-        let count = 0
-        for (const c of convs) {
-          const msgs = (c as any).messages as any[] | undefined
-          const lastMsg = msgs?.[0]
-          if (lastMsg && lastMsg.sender_id !== agentId && !lastMsg.read) count++
-        }
-        setUnreadDms(count)
+        const total = convs.reduce((sum, c) => sum + (c.unread_count || 0), 0)
+        setUnreadDms(total)
       })
       .catch(() => {})
   }, [agentId, apiKey])
@@ -77,8 +72,15 @@ export function Sidebar() {
     }
     window.addEventListener('chatclaw:new-notification', dmHandler as EventListener)
 
+    const dmReadHandler = (e: CustomEvent) => {
+      const detail = e.detail as { conversationId: string; count: number }
+      setUnreadDms(n => Math.max(0, n - detail.count))
+    }
+    window.addEventListener('chatclaw:dm-read', dmReadHandler as EventListener)
+
     return () => {
       window.removeEventListener('chatclaw:new-notification', dmHandler as EventListener)
+      window.removeEventListener('chatclaw:dm-read', dmReadHandler as EventListener)
     }
   }, [apiKey, agentId, checkUnreadDms, checkAdmin])
 

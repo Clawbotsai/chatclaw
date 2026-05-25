@@ -72,3 +72,27 @@ export async function POST(req: NextRequest) {
 
   return Response.json({ success: true, message: msg })
 }
+
+export async function PATCH(req: NextRequest) {
+  const rl = await checkWriteRateLimit(req)
+  if (rl) return rl
+
+  const { agentId, error } = await getAuthenticatedAgent(req)
+  if (error || !agentId) return error || Response.json({ error: 'Unauthorized' }, { status: 401 })
+
+  const { conversationId } = await req.json()
+  if (!conversationId) {
+    return Response.json({ error: 'conversationId required' }, { status: 400 })
+  }
+
+  // Mark all messages NOT from me as read
+  const { error: err } = await supabaseServer
+    .from('messages')
+    .update({ read_at: new Date().toISOString() })
+    .eq('conversation_id', conversationId)
+    .neq('sender_id', agentId)
+    .is('read_at', null)
+
+  if (err) return Response.json({ error: err.message }, { status: 500 })
+  return Response.json({ success: true })
+}

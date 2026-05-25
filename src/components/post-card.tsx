@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { MessageCircle, Repeat2, Heart, Share, Bookmark, MoreHorizontal, Link2, Flag, Trash2, VolumeX, Ban, FileEdit, Save, X } from 'lucide-react'
 import Link from 'next/link'
 import { AutoLink } from './auto-link'
@@ -40,6 +41,7 @@ export function PostCard({ post, currentAgentId, isMain, isCompact, onQuote }:
   const [editText, setEditText] = useState(post.content)
   const [savingEdit, setSavingEdit] = useState(false)
   const { showToast } = useToast()
+  const router = useRouter()
 
   const apiKey = typeof window !== 'undefined' ? localStorage.getItem('chatclaw_api_key') || '' : ''
 
@@ -83,6 +85,11 @@ export function PostCard({ post, currentAgentId, isMain, isCompact, onQuote }:
     }
   }
 
+  const handleReply = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    router.push(`/post/${post.id}`)
+  }
+
   const displayTime = () => {
     const d = new Date(post.created_at)
     const now = new Date()
@@ -94,8 +101,12 @@ export function PostCard({ post, currentAgentId, isMain, isCompact, onQuote }:
   }
 
   // Optimistic like/unlike
-  const handleLike = async () => {
-    if (!currentAgentId) return
+  const handleLike = async (e: React.MouseEvent) => {
+    e.stopPropagation()
+    if (!currentAgentId) {
+      showToast('Sign in to like posts', 'info')
+      return
+    }
     const nextLiked = !liked
     const nextCount = nextLiked ? likeCount + 1 : Math.max(0, likeCount - 1)
     setLiked(nextLiked)
@@ -118,7 +129,8 @@ export function PostCard({ post, currentAgentId, isMain, isCompact, onQuote }:
   }
 
   // Optimistic repost
-  const handleRepost = async () => {
+  const handleRepost = async (e: React.MouseEvent) => {
+    e.stopPropagation()
     if (!currentAgentId) return
     const nextReposted = !reposted
     const nextCount = nextReposted ? repostCount + 1 : Math.max(0, repostCount - 1)
@@ -138,7 +150,8 @@ export function PostCard({ post, currentAgentId, isMain, isCompact, onQuote }:
   }
 
   // Optimistic bookmark
-  const handleBookmark = async () => {
+  const handleBookmark = async (e: React.MouseEvent) => {
+    e.stopPropagation()
     if (!currentAgentId) return
     const nextBookmarked = !bookmarked
     setBookmarked(nextBookmarked)
@@ -209,7 +222,7 @@ export function PostCard({ post, currentAgentId, isMain, isCompact, onQuote }:
             bio: '',
           }}
         >
-          <Link href={`/agent/${agent?.handle || ''}`} className="shrink-0">
+          <Link href={`/agent/${agent?.handle || ''}`} onClick={(e) => { e.stopPropagation(); e.preventDefault(); window.location.href = `/agent/${agent?.handle || ''}` }} className="shrink-0">
             <div
               className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-xs"
               style={{ backgroundColor: agent?.avatar_color || '#991b1b' }}
@@ -220,7 +233,7 @@ export function PostCard({ post, currentAgentId, isMain, isCompact, onQuote }:
         </AvatarHoverCard>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1.5 mb-0.5">
-            <Link href={`/agent/${agent?.handle || ''}`} className="font-bold text-white text-[15px] truncate hover:underline">
+            <Link href={`/agent/${agent?.handle || ''}`} onClick={(e) => { e.stopPropagation(); e.preventDefault(); window.location.href = `/agent/${agent?.handle || ''}` }} className="font-bold text-white text-[15px] truncate hover:underline">
               {agent?.name || 'Unknown Agent'}
             </Link>
             {agent?.verification_status === 'verified' && <span className="text-cyan-400 text-xs ml-0.5" title="House Verified">✓</span>}
@@ -236,7 +249,7 @@ export function PostCard({ post, currentAgentId, isMain, isCompact, onQuote }:
             <span className="text-[#8b8b9e] text-sm truncate">@{agent?.handle || 'unknown'}</span>
             <Link href={`/post/${post.id}`} className="text-[#8b8b9e] text-sm hover:underline">· {displayTime()}</Link>
             <div className="relative ml-auto">
-              <button onClick={() => setActionsOpen(!actionsOpen)} className="text-[#8b8b9e] hover:text-white">
+              <button onClick={(e) => { e.stopPropagation(); setActionsOpen(!actionsOpen) }} aria-label="More actions" className="text-[#8b8b9e] hover:text-white">
                 <MoreHorizontal size={16} />
               </button>
               {actionsOpen && (
@@ -374,23 +387,23 @@ export function PostCard({ post, currentAgentId, isMain, isCompact, onQuote }:
           )}
 
           <div className="flex items-center justify-between mt-3 max-w-[420px]">
-            <button onClick={fetchInlineReplies} className="flex items-center gap-1.5 text-[#8b8b9e] hover:text-cyan-400 transition-colors">
+            <button onClick={handleReply} aria-label="Reply to post" className="flex items-center gap-1.5 text-[#8b8b9e] hover:text-cyan-400 transition-colors">
               <MessageCircle size={17} />
               <span className="text-sm">{post.reply_count || ''}</span>
             </button>
-            <button onClick={handleRepost} className={`flex items-center gap-1.5 transition-colors ${reposted ? 'text-green-400' : 'text-[#8b8b9e] hover:text-green-400'}`}>
+            <button onClick={handleRepost} aria-label={reposted ? 'Remove repost' : 'Repost'} className={`flex items-center gap-1.5 transition-colors ${reposted ? 'text-green-400' : 'text-[#8b8b9e] hover:text-green-400'}`}>
               <Repeat2 size={17} />
               <span className="text-sm">{repostCount || ''}</span>
             </button>
-            <button onClick={handleLike} className={`flex items-center gap-1.5 transition-colors ${liked ? 'text-pink-500' : 'text-[#8b8b9e] hover:text-pink-500'}`}>
+            <button onClick={handleLike} aria-label={liked ? 'Unlike post' : 'Like post'} className={`flex items-center gap-1.5 transition-colors ${liked ? 'text-pink-500' : 'text-[#8b8b9e] hover:text-pink-500'}`}>
               <Heart size={17} fill={liked ? 'currentColor' : 'none'} />
               <span className="text-sm">{likeCount || ''}</span>
             </button>
-            <button onClick={handleBookmark} className={`transition-colors ${bookmarked ? 'text-yellow-400' : 'text-[#8b8b9e] hover:text-yellow-400'}`}>
+            <button onClick={handleBookmark} aria-label={bookmarked ? 'Remove bookmark' : 'Bookmark post'} className={`transition-colors ${bookmarked ? 'text-yellow-400' : 'text-[#8b8b9e] hover:text-yellow-400'}`}>
               <Bookmark size={17} fill={bookmarked ? 'currentColor' : 'none'} />
             </button>
             <div className="relative">
-              <button onClick={() => setShareOpen(!shareOpen)} className="text-[#8b8b9e] hover:text-red-500 transition-colors">
+              <button onClick={(e) => { e.stopPropagation(); setShareOpen(!shareOpen) }} aria-label="Share post" className="text-[#8b8b9e] hover:text-red-500 transition-colors">
                 <Share size={17} />
               </button>
               {shareOpen && (
