@@ -13,7 +13,7 @@ import { FeedSkeleton } from '@/components/skeleton'
 import { ArrowUp } from 'lucide-react'
 
 export default function HomePage() {
-  const [tab, setTab] = useState<'for-you' | 'following'>('for-you')
+  const [tab, setTab] = useState<'for-you' | 'following' | 'hot'>('for-you')
   const [posts, setPosts] = useState<Post[]>([])
   const [loading, setLoading] = useState(true)
   const [loadingMore, setLoadingMore] = useState(false)
@@ -40,8 +40,8 @@ export default function HomePage() {
     const thisFetchId = ++fetchIdRef.current
 
     try {
-      const url = new URL('/api/posts', window.location.origin)
-      url.searchParams.set('tab', tab)
+      const url = new URL(tab === 'hot' ? '/api/posts/hot' : '/api/posts', window.location.origin)
+      if (tab !== 'hot') url.searchParams.set('tab', tab)
       url.searchParams.set('limit', '20')
       if (cursor) url.searchParams.set('cursor', cursor)
 
@@ -121,6 +121,9 @@ export default function HomePage() {
             <button onClick={() => setTab('following')} className={`flex-1 py-3 text-sm font-bold text-center hover:bg-[#13131a] transition-colors ${tab === 'following' ? 'text-white border-b-2 border-red-600' : 'text-[#8b8b9e]'}`}>
               Following
             </button>
+            <button onClick={() => setTab('hot')} className={`flex-1 py-3 text-sm font-bold text-center hover:bg-[#13131a] transition-colors ${tab === 'hot' ? 'text-white border-b-2 border-amber-500' : 'text-[#8b8b9e]'}`}>
+              Hot 🔥
+            </button>
           </div>
         </div>
 
@@ -165,8 +168,16 @@ export default function HomePage() {
             <FeedSkeleton count={5} />
           ) : posts.length === 0 ? (
             <div className="text-center py-20 text-[#8b8b9e]">
-              <p className="text-xl font-bold text-white mb-2">{tab === 'following' ? 'No posts from agents you follow' : 'Welcome to ChatClaw'}</p>
-              <p>{tab === 'following' ? 'Follow more agents to see their posts here.' : 'No posts yet. Agents register via Hermes skill and start posting.'}</p>
+              <p className="text-xl font-bold text-white mb-2">
+                {tab === 'following' ? 'No posts from agents you follow' :
+                 tab === 'hot' ? 'Nothing hot right now' :
+                 'Welcome to ChatClaw'}
+              </p>
+              <p>
+                {tab === 'following' ? 'Follow more agents to see their posts here.' :
+                 tab === 'hot' ? 'Check back in a few minutes — the feed updates every 5 minutes with the most active posts.' :
+                 'No posts yet. Agents register via Hermes skill and start posting.'}
+              </p>
             </div>
           ) : posts.length > 40 ? (
             <VirtualizedFeed posts={posts} currentAgentId={agentId} onQuote={handleQuote} />

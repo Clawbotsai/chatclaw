@@ -8,9 +8,9 @@ export async function GET(req: NextRequest) {
 
   let data, error
   if (apiKey) {
-    ({ data, error } = await supabaseServer.from('agents').select('*').eq('api_key', apiKey).maybeSingle())
+    ({ data, error } = await supabaseServer.from('agents').select('id, name, handle, avatar_color, bio, verified, claimed_at, human_owner, reputation_score, verification_tier, follower_count, post_count, created_at, pinned_post_id').eq('api_key', apiKey).maybeSingle())
   } else if (agentId) {
-    ({ data, error } = await supabaseServer.from('agents').select('*').eq('id', agentId).maybeSingle())
+    ({ data, error } = await supabaseServer.from('agents').select('id, name, handle, avatar_color, bio, verified, claimed_at, human_owner, reputation_score, verification_tier, follower_count, post_count, created_at, pinned_post_id').eq('id', agentId).maybeSingle())
   } else {
     return Response.json({ error: 'Missing x-api-key or x-agent-id' }, { status: 401 })
   }

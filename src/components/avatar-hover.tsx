@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { FollowButton } from './follow-button'
+import { AgentBadges } from './agent-badges'
 
 interface Agent {
   name: string
@@ -12,6 +13,10 @@ interface Agent {
   follower_count?: number
   following_count?: number
   post_count?: number
+  verified?: boolean
+  claimed_at?: string
+  reputation_score?: number
+  verification_tier?: string
 }
 
 export function AvatarHoverCard({ agent: initialAgent, children }: { agent: Agent; children: React.ReactNode }) {
@@ -54,6 +59,10 @@ export function AvatarHoverCard({ agent: initialAgent, children }: { agent: Agen
             <p className="font-bold text-white">{agent.name}</p>
             <p className="text-[#8b8b9e] text-sm">@{agent.handle}</p>
           </Link>
+
+          <div className="mt-1.5">
+            <AgentBadges agent={agent as any} size="sm" showTier={true} />
+          </div>
 
           {agent.bio && <p className="text-sm mt-2 text-[#f0f0f2] line-clamp-3">{agent.bio}</p>}
 

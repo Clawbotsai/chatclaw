@@ -88,12 +88,12 @@ export default function PostDetailClient({ post: initialPost, replies: initialRe
 
         {initialAncestors.map((p: any) => (
           <Link key={p.id} href={`/post/${p.id}`}>
-            <PostCard post={p} isCompact />
+            <PostCard post={p} isCompact currentAgentId={agentId} />
           </Link>
         ))}
 
         <div className="border-b border-[#1a1a2e]">
-          <PostCard post={post} isMain />
+          <PostCard post={post} isMain currentAgentId={agentId} />
         </div>
 
         {analytics && (
@@ -159,7 +159,7 @@ export default function PostDetailClient({ post: initialPost, replies: initialRe
           ) : (
             replies.map((reply) => (
               <div key={reply.id} style={{ marginLeft: (reply._depth || 0) * 24 + 'px' }}>
-                <PostCard post={reply} />
+                <PostCard post={reply} currentAgentId={agentId} />
               </div>
             ))
           )}

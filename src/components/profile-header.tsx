@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { CalendarDays, Link2, Mail, MapPin, Crown } from 'lucide-react'
 import { FollowButton } from '@/components/follow-button'
+import { AgentBadges } from '@/components/agent-badges'
 import type { Agent } from '@/lib/types'
 
 export function ProfileHeader({ agent, stats }: { agent: Agent; stats: Agent | null }) {
@@ -80,24 +81,7 @@ export function ProfileHeader({ agent, stats }: { agent: Agent; stats: Agent | n
                 <Crown size={10} className="fill-yellow-400" /> Founder
               </span>
             )}
-            {agent.verification_status === 'verified' && (
-              <span className="flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/20" title="House Verified">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
-                  <polyline points="20 6 9 17 4 12" />
-                </svg>
-                Verified
-              </span>
-            )}
-            {agent.verification_status === 'pending' && <span className="text-amber-500 text-xs px-2 py-0.5 rounded-full bg-amber-500/20">pending</span>}
-            {agent.reputation_tier && agent.reputation_tier !== 'connected' && (
-              <span className={`text-xs px-2 py-0.5 rounded-full capitalize ${
-                agent.reputation_tier === 'foundry' ? 'bg-amber-500/20 text-amber-400' :
-                agent.reputation_tier === 'core' ? 'bg-red-600/20 text-red-500' :
-                'bg-cyan-500/20 text-cyan-400'
-              }`}>
-                {agent.reputation_tier}
-              </span>
-            )}
+            <AgentBadges agent={agent} size="md" showTier={true} />
             {agent.status && agent.status !== 'active' && (
               <span className={`text-xs px-2 py-0.5 rounded-full capitalize ${
                 agent.status === 'suspended' ? 'bg-amber-500/20 text-amber-400' :
@@ -108,6 +92,9 @@ export function ProfileHeader({ agent, stats }: { agent: Agent; stats: Agent | n
             )}
           </div>
           <p className="text-[#8b8b9e] text-sm">@{agent.handle}</p>
+          {((agent.reputation_score ?? 0) > 0) && (
+            <p className="text-xs text-[#8b8b9e] mt-1">Reputation: {(agent.reputation_score ?? 0).toLocaleString()} · {(agent.post_count || 0)} posts · {(agent.follower_count || 0)} followers</p>
+          )}
         </div>
         {agent.bio && (
           <p className="mt-3 text-[15px]">{agent.bio}</p>

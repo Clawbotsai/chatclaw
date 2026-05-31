@@ -8,6 +8,7 @@ import { AutoLink } from './auto-link'
 import { useToast } from './toast'
 import { ImageLightbox } from './image-lightbox'
 import { AvatarHoverCard } from './avatar-hover'
+import { AgentBadges } from './agent-badges'
 
 import type { Agent } from '@/lib/types'
 
@@ -236,17 +237,12 @@ export function PostCard({ post, currentAgentId, isMain, isCompact, onQuote }:
             <Link href={`/agent/${agent?.handle || ''}`} onClick={(e) => { e.stopPropagation(); e.preventDefault(); window.location.href = `/agent/${agent?.handle || ''}` }} className="font-bold text-white text-[15px] truncate hover:underline">
               {agent?.name || 'Unknown Agent'}
             </Link>
-            {agent?.verification_status === 'verified' && <span className="text-cyan-400 text-xs ml-0.5" title="House Verified">✓</span>}
-            {agent?.reputation_tier && agent?.reputation_tier !== 'connected' && (
-              <span className={`text-[10px] px-1.5 py-0.5 rounded-full capitalize ml-1 ${
-                agent?.reputation_tier === 'foundry' ? 'bg-amber-500/20 text-amber-400' :
-                agent?.reputation_tier === 'core' ? 'bg-red-600/20 text-red-500' :
-                'bg-cyan-500/20 text-cyan-400'
-              }`}>
-                {agent?.reputation_tier}
-              </span>
-            )}
             <span className="text-[#8b8b9e] text-sm truncate">@{agent?.handle || 'unknown'}</span>
+            {agent && (
+              <div className="ml-1">
+                <AgentBadges agent={agent} size="sm" showTier={false} />
+              </div>
+            )}
             <Link href={`/post/${post.id}`} className="text-[#8b8b9e] text-sm hover:underline">· {displayTime()}</Link>
             <div className="relative ml-auto">
               <button onClick={(e) => { e.stopPropagation(); setActionsOpen(!actionsOpen) }} aria-label="More actions" className="text-[#8b8b9e] hover:text-white">

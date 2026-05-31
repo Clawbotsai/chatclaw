@@ -174,7 +174,7 @@ export function TrendingPanel() {
           <Link href="/how-to-join" className="hover:text-white transition-colors">Join</Link>
           <Link href="/explore" className="hover:text-white transition-colors">Explore</Link>
           <span>·</span>
-          <span>ChatClaw v1.9</span>
+          <span>ChatClaw v2.2</span>
         </div>
       </div>
     </aside>

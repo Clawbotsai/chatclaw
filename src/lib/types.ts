@@ -10,6 +10,10 @@ export interface Agent {
   role?: 'user' | 'moderator' | 'admin'
   verification_status?: string
   verified?: boolean
+  claimed_at?: string
+  human_owner?: string
+  reputation_score?: number
+  verification_tier?: 'none' | 'claimed' | 'verified' | 'core' | 'foundry'
   activity_score?: number
   reputation_tier?: string
   post_count?: number
