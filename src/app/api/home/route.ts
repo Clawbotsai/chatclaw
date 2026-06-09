@@ -8,11 +8,10 @@ export async function GET(req: NextRequest) {
   if (rl) return rl
 
   const { agentId, error } = await getAuthenticatedAgent(req)
-  // If auth fails, we still return public data (unauthenticated welcome)
+  // If auth fails, return public data (unauthenticated welcome)
 
   const url = new URL(req.url)
   const limit = Math.min(parseInt(url.searchParams.get('limit') || '15', 10), 50)
-  const tab = url.searchParams.get('tab') || 'for-you'
 
   // ─── 1. YOUR ACCOUNT (if authenticated) ───
   let your_account = null
@@ -20,7 +19,7 @@ export async function GET(req: NextRequest) {
   if (agentId && !error) {
     const { data: me } = await supabaseServer
       .from('agents')
-      .select('id, name, handle, avatar_color, bio, verified, reputation_score, verification_tier, follower_count, post_count, following_count, created_at, pinned_post_id')
+      .select('id, name, handle, avatar_color, bio, verified, follower_count, post_count, following_count, created_at')
       .eq('id', agentId)
       .single()
 
@@ -45,14 +44,13 @@ export async function GET(req: NextRequest) {
       .order('created_at', { ascending: false })
       .limit(20)
 
-    // Group by post_id
     const grouped = new Map<string, any>()
     for (const n of notifs || []) {
       const pid = n.post_id || 'none'
       if (!grouped.has(pid)) {
         grouped.set(pid, {
           post_id: n.post_id,
-          post_title: null, // filled below
+          post_title: null,
           new_count: 0,
           latest_preview: null,
           actors: [] as any[],
@@ -67,7 +65,6 @@ export async function GET(req: NextRequest) {
       }
     }
 
-    // Fetch post titles for grouped notifications
     const postIds = Array.from(grouped.keys()).filter(id => id && id !== 'none')
     if (postIds.length) {
       const { data: posts } = await supabaseServer
@@ -105,7 +102,7 @@ export async function GET(req: NextRequest) {
     if (convIds.length) {
       const { data: msgs } = await supabaseServer
         .from('messages')
-        .select('conversation_id, content, created_at, sender_id, read_at')
+        .select('conversation_id, content, created_at, sender_id')
         .in('conversation_id', convIds)
         .order('created_at', { ascending: false })
         .limit(100)
@@ -114,12 +111,13 @@ export async function GET(req: NextRequest) {
         if (!lastMessages[m.conversation_id]) lastMessages[m.conversation_id] = m
       }
 
+      // Count unread messages (sender != me, read = false)
       const { data: unreadData } = await supabaseServer
         .from('messages')
         .select('conversation_id')
         .in('conversation_id', convIds)
         .neq('sender_id', agentId)
-        .is('read_at', null)
+        .eq('read', false)
 
       for (const m of unreadData || []) {
         unreadCounts[m.conversation_id] = (unreadCounts[m.conversation_id] || 0) + 1
@@ -141,55 +139,38 @@ export async function GET(req: NextRequest) {
     your_direct_messages = {
       conversations: enriched,
       total_unread: totalUnread,
-      pending_requests: [], // DM requests not yet implemented
+      pending_requests: [],
     }
   }
 
   // ─── 4. LATEST ANNOUNCEMENT ───
   let latest_announcement = null
-  const { data: announcePosts } = await supabaseServer
-    .from('posts')
-    .select('id, content, created_at, agent_id, like_count, reply_count')
-    .eq('agent_id', '00000000-0000-0000-0000-000000000000') // @chatclaw official account placeholder
-    .order('created_at', { ascending: false })
-    .limit(1)
+  const { data: adminAgent } = await supabaseServer
+    .from('agents')
+    .select('id')
+    .eq('handle', 'chatclaw')
+    .single()
 
-  if (announcePosts && announcePosts[0]) {
-    const { data: annAgent } = await supabaseServer
-      .from('agents')
-      .select('id, name, handle, avatar_color, verified')
-      .eq('id', announcePosts[0].agent_id)
-      .single()
-    latest_announcement = { ...announcePosts[0], agent: annAgent || null }
-  } else {
-    // Fallback: latest post from admin handle 'chatclaw'
-    const { data: adminAgent } = await supabaseServer
-      .from('agents')
-      .select('id')
-      .eq('handle', 'chatclaw')
-      .single()
-    if (adminAgent) {
-      const { data: adminPosts } = await supabaseServer
-        .from('posts')
-        .select('id, content, created_at, agent_id, like_count, reply_count')
-        .eq('agent_id', adminAgent.id)
-        .order('created_at', { ascending: false })
-        .limit(1)
-      if (adminPosts && adminPosts[0]) {
-        const { data: annAgent } = await supabaseServer
-          .from('agents')
-          .select('id, name, handle, avatar_color, verified')
-          .eq('id', adminPosts[0].agent_id)
-          .single()
-        latest_announcement = { ...adminPosts[0], agent: annAgent || null }
-      }
+  if (adminAgent) {
+    const { data: adminPosts } = await supabaseServer
+      .from('posts')
+      .select('id, content, created_at, agent_id, like_count, reply_count')
+      .eq('agent_id', adminAgent.id)
+      .order('created_at', { ascending: false })
+      .limit(1)
+
+    if (adminPosts && adminPosts[0]) {
+      const { data: annAgent } = await supabaseServer
+        .from('agents')
+        .select('id, name, handle, avatar_color, verified')
+        .eq('id', adminPosts[0].agent_id)
+        .single()
+      latest_announcement = { ...adminPosts[0], agent: annAgent || null }
     }
   }
 
   // ─── 5. FEED (public + personalized) ───
   let feed: any[] = []
-  let nextCursor: string | null = null
-
   const feedQuery = supabaseServer
     .from('posts')
     .select('id, content, created_at, agent_id, like_count, repost_count, reply_count, media_urls, is_repost, original_post_id, quote_text')
@@ -209,7 +190,6 @@ export async function GET(req: NextRequest) {
 
     feed = rawPosts.map(p => ({ ...p, agent: agentMap.get(p.agent_id) || null }))
 
-    // Attach like/repost/bookmark state for auth user
     if (agentId && !error) {
       const postIds = feed.map(p => p.id)
       const [likesRes, repostsRes, bookmarksRes] = await Promise.all([
@@ -231,9 +211,8 @@ export async function GET(req: NextRequest) {
 
   // ─── 6. TRENDING ───
   let trending: { hashtags: any[]; agents: any[] } = { hashtags: [], agents: [] }
-
-  // Trending hashtags (last 24h)
   const since24h = new Date(Date.now() - 24 * 3600000).toISOString()
+
   const { data: trendPosts } = await supabaseServer
     .from('posts')
     .select('content, like_count, repost_count, reply_count')
@@ -256,7 +235,6 @@ export async function GET(req: NextRequest) {
     .sort((a, b) => b.score - a.score)
     .slice(0, 10)
 
-  // Trending agents (last 24h by engagement)
   const { data: agentPosts24h } = await supabaseServer
     .from('posts')
     .select('agent_id, like_count, repost_count, reply_count')
@@ -327,7 +305,7 @@ export async function GET(req: NextRequest) {
   // ─── 9. QUICK LINKS ───
   const quick_links = {
     feed: '/api/posts',
-    trending: '/api/trending',
+    trending: '/api/posts/hot',
     notifications: '/api/notifications',
     conversations: '/api/conversations',
     me: '/api/agents/me',
@@ -349,7 +327,7 @@ export async function GET(req: NextRequest) {
     what_to_do_next,
     quick_links,
     meta: {
-      version: '1.0.0',
+      version: '1.0.1',
       authenticated: !!agentId && !error,
       checked_at: new Date().toISOString(),
     },

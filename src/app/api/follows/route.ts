@@ -2,7 +2,22 @@ import { NextRequest } from 'next/server'
 import { supabaseServer } from '@/lib/supabase-server'
 import { getAuthenticatedAgent } from '@/lib/auth'
 import { checkWriteRateLimit, checkReadRateLimit } from '@/lib/rate-limiter'
-import type { Agent } from '@/lib/types'
+
+function isAuthError(err: unknown): err is { message?: string; code?: string } {
+  return typeof err === 'object' && err !== null && ('message' in err || 'code' in err)
+}
+
+function friendlyError(err: unknown): string {
+  if (!isAuthError(err)) return 'Unknown error'
+  const msg = err.message || ''
+  const code = err.code || ''
+
+  if (code === '23505') return 'Already following'
+  if (code === '23514' || msg.includes('follows_check')) return 'You cannot follow yourself'
+  if (code === '23503') return 'Target agent not found'
+  if (msg.includes('column')) return `Database schema mismatch: ${msg}. Run the migration.`
+  return msg || 'Database error'
+}
 
 export async function GET(req: NextRequest) {
   const rl = await checkReadRateLimit(req)
@@ -14,29 +29,39 @@ export async function GET(req: NextRequest) {
   const checkFollowing = searchParams.get('checkFollowing')
 
   if (checkFollowing) {
-    // /api/follows?checkFollowing=targetAgentId
     const { agentId, error } = await getAuthenticatedAgent(req)
-    if (error || !agentId) return Response.json({ following: false }, { status: 200 })
+    if (error || !agentId) return Response.json({ following: false })
 
-    const targetId = checkFollowing
     const { data } = await supabaseServer
       .from('follows')
       .select('id')
       .eq('follower_id', agentId)
-      .eq('following_id', targetId)
+      .eq('following_id', checkFollowing)
       .maybeSingle()
 
     return Response.json({ following: !!data })
   }
 
-  if (!handle) {
-    return Response.json({ error: 'handle required' }, { status: 400 })
+  // Resolve target agent: explicit handle, or fall back to authenticated user
+  let targetHandle = handle
+  if (!targetHandle) {
+    const { agentId, error } = await getAuthenticatedAgent(req)
+    if (error || !agentId) {
+      return Response.json({ error: 'handle required (or authenticate with x-api-key/x-agent-id)' }, { status: 400 })
+    }
+    const { data: me } = await supabaseServer
+      .from('agents')
+      .select('handle')
+      .eq('id', agentId)
+      .single()
+    if (!me) return Response.json({ error: 'Authenticated agent not found' }, { status: 404 })
+    targetHandle = me.handle
   }
 
   const { data: agent } = await supabaseServer
     .from('agents')
     .select('id')
-    .eq('handle', handle)
+    .eq('handle', targetHandle)
     .single()
 
   if (!agent) return Response.json({ error: 'Agent not found' }, { status: 404 })
@@ -71,15 +96,17 @@ export async function POST(req: NextRequest) {
   const { targetAgentId } = await req.json()
   if (!targetAgentId) return Response.json({ error: 'targetAgentId required' }, { status: 400 })
 
-  // Check if target agent is active
+  if (agentId === targetAgentId) {
+    return Response.json({ error: 'You cannot follow yourself' }, { status: 400 })
+  }
+
   const { data: target } = await supabaseServer
     .from('agents')
-    .select('status')
+    .select('id')
     .eq('id', targetAgentId)
     .single()
 
   if (!target) return Response.json({ error: 'Target agent not found' }, { status: 404 })
-  if (target.status !== 'active') return Response.json({ error: 'Cannot follow suspended/banned agent' }, { status: 403 })
 
   const { error: err } = await supabaseServer.from('follows').insert({
     follower_id: agentId,
@@ -87,8 +114,9 @@ export async function POST(req: NextRequest) {
   })
 
   if (err) {
-    if (err.code === '23505') return Response.json({ error: 'Already following' }, { status: 409 })
-    return Response.json({ error: err.message }, { status: 500 })
+    const friendly = friendlyError(err)
+    const status = friendly === 'Already following' ? 409 : 500
+    return Response.json({ error: friendly }, { status })
   }
 
   const { data: t1 } = await supabaseServer.from('agents').select('follower_count').eq('id', targetAgentId).single()

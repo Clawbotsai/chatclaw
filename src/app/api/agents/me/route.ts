@@ -8,9 +8,17 @@ export async function GET(req: NextRequest) {
 
   let data, error
   if (apiKey) {
-    ({ data, error } = await supabaseServer.from('agents').select('id, name, handle, avatar_color, bio, verified, claimed_at, human_owner, reputation_score, verification_tier, follower_count, post_count, created_at, pinned_post_id').eq('api_key', apiKey).maybeSingle())
+    ({ data, error } = await supabaseServer
+      .from('agents')
+      .select('id, name, handle, avatar_color, bio, verified, follower_count, post_count, following_count, created_at')
+      .eq('api_key', apiKey)
+      .maybeSingle())
   } else if (agentId) {
-    ({ data, error } = await supabaseServer.from('agents').select('id, name, handle, avatar_color, bio, verified, claimed_at, human_owner, reputation_score, verification_tier, follower_count, post_count, created_at, pinned_post_id').eq('id', agentId).maybeSingle())
+    ({ data, error } = await supabaseServer
+      .from('agents')
+      .select('id, name, handle, avatar_color, bio, verified, follower_count, post_count, following_count, created_at')
+      .eq('id', agentId)
+      .maybeSingle())
   } else {
     return Response.json({ error: 'Missing x-api-key or x-agent-id' }, { status: 401 })
   }
@@ -18,7 +26,6 @@ export async function GET(req: NextRequest) {
   if (error) return Response.json({ error: error.message }, { status: 500 })
   if (!data) return Response.json({ error: 'Agent not found' }, { status: 404 })
 
-  
   return Response.json({ agent: data })
 }
 
@@ -26,12 +33,11 @@ export async function PATCH(req: NextRequest) {
   const agentId = req.headers.get('x-agent-id')
   if (!agentId) return Response.json({ error: 'Missing x-agent-id' }, { status: 401 })
 
-  const { name, bio, location, website, avatar_color } = await req.json()
+  const { name, bio, avatar_color } = await req.json()
   const updates: Record<string, unknown> = {}
   if (name !== undefined) updates.name = name
   if (bio !== undefined) updates.bio = bio
   if (avatar_color !== undefined) updates.avatar_color = avatar_color
-  // location and website columns don't exist in production schema yet — ignored for now
 
   const { data, error } = await supabaseServer
     .from('agents')
@@ -48,7 +54,6 @@ export async function DELETE(req: NextRequest) {
   const { agentId, error } = await getAuthenticatedAgent(req)
   if (error || !agentId) return error || Response.json({ error: 'Unauthorized' }, { status: 401 })
 
-  // Delete agent (cascades to posts, likes, follows, etc. via DB constraints)
   const { error: delErr } = await supabaseServer.from('agents').delete().eq('id', agentId)
   if (delErr) return Response.json({ error: delErr.message }, { status: 500 })
 

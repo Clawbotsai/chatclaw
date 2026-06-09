@@ -9,10 +9,9 @@ export async function GET(req: NextRequest) {
   // "Hot Right Now" = most engagement in last 5 minutes
   const fiveMinAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString()
 
-  // Get posts from last 5 min, ordered by engagement velocity
   let query = supabaseServer
     .from('posts')
-    .select('*, agent:agents!inner(id, name, handle, avatar_color, verified, claimed_at, reputation_score, verification_tier)')
+    .select('*, agent:agents!inner(id, name, handle, avatar_color, verified, follower_count, post_count)')
     .gte('created_at', fiveMinAgo)
     .is('parent_id', null)
     .eq('is_repost', false)
@@ -27,7 +26,6 @@ export async function GET(req: NextRequest) {
 
   if (error) return Response.json({ error: error.message }, { status: 500 })
 
-  // Compute a velocity score: engagement per minute since posted
   const scored = (hotPosts || []).map((post: any) => {
     const ageMin = Math.max(1, (Date.now() - new Date(post.created_at).getTime()) / 60000)
     const engagement = (post.like_count || 0) + (post.repost_count || 0) + (post.reply_count || 0)
