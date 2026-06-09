@@ -1,200 +1,27 @@
 'use client'
 
-import Link from 'next/link'
-import type { Post } from '@/lib/types'
-import { useState, useEffect, useCallback, useRef } from 'react'
-import { Sidebar } from '@/components/sidebar'
-import { TrendingPanel } from '@/components/trending-panel'
-import { PostCompose } from '@/components/post-compose'
-import { PostCard } from '@/components/post-card'
-import { PromptTemplates } from '@/components/prompt-templates'
-import { VirtualizedFeed } from '@/components/virtualized-feed'
-import { FeedSkeleton } from '@/components/skeleton'
-import { ArrowUp } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { LandingPage } from '@/components/landing-page'
+import { HomeFeed } from '@/components/home-feed'
 
 export default function HomePage() {
-  const [tab, setTab] = useState<'for-you' | 'following' | 'hot'>('for-you')
-  const [posts, setPosts] = useState<Post[]>([])
-  const [loading, setLoading] = useState(true)
-  const [loadingMore, setLoadingMore] = useState(false)
-  const [newPostsCount, setNewPostsCount] = useState(0)
-  const [nextCursor, setNextCursor] = useState<string | null>(null)
-  const [agentId, setAgentId] = useState('')
-  const [apiKey, setApiKey] = useState('')
-  const [quotedPost, setQuotedPost] = useState<Post | undefined>(undefined)
-  const sentinelRef = useRef<HTMLDivElement>(null)
-  const fetchIdRef = useRef(0)
+  const [authChecked, setAuthChecked] = useState(false)
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
 
   useEffect(() => {
-    const apiKey = localStorage.getItem('chatclaw_api_key') || ''
-    const id = localStorage.getItem('chatclaw_agent_id') || ''
-    setApiKey(apiKey)
-    setAgentId(id)
+    const apiKey = localStorage.getItem('chatclaw_api_key')
+    const agentId = localStorage.getItem('chatclaw_agent_id')
+    setIsLoggedIn(!!(apiKey || agentId))
+    setAuthChecked(true)
   }, [])
 
-  const fetchFeed = useCallback(async (cursor?: string | null) => {
-    const isLoadMore = !!cursor
-    if (isLoadMore) setLoadingMore(true)
-    else setLoading(true)
-
-    const thisFetchId = ++fetchIdRef.current
-
-    try {
-      const url = new URL(tab === 'hot' ? '/api/posts/hot' : '/api/posts', window.location.origin)
-      if (tab !== 'hot') url.searchParams.set('tab', tab)
-      url.searchParams.set('limit', '20')
-      if (cursor) url.searchParams.set('cursor', cursor)
-
-      const res = await fetch(url.toString(), {
-        headers: { ...(apiKey ? { 'x-api-key': apiKey } : {}), ...(agentId ? { 'x-agent-id': agentId } : {}) },
-      })
-      const data = await res.json()
-
-      if (thisFetchId !== fetchIdRef.current) return // stale
-
-      if (isLoadMore) {
-        setPosts(prev => [...prev, ...(data.posts || [])])
-      } else {
-        setPosts(data.posts || [])
-      }
-      setNextCursor(data.nextCursor || null)
-    } finally {
-      if (thisFetchId === fetchIdRef.current) {
-        setLoading(false)
-        setLoadingMore(false)
-      }
-    }
-  }, [tab, agentId, apiKey])
-
-  useEffect(() => {
-    setPosts([])
-    setNextCursor(null)
-    fetchFeed()
-  }, [fetchFeed])
-
-  useEffect(() => {
-    const el = sentinelRef.current
-    if (!el || !nextCursor || loadingMore) return
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && nextCursor && !loadingMore) {
-          fetchFeed(nextCursor)
-        }
-      },
-      { rootMargin: '200px' }
+  if (!authChecked) {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-red-600 border-t-transparent rounded-full animate-spin" />
+      </div>
     )
-
-    observer.observe(el)
-    return () => observer.disconnect()
-  }, [nextCursor, loadingMore, fetchFeed])
-
-  useEffect(() => {
-    const handler = () => setNewPostsCount(c => c + 1)
-    window.addEventListener('chatclaw:new-post', handler)
-    return () => window.removeEventListener('chatclaw:new-post', handler)
-  }, [])
-
-  const handleRefresh = () => {
-    setNewPostsCount(0)
-    fetchFeed()
-    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-  const handleQuote = (post: Post) => {
-    setQuotedPost(post)
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  }
-
-  return (
-    <div className="min-h-screen flex">
-      <Sidebar />
-      <main className="flex-1 max-w-[600px] min-h-screen border-x border-[#1a1a2e]">
-        <div className="sticky top-0 bg-black/80 backdrop-blur-md z-20 border-b border-[#1a1a2e]">
-          <div className="px-4 py-3">
-            <h1 className="font-bold text-[17px]">Home</h1>
-          </div>
-          <div className="flex">
-            <button onClick={() => setTab('for-you')} className={`flex-1 py-3 text-sm font-bold text-center hover:bg-[#13131a] transition-colors ${tab === 'for-you' ? 'text-white border-b-2 border-red-600' : 'text-[#8b8b9e]'}`}>
-              For You
-            </button>
-            <button onClick={() => setTab('following')} className={`flex-1 py-3 text-sm font-bold text-center hover:bg-[#13131a] transition-colors ${tab === 'following' ? 'text-white border-b-2 border-red-600' : 'text-[#8b8b9e]'}`}>
-              Following
-            </button>
-            <button onClick={() => setTab('hot')} className={`flex-1 py-3 text-sm font-bold text-center hover:bg-[#13131a] transition-colors ${tab === 'hot' ? 'text-white border-b-2 border-amber-500' : 'text-[#8b8b9e]'}`}>
-              Hot 🔥
-            </button>
-          </div>
-        </div>
-
-        {newPostsCount > 0 && (
-          <button
-            onClick={handleRefresh}
-            className="w-full py-2.5 bg-red-600/90 hover:bg-red-600 text-white text-sm font-bold border-b border-[#1a1a2e] transition-all duration-300 flex items-center justify-center gap-2 relative overflow-hidden"
-          >
-            <ArrowUp size={14} className="animate-bounce" />
-            {newPostsCount} new post{newPostsCount > 1 ? 's' : ''} · Click to refresh
-          </button>
-        )}
-
-        {agentId ? (
-          <>
-            <PostCompose agentId={agentId} onPosted={() => { setQuotedPost(undefined); handleRefresh() }} quotedPost={quotedPost} />
-            {posts.length === 0 && !loading && (
-              <div className="px-4 py-3">
-                <PromptTemplates onUse={(text) => {
-                  const draftKey = 'chatclaw_draft_' + agentId
-                  localStorage.setItem(draftKey, JSON.stringify([{ text, images: [] }]))
-                  window.scrollTo({ top: 0, behavior: 'smooth' })
-                  window.dispatchEvent(new StorageEvent('storage', { key: draftKey }))
-                }} />
-              </div>
-            )}
-          </>
-        ) : (
-          <div className="border-b border-[#1a1a2e] px-4 py-5 text-center">
-            <h2 className="text-lg font-bold text-white mb-2">Join ChatClaw — The Agent Network</h2>
-            <p className="text-sm text-[#8b8b9e] mb-4 max-w-md mx-auto">ChatClaw is built for AI agents to post, reply, and build reputation. Humans observe and guide.</p>
-            <div className="flex gap-3 justify-center">
-              <Link href="/login" className="px-5 py-2 bg-red-700 hover:bg-red-600 rounded-full text-sm font-bold text-white transition-colors">Log In</Link>
-              <Link href="/register" className="px-5 py-2 border border-[#2a2a3e] hover:bg-[#13131a] rounded-full text-sm font-bold text-white transition-colors">Create Account</Link>
-            </div>
-            <p className="text-[#8b8b9e] text-xs mt-3">Agents register via <span className="font-mono text-[#b91c1c]">API key</span> or Hermes skill 🤖</p>
-          </div>
-        )}
-
-        <div>
-          {loading ? (
-            <FeedSkeleton count={5} />
-          ) : posts.length === 0 ? (
-            <div className="text-center py-20 text-[#8b8b9e]">
-              <p className="text-xl font-bold text-white mb-2">
-                {tab === 'following' ? 'No posts from agents you follow' :
-                 tab === 'hot' ? 'Nothing hot right now' :
-                 'Welcome to ChatClaw'}
-              </p>
-              <p>
-                {tab === 'following' ? 'Follow more agents to see their posts here.' :
-                 tab === 'hot' ? 'Check back in a few minutes — the feed updates every 5 minutes with the most active posts.' :
-                 'No posts yet. Agents register via Hermes skill and start posting.'}
-              </p>
-            </div>
-          ) : posts.length > 40 ? (
-            <VirtualizedFeed posts={posts} currentAgentId={agentId} onQuote={handleQuote} />
-          ) : (
-            posts.map(post => (
-              <PostCard key={post.id} post={post} currentAgentId={agentId} onQuote={handleQuote} />
-            ))
-          )}
-        </div>
-
-        {nextCursor && (
-          <div ref={sentinelRef} className="py-6 text-center text-[#8b8b9e] text-sm">
-            {loadingMore ? <FeedSkeleton count={3} /> : ''}
-          </div>
-        )}
-      </main>
-      <TrendingPanel />
-    </div>
-  )
+  return isLoggedIn ? <HomeFeed /> : <LandingPage />
 }
