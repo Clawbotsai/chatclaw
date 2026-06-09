@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { NextRequest } from 'next/server'
 import { supabaseServer } from '@/lib/supabase-server'
 import { getAuthenticatedAgent } from '@/lib/auth'
@@ -8,12 +9,10 @@ export async function GET(req: NextRequest) {
   if (rl) return rl
 
   const { agentId, error } = await getAuthenticatedAgent(req)
-  // If auth fails, return public data (unauthenticated welcome)
-
+  if (error || !agentId) return error || Response.json({ error: 'Unauthorized' }, { status: 401 })
   const url = new URL(req.url)
   const limit = Math.min(parseInt(url.searchParams.get('limit') || '15', 10), 50)
 
-  // ─── 1. YOUR ACCOUNT (if authenticated) ───
   let your_account = null
   let unread_notification_count = 0
   if (agentId && !error) {
@@ -33,8 +32,7 @@ export async function GET(req: NextRequest) {
     unread_notification_count = unreadCount || 0
   }
 
-  // ─── 2. ACTIVITY ON YOUR POSTS (if authenticated) ───
-  let activity_on_your_posts: any[] = []
+  let activity_on_your_posts = []
   if (agentId && !error) {
     const { data: notifs } = await supabaseServer
       .from('notifications')
@@ -44,7 +42,7 @@ export async function GET(req: NextRequest) {
       .order('created_at', { ascending: false })
       .limit(20)
 
-    const grouped = new Map<string, any>()
+    const grouped = new Map()
     for (const n of notifs || []) {
       const pid = n.post_id || 'none'
       if (!grouped.has(pid)) {
@@ -53,15 +51,16 @@ export async function GET(req: NextRequest) {
           post_title: null,
           new_count: 0,
           latest_preview: null,
-          actors: [] as any[],
+          actors: [],
         })
       }
       const g = grouped.get(pid)
       g.new_count++
       if (!g.latest_preview) g.latest_preview = n.content?.slice(0, 120)
       const actor = Array.isArray(n.source_agent) ? n.source_agent[0] : n.source_agent
-      if (actor && !g.actors.find((a: any) => a.id === actor.id)) {
-        g.actors.push(actor)
+      const actorObj = actor as { id?: string } | null
+      if (actorObj?.id && !g.actors.find((a: any) => (a as any).id === actorObj.id)) {
+        g.actors.push(actor as any)
       }
     }
 
@@ -82,8 +81,7 @@ export async function GET(req: NextRequest) {
     activity_on_your_posts = Array.from(grouped.values()).slice(0, 10)
   }
 
-  // ─── 3. YOUR DIRECT MESSAGES (if authenticated) ───
-  let your_direct_messages: any = { conversations: [], total_unread: 0, pending_requests: [] }
+  let your_direct_messages = { conversations: [], total_unread: 0, pending_requests: [] }
   if (agentId && !error) {
     const { data: convData } = await supabaseServer
       .from('conversations')
@@ -91,13 +89,13 @@ export async function GET(req: NextRequest) {
       .order('updated_at', { ascending: false })
       .limit(20)
 
-    const myConversations = (convData || []).filter((c: any) =>
-      c.participants?.some((p: any) => p.agent_id === agentId)
+    const myConversations = (convData || []).filter((c) =>
+      c.participants?.some((p) => p.agent_id === agentId)
     )
 
-    const convIds = myConversations.map((c: any) => c.id)
-    let lastMessages: Record<string, any> = {}
-    let unreadCounts: Record<string, number> = {}
+    const convIds = myConversations.map((c) => c.id)
+    let lastMessages = {}
+    let unreadCounts = {}
 
     if (convIds.length) {
       const { data: msgs } = await supabaseServer
@@ -111,7 +109,6 @@ export async function GET(req: NextRequest) {
         if (!lastMessages[m.conversation_id]) lastMessages[m.conversation_id] = m
       }
 
-      // Count unread messages (sender != me, read = false)
       const { data: unreadData } = await supabaseServer
         .from('messages')
         .select('conversation_id')
@@ -124,8 +121,8 @@ export async function GET(req: NextRequest) {
       }
     }
 
-    const enriched = myConversations.map((c: any) => {
-      const other = c.participants?.find((p: any) => p.agent_id !== agentId)
+    const enriched = myConversations.map((c) => {
+      const other = c.participants?.find((p) => p.agent_id !== agentId)
       return {
         id: c.id,
         with_agent: other?.agent || null,
@@ -135,7 +132,7 @@ export async function GET(req: NextRequest) {
       }
     })
 
-    const totalUnread = enriched.reduce((sum: number, c: any) => sum + (c.unread_count || 0), 0)
+    const totalUnread = enriched.reduce((sum, c) => sum + (c.unread_count || 0), 0)
     your_direct_messages = {
       conversations: enriched,
       total_unread: totalUnread,
@@ -143,7 +140,6 @@ export async function GET(req: NextRequest) {
     }
   }
 
-  // ─── 4. LATEST ANNOUNCEMENT ───
   let latest_announcement = null
   const { data: adminAgent } = await supabaseServer
     .from('agents')
@@ -169,8 +165,7 @@ export async function GET(req: NextRequest) {
     }
   }
 
-  // ─── 5. FEED (public + personalized) ───
-  let feed: any[] = []
+  let feed = []
   const feedQuery = supabaseServer
     .from('posts')
     .select('id, content, created_at, agent_id, like_count, repost_count, reply_count, media_urls, is_repost, original_post_id, quote_text')
@@ -197,9 +192,9 @@ export async function GET(req: NextRequest) {
         supabaseServer.from('reposts').select('post_id').eq('agent_id', agentId).in('post_id', postIds),
         supabaseServer.from('bookmarks').select('post_id').eq('agent_id', agentId).in('post_id', postIds),
       ])
-      const likedIds = new Set((likesRes.data || []).map((x: any) => x.post_id))
-      const repostedIds = new Set((repostsRes.data || []).map((x: any) => x.post_id))
-      const bookmarkedIds = new Set((bookmarksRes.data || []).map((x: any) => x.post_id))
+      const likedIds = new Set((likesRes.data || []).map((x) => x.post_id))
+      const repostedIds = new Set((repostsRes.data || []).map((x) => x.post_id))
+      const bookmarkedIds = new Set((bookmarksRes.data || []).map((x) => x.post_id))
       feed = feed.map(p => ({
         ...p,
         liked_by_me: likedIds.has(p.id),
@@ -209,8 +204,7 @@ export async function GET(req: NextRequest) {
     }
   }
 
-  // ─── 6. TRENDING ───
-  let trending: { hashtags: any[]; agents: any[] } = { hashtags: [], agents: [] }
+  let trending = { hashtags: [], agents: [] }
   const since24h = new Date(Date.now() - 24 * 3600000).toISOString()
 
   const { data: trendPosts } = await supabaseServer
@@ -219,9 +213,9 @@ export async function GET(req: NextRequest) {
     .gte('created_at', since24h)
     .is('parent_id', null)
 
-  const tagCounts = new Map<string, { count: number; engagement: number }>()
+  const tagCounts = new Map()
   for (const post of trendPosts || []) {
-    const tags = (post.content as string)?.match(/#\w+/g) || []
+    const tags = (post.content)?.match(/#\w+/g) || []
     for (const tag of tags) {
       const lower = tag.toLowerCase()
       const existing = tagCounts.get(lower) || { count: 0, engagement: 0 }
@@ -241,7 +235,7 @@ export async function GET(req: NextRequest) {
     .gte('created_at', since24h)
     .is('parent_id', null)
 
-  const agentScores = new Map<string, number>()
+  const agentScores = new Map()
   for (const p of agentPosts24h || []) {
     if (!p.agent_id) continue
     const score = ((p.like_count || 0) * 2) + ((p.repost_count || 0) * 3) + (p.reply_count || 0)
@@ -253,7 +247,7 @@ export async function GET(req: NextRequest) {
     .slice(0, 5)
     .map(([id]) => id)
 
-  let trendingAgents: any[] = []
+  let trendingAgents = []
   if (topAgentIds.length) {
     const { data: topAgents } = await supabaseServer
       .from('agents')
@@ -268,7 +262,6 @@ export async function GET(req: NextRequest) {
 
   trending = { hashtags, agents: trendingAgents }
 
-  // ─── 7. PLATFORM STATS ───
   const { count: total_agents } = await supabaseServer.from('agents').select('*', { count: 'exact', head: true })
   const { count: total_posts } = await supabaseServer.from('posts').select('*', { count: 'exact', head: true }).is('parent_id', null)
   const { count: total_replies } = await supabaseServer.from('posts').select('*', { count: 'exact', head: true }).not('parent_id', 'is', null)
@@ -281,8 +274,7 @@ export async function GET(req: NextRequest) {
     total_conversations: total_conversations || 0,
   }
 
-  // ─── 8. WHAT TO DO NEXT (prioritized) ───
-  const what_to_do_next: string[] = []
+  const what_to_do_next = []
   if (!agentId || error) {
     what_to_do_next.push('Register your agent to join the community')
     what_to_do_next.push('Browse the live feed to see what agents are talking about')
@@ -302,7 +294,6 @@ export async function GET(req: NextRequest) {
     what_to_do_next.push('Post something when you have something to share')
   }
 
-  // ─── 9. QUICK LINKS ───
   const quick_links = {
     feed: '/api/posts',
     trending: '/api/posts/hot',

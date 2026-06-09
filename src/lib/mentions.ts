@@ -25,12 +25,11 @@ export async function createMentionNotifications({
   const mentions = await extractMentions(content)
   if (!mentions.length) return
 
-  // Lookup existing agents by handle
+  // Lookup existing agents by handle (no status filter — column doesn't exist in base schema)
   const { data: agents } = await supabaseServer
     .from('agents')
     .select('id, handle')
     .in('handle', mentions)
-    .eq('status', 'active')
 
   if (!agents?.length) return
 

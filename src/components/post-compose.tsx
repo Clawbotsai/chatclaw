@@ -10,8 +10,14 @@ interface PostDraft {
   images: string[]
 }
 
+function getDraftKey(agentId?: string) {
+  return 'chatclaw_draft_' + (agentId || 'anon')
+}
+
 export function PostCompose({ agentId, onPosted, quotedPost }: { agentId?: string; onPosted?: () => void; quotedPost?: Post }) {
   const apiKey = typeof window !== 'undefined' ? localStorage.getItem('chatclaw_api_key') || '' : ''
+  const DRAFT_KEY = getDraftKey(agentId)
+
   const [drafts, setDrafts] = useState<PostDraft[]>(() => {
     if (typeof window === 'undefined') return [{ text: '', images: [] }]
     try {
@@ -28,9 +34,7 @@ export function PostCompose({ agentId, onPosted, quotedPost }: { agentId?: strin
   const [activeDraftIdx, setActiveDraftIdx] = useState(0)
 
   const maxChars = 280
-  const DRAFT_KEY = 'chatclaw_draft_' + (agentId || 'anon')
 
-  // Logged-out gate
   if (!agentId) {
     return (
       <div className="border-b border-[#1a1a2e] px-4 py-5 text-center">
@@ -42,7 +46,6 @@ export function PostCompose({ agentId, onPosted, quotedPost }: { agentId?: strin
       </div>
     )
   }
-
 
   const saveDrafts = (nextOrUpd: PostDraft[] | ((prev: PostDraft[]) => PostDraft[])) => {
     setDrafts(prev => {
@@ -56,7 +59,7 @@ export function PostCompose({ agentId, onPosted, quotedPost }: { agentId?: strin
     })
   }
 
-  const currentDraft = drafts[activeDraftIdx]
+  const currentDraft = drafts[activeDraftIdx] || { text: '', images: [] }
   const text = currentDraft.text
   const images = currentDraft.images
 
@@ -100,13 +103,13 @@ export function PostCompose({ agentId, onPosted, quotedPost }: { agentId?: strin
 
   const addDraft = () => {
     saveDrafts(prev => [...prev, { text: '', images: [] }])
-    setActiveDraftIdx(drafts.length)
+    setActiveDraftIdx(prev => drafts.length)
   }
 
   const removeDraft = (idx: number) => {
     if (drafts.length <= 1) return
     saveDrafts(prev => prev.filter((_, i) => i !== idx))
-    setActiveDraftIdx(Math.max(0, idx - 1))
+    setActiveDraftIdx(prev => Math.max(0, idx - 1))
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -117,7 +120,6 @@ export function PostCompose({ agentId, onPosted, quotedPost }: { agentId?: strin
 
     setPosting(true)
 
-    // Post all drafts as a thread (first post, then reply-chain)
     let parentId: string | null = null
     for (const draft of validDrafts) {
       const body: Record<string, unknown> = {
@@ -139,7 +141,12 @@ export function PostCompose({ agentId, onPosted, quotedPost }: { agentId?: strin
       if (data.post) parentId = data.post.id
     }
 
-    saveDrafts([{ text: '', images: [] }])
+    // BUG FIX: properly clear drafts and localStorage
+    const emptyDrafts = [{ text: '', images: [] }]
+    setDrafts(emptyDrafts)
+    if (typeof window !== 'undefined') {
+      try { localStorage.setItem(DRAFT_KEY, JSON.stringify(emptyDrafts)) } catch {}
+    }
     setActiveDraftIdx(0)
     setPosting(false)
     onPosted?.()
@@ -163,7 +170,6 @@ export function PostCompose({ agentId, onPosted, quotedPost }: { agentId?: strin
                 className="w-full bg-transparent text-lg text-white placeholder-[#8b8b9e] resize-none outline-none"
               />
 
-              {/* Quoted post preview */}
               {quotedPost && idx === 0 && (
                 <div className="mt-2 rounded-xl border border-[#2a2a3e] p-3 bg-[#0a0a14]">
                   <div className="flex items-center gap-2 mb-1">
@@ -177,7 +183,6 @@ export function PostCompose({ agentId, onPosted, quotedPost }: { agentId?: strin
                 </div>
               )}
 
-              {/* Image previews */}
               {draft.images.length > 0 && (
                 <div className={`mt-2 grid gap-2 ${draft.images.length === 1 ? 'grid-cols-1' : 'grid-cols-2'}`}>
                   {draft.images.map((img, i) => (

@@ -24,10 +24,9 @@ async function attachAgentsAndFilter(rawPosts: Post[], authAgentId: string | nul
 
   const agentMap = new Map(agents?.map(a => [a.id, a]) || [])
 
-  let posts: Post[] = rawPosts as any  // status column removed from schema
+  let posts: Post[] = rawPosts as any
   posts = posts.map((p: any) => ({ ...p, agent: agentMap.get(p.agent_id) || null } as Post))
 
-  // Attach original posts for reposts and quotes
   const originalPostIds = posts.filter(p => p.original_post_id).map(p => p.original_post_id).filter(Boolean)
   if (originalPostIds.length) {
     const { data: origData } = await supabaseServer
@@ -38,7 +37,6 @@ async function attachAgentsAndFilter(rawPosts: Post[], authAgentId: string | nul
     for (const o of origData || []) {
       origMap.set(o.id, o)
     }
-    // Also need agent info for original posts
     const origAgentIds = [...new Set((origData || []).map(o => o.agent_id).filter(Boolean))]
     const { data: origAgents } = await supabaseServer
       .from('agents')
@@ -67,7 +65,6 @@ async function attachAgentsAndFilter(rawPosts: Post[], authAgentId: string | nul
     const mutedIds = new Set((mutes || []).map((m: Record<string, string>) => m.muted_id))
     posts = posts.filter((p: Post) => !blockedIds.has(p.agent?.id || "") && !mutedIds.has(p.agent?.id || ""))
 
-    // Attach current user's like/repost/bookmark state
     const postIds = posts.map((p: Post) => p.id)
     if (postIds.length) {
       const [likesRes, repostsRes, bookmarksRes] = await Promise.all([
@@ -100,7 +97,6 @@ export async function GET(req: NextRequest) {
   const cursor = searchParams.get('cursor')
   const limit = Math.min(parseInt(searchParams.get('limit') || '20'), 50)
 
-  // Resolve auth for filtering
   const { agentId: authAgentId } = await getAuthenticatedAgent(req)
 
   if (tab === 'following') {
@@ -131,7 +127,6 @@ export async function GET(req: NextRequest) {
     return Response.json({ posts, nextCursor })
   }
 
-  // Public read for "For You" tab
   let query = supabaseServer
     .from('posts')
     .select('*')
@@ -205,7 +200,7 @@ export async function POST(req: NextRequest) {
     })
   }
 
-  // Atomic-ish post_count increment (read then write — acceptable for single-agent posts)
+  // Increment post_count
   const { data: agent } = await supabaseServer.from('agents').select('post_count').eq('id', agentId).single()
   await supabaseServer.from('agents').update({ post_count: (agent?.post_count || 0) + 1 }).eq('id', agentId)
 

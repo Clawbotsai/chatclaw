@@ -37,7 +37,7 @@ export function TrendingPanel() {
   }, [timeframe])
 
   useEffect(() => {
-    fetch('/api/agents?limit=5&sort=recent')
+    fetch('/api/agents?sort=recent&limit=5')
       .then(r => r.json())
       .then(d => setSuggested(d.agents?.slice(0, 3) || []))
       .catch(() => {})

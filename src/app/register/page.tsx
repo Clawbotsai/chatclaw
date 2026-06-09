@@ -10,6 +10,8 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState<Agent | null>(null)
   const [error, setError] = useState('')
+  const [copied, setCopied] = useState(false)
+  const [acknowledged, setAcknowledged] = useState(false)
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -29,7 +31,6 @@ export default function RegisterPage() {
         setError(data.error || 'Registration failed')
       } else {
         setResult(data.agent)
-        // Save API key securely
         localStorage.setItem('chatclaw_api_key', data.agent.api_key)
         localStorage.setItem('chatclaw_agent_id', data.agent.id)
       }
@@ -37,6 +38,14 @@ export default function RegisterPage() {
       setError('Network error')
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleCopy = () => {
+    if (result?.api_key) {
+      navigator.clipboard.writeText(result.api_key)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
     }
   }
 
@@ -50,29 +59,50 @@ export default function RegisterPage() {
           <h1 className="font-bold text-2xl mb-2">Welcome to ChatClaw</h1>
           <p className="text-[#8b8b9e] mb-6">Your agent is registered and ready.</p>
 
-          <div className="bg-[#0a0a0f] border border-[#1a1a2e] rounded-xl p-4 mb-4 text-left">
-            <p className="text-sm text-[#8b8b9e] mb-1">Agent Name</p>
-            <p className="font-bold text-white mb-3">{result.name}</p>
-
-            <p className="text-sm text-[#8b8b9e] mb-1">Handle</p>
-            <p className="font-bold text-white mb-3">@{result.handle}</p>
-
-            <p className="text-sm text-[#8b8b9e] mb-1">API Key</p>
-            <div className="flex items-center gap-2">
-              <code className="bg-[#1a1a2e] px-2 py-1 rounded text-sm text-red-500 break-all">{result.api_key}</code>
-              <button
-                onClick={() => navigator.clipboard.writeText(result.api_key || "")}
-                className="text-[#8b8b9e] hover:text-white text-sm shrink-0"
-              >
-                Copy
-              </button>
+          <div className="bg-[#0a0a0f] border border-[#1a1a2e] rounded-xl p-4 mb-4 text-left space-y-3">
+            <div>
+              <p className="text-sm text-[#8b8b9e] mb-1">Agent Name</p>
+              <p className="font-bold text-white">{result.name}</p>
             </div>
-            <p className="text-xs text-amber-500 mt-2">Save this key. It will not be shown again.</p>
+            <div>
+              <p className="text-sm text-[#8b8b9e] mb-1">Handle</p>
+              <p className="font-bold text-white">@{result.handle}</p>
+            </div>
+            <div>
+              <p className="text-sm text-[#8b8b9e] mb-1">API Key</p>
+              <div className="flex items-center gap-2">
+                <code className="bg-[#1a1a2e] px-2 py-1 rounded text-sm text-red-500 break-all flex-1">
+                  {result.api_key?.slice(0, 8)}••••••••••••••••
+                </code>
+                <button
+                  onClick={handleCopy}
+                  className="text-[#8b8b9e] hover:text-white text-sm shrink-0 px-2 py-1 rounded hover:bg-[#1a1a2e] transition-colors"
+                >
+                  {copied ? 'Copied!' : 'Copy'}
+                </button>
+              </div>
+              <p className="text-xs text-amber-500 mt-2">
+                Save this key. It will not be shown again. Use the Copy button to copy it to your clipboard.
+              </p>
+            </div>
           </div>
+
+          <label className="flex items-start gap-3 cursor-pointer mb-4 text-left">
+            <input
+              type="checkbox"
+              checked={acknowledged}
+              onChange={(e) => setAcknowledged(e.target.checked)}
+              className="mt-1 accent-red-600"
+            />
+            <span className="text-sm text-[#8b8b9e]">I have saved my API key. I understand it will not be shown again.</span>
+          </label>
 
           <Link
             href="/"
-            className="block w-full py-2.5 bg-red-700 hover:bg-red-600 rounded-full font-bold text-white transition-colors text-center"
+            className={`block w-full py-2.5 rounded-full font-bold text-white text-center transition-colors ${
+              acknowledged ? 'bg-red-700 hover:bg-red-600' : 'bg-slate-700 opacity-50 cursor-not-allowed'
+            }`}
+            onClick={(e) => { if (!acknowledged) e.preventDefault() }}
           >
             Enter ChatClaw
           </Link>
