@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { Send, ImagePlus, X, Plus } from 'lucide-react'
 import Link from 'next/link'
 import type { Post } from '@/lib/types'
@@ -30,6 +30,8 @@ export function PostCompose({ agentId, onPosted, quotedPost }: { agentId?: strin
     return [{ text: '', images: [] }]
   })
   const [posting, setPosting] = useState(false)
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle')
+  const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [activeDraftIdx, setActiveDraftIdx] = useState(0)
 
@@ -48,6 +50,9 @@ export function PostCompose({ agentId, onPosted, quotedPost }: { agentId?: strin
   }
 
   const saveDrafts = (nextOrUpd: PostDraft[] | ((prev: PostDraft[]) => PostDraft[])) => {
+    setSaveStatus('saving')
+    if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current)
+    saveTimeoutRef.current = setTimeout(() => setSaveStatus('saved'), 600)
     setDrafts(prev => {
       const next = typeof nextOrUpd === 'function' ? nextOrUpd(prev) : nextOrUpd
       if (typeof window !== 'undefined') {
@@ -141,7 +146,6 @@ export function PostCompose({ agentId, onPosted, quotedPost }: { agentId?: strin
       if (data.post) parentId = data.post.id
     }
 
-    // BUG FIX: properly clear drafts and localStorage
     const emptyDrafts = [{ text: '', images: [] }]
     setDrafts(emptyDrafts)
     if (typeof window !== 'undefined') {
@@ -173,8 +177,12 @@ export function PostCompose({ agentId, onPosted, quotedPost }: { agentId?: strin
               {quotedPost && idx === 0 && (
                 <div className="mt-2 rounded-xl border border-[#2a2a3e] p-3 bg-[#0a0a14]">
                   <div className="flex items-center gap-2 mb-1">
-                    <div className="w-5 h-5 rounded-full flex items-center justify-center text-white font-bold text-[8px]" style={{ backgroundColor: quotedPost.agent?.avatar_color || '#991b1b' }}>
-                      {quotedPost.agent?.name?.slice(0, 2).toUpperCase()}
+                    <div className="w-5 h-5 rounded-full flex items-center justify-center text-white font-bold text-[8px] overflow-hidden" style={{ backgroundColor: quotedPost.agent?.avatar_color || '#991b1b' }}>
+                      {quotedPost.agent?.avatar_url ? (
+                        <img src={quotedPost.agent.avatar_url} alt="" className="w-5 h-5 rounded-full object-cover" />
+                      ) : (
+                        <span>{(quotedPost.agent?.name || 'A').slice(0, 1).toUpperCase()}</span>
+                      )}
                     </div>
                     <span className="font-bold text-sm text-white">{quotedPost.agent?.name}</span>
                     <span className="text-[#8b8b9e] text-sm">@{quotedPost.agent?.handle}</span>
@@ -206,6 +214,11 @@ export function PostCompose({ agentId, onPosted, quotedPost }: { agentId?: strin
 
       <div className="flex justify-between items-center mt-2">
         <div className="flex items-center gap-3">
+          {saveStatus !== 'idle' && (
+            <span className={`text-xs transition-opacity duration-300 ${saveStatus === 'saved' ? 'text-green-400 opacity-70' : 'text-[#8b8b9e] opacity-50'}`}>
+              {saveStatus === 'saving' ? 'Saving...' : 'Saved'}
+            </span>
+          )}
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}

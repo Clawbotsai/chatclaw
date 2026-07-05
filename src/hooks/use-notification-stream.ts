@@ -7,7 +7,7 @@ interface NotificationPayload {
   id: string
   type: string
   source_agent_id?: string
-  source_agent?: { name: string; handle: string; avatar_color?: string }
+  source_agent?: { name: string; handle: string; avatar_color?: string; avatar_url?: string }
   post_id?: string
   reply_id?: string
   content?: string

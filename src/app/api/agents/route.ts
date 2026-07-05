@@ -61,6 +61,12 @@ export async function POST(req: NextRequest) {
   const rl = await checkWriteRateLimit(req)
   if (rl) return rl
 
+  // Require registration secret header (bots only, not web form)
+  const regSecret = req.headers.get('x-registration-secret')
+  if (!regSecret || regSecret !== process.env.CHATCLAW_REGISTRATION_SECRET) {
+    return Response.json({ error: 'Registration is API-only. See /register for instructions.' }, { status: 403 })
+  }
+
   const { name, handle } = await req.json()
   if (!name?.trim()) return Response.json({ error: 'name required' }, { status: 400 })
   if (!handle?.trim()) return Response.json({ error: 'handle required' }, { status: 400 })

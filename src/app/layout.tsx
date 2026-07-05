@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { ThemeProvider } from "@/components/theme-provider";
 import { RealtimeProvider } from "@/components/realtime-provider";
 import { BottomNav } from "@/components/bottom-nav";
 import { KeyboardShortcuts } from "@/components/keyboard-shortcuts";
@@ -27,13 +28,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark">
-      <body className="bg-black text-white min-h-screen font-sans antialiased md:pb-0 pb-14">
-        <RealtimeProvider>
-          <ToastProvider>
-            {children}
-            <KeyboardShortcutsHelp />
-          </ToastProvider>
-        </RealtimeProvider>
+      <body className="min-h-screen font-sans antialiased md:pb-0 pb-14" style={{ backgroundColor: 'var(--color-bg)', color: 'var(--color-text)' }}>
+        <ThemeProvider>
+          <RealtimeProvider>
+            <ToastProvider>
+              {children}
+              <KeyboardShortcutsHelp />
+            </ToastProvider>
+          </RealtimeProvider>
+        </ThemeProvider>
         <KeyboardShortcuts />
         <BottomNav />
       </body>

@@ -1,8 +1,9 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import Link from 'next/link'
 import { Sidebar } from '@/components/sidebar'
-import { BarChart3, TrendingUp, Heart, MessageCircle, Repeat, Users, ArrowUpRight } from 'lucide-react'
+import { BarChart3, TrendingUp, Heart, MessageCircle, Repeat, Users, ArrowUpRight, BarChart } from 'lucide-react'
 
 interface AnalyticsData {
   overview: {
@@ -30,19 +31,20 @@ interface AnalyticsData {
 export default function AnalyticsPage() {
   const [data, setData] = useState<AnalyticsData | null>(null)
   const [loading, setLoading] = useState(true)
-
-  const apiKey = typeof window !== 'undefined' ? localStorage.getItem('chatclaw_api_key') || '' : ''
-  const agentId = typeof window !== 'undefined' ? localStorage.getItem('chatclaw_agent_id') || '' : ''
+  const [authed, setAuthed] = useState(false)
 
   useEffect(() => {
-    if (!agentId) { setLoading(false); return }
+    const apiKey = localStorage.getItem('chatclaw_api_key') || ''
+    const agentId = localStorage.getItem('chatclaw_agent_id') || ''
+    if (!agentId) { setAuthed(false); setLoading(false); return }
+    setAuthed(true)
     fetch('/api/analytics', {
       headers: { ...(apiKey ? { 'x-api-key': apiKey } : {}), 'x-agent-id': agentId }
     })
       .then(r => r.json())
       .then(d => { setData(d); setLoading(false) })
       .catch(() => setLoading(false))
-  }, [agentId, apiKey])
+  }, [])
 
   if (loading) {
     return (
@@ -50,6 +52,24 @@ export default function AnalyticsPage() {
         <Sidebar />
         <main className="flex-1 max-w-[800px] min-h-screen border-x border-[#1a1a2e] p-6">
           <div className="text-center py-20 text-[#8b8b9e]">Loading analytics...</div>
+        </main>
+      </div>
+    )
+  }
+
+  if (!authed) {
+    return (
+      <div className="min-h-screen flex">
+        <Sidebar />
+        <main className="flex-1 max-w-[800px] min-h-screen border-x border-[#1a1a2e] p-6 flex flex-col items-center justify-center">
+          <BarChart size={48} className="text-[#2a2a3e] mb-4" />
+          <h2 className="text-xl font-bold text-white mb-2">Analytics requires login</h2>
+          <p className="text-sm text-[#8b8b9e] mb-6 text-center max-w-sm">
+            Log in as an agent to see your post analytics, engagement rates, and daily activity.
+          </p>
+          <Link href="/login" className="px-6 py-2.5 bg-red-600 hover:bg-red-500 rounded-full text-sm font-bold text-white transition-colors">
+            Log in
+          </Link>
         </main>
       </div>
     )

@@ -20,6 +20,8 @@ export default function SettingsPage() {
 
   const [name, setName] = useState('')
   const [bio, setBio] = useState('')
+  const [avatarUrl, setAvatarUrl] = useState('')
+  const [uploadingAvatar, setUploadingAvatar] = useState(false)
   const [avatarColor, setAvatarColor] = useState('#991b1b')
 
   const colors = [
@@ -47,6 +49,7 @@ export default function SettingsPage() {
         setName(data.agent.name || '')
         setBio(data.agent.bio || '')
         setAvatarColor(data.agent.avatar_color || '#991b1b')
+        setAvatarUrl(data.agent.avatar_url || '')
       }
     } finally {
       setLoading(false)
@@ -64,7 +67,7 @@ export default function SettingsPage() {
           ...(apiKey ? { 'x-api-key': apiKey } : {}),
           ...(agentId ? { 'x-agent-id': agentId } : {}),
         },
-        body: JSON.stringify({ name, bio, avatar_color: avatarColor }),
+        body: JSON.stringify({ name, bio, avatar_color: avatarColor, avatar_url: avatarUrl }),
       })
       if (res.ok) {
         setSaveStatus('success')
@@ -78,6 +81,34 @@ export default function SettingsPage() {
       setSaveStatus('error')
     }
     setSaving(false)
+  }
+
+  async function handleAvatarUpload(file: File) {
+    if (!file || !agentId) return
+    setUploadingAvatar(true)
+    try {
+      const formData = new FormData()
+      formData.append('file', file)
+      formData.append('type', 'avatar')
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        headers: {
+          ...(apiKey ? { 'x-api-key': apiKey } : {}),
+          ...(agentId ? { 'x-agent-id': agentId } : {}),
+        },
+        body: formData,
+      })
+      const data = await res.json()
+      if (data.url) {
+        setAvatarUrl(data.url)
+        showToast('Avatar uploaded', 'success')
+      } else {
+        showToast('Upload failed', 'error')
+      }
+    } catch {
+      showToast('Upload failed', 'error')
+    }
+    setUploadingAvatar(false)
   }
 
   async function handleLogout() {
@@ -144,11 +175,39 @@ export default function SettingsPage() {
             <div className="space-y-5">
               {/* Avatar preview */}
               <div className="flex items-center gap-4">
-                <div
-                  className="w-20 h-20 rounded-full flex items-center justify-center text-white font-bold text-2xl"
-                  style={{ backgroundColor: avatarColor }}
-                >
-                  {name.slice(0, 2).toUpperCase()}
+                <div className="relative group">
+                  {avatarUrl ? (
+                    <img
+                      src={avatarUrl}
+                      alt=""
+                      className="w-20 h-20 rounded-full object-cover border-2 border-white/10"
+                    />
+                  ) : (
+                    <div
+                      className="w-20 h-20 rounded-full flex items-center justify-center text-white font-bold text-2xl"
+                      style={{ backgroundColor: avatarColor }}
+                    >
+                      {name.slice(0, 2).toUpperCase()}
+                    </div>
+                  )}
+                  <label className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full opacity-0 group-hover:opacity-100 cursor-pointer transition-opacity">
+                    <span className="text-xs font-bold text-white">Change</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={e => {
+                        const f = e.target.files?.[0]
+                        if (f) handleAvatarUpload(f)
+                      }}
+                      disabled={uploadingAvatar}
+                    />
+                  </label>
+                  {uploadingAvatar && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/60 rounded-full">
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    </div>
+                  )}
                 </div>
                 <div>
                   <p className="font-bold text-lg">{name || 'Your Agent'}</p>

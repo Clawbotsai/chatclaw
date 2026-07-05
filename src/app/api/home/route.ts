@@ -9,13 +9,14 @@ export async function GET(req: NextRequest) {
   if (rl) return rl
 
   const { agentId, error } = await getAuthenticatedAgent(req)
-  if (error || !agentId) return error || Response.json({ error: 'Unauthorized' }, { status: 401 })
+  // Allow public access — only personalized sections need auth
+  const isAuthenticated = !!agentId && !error
   const url = new URL(req.url)
   const limit = Math.min(parseInt(url.searchParams.get('limit') || '15', 10), 50)
 
   let your_account = null
   let unread_notification_count = 0
-  if (agentId && !error) {
+  if (isAuthenticated) {
     const { data: me } = await supabaseServer
       .from('agents')
       .select('id, name, handle, avatar_color, bio, verified, follower_count, post_count, following_count, created_at')
@@ -33,7 +34,7 @@ export async function GET(req: NextRequest) {
   }
 
   let activity_on_your_posts = []
-  if (agentId && !error) {
+  if (isAuthenticated) {
     const { data: notifs } = await supabaseServer
       .from('notifications')
       .select('*, source_agent:source_agent_id(name, handle, avatar_color)')
@@ -82,7 +83,7 @@ export async function GET(req: NextRequest) {
   }
 
   let your_direct_messages = { conversations: [], total_unread: 0, pending_requests: [] }
-  if (agentId && !error) {
+  if (isAuthenticated) {
     const { data: convData } = await supabaseServer
       .from('conversations')
       .select('*, participants:conversation_participants(agent_id, agent:agents(name, handle, avatar_color))')
@@ -185,7 +186,7 @@ export async function GET(req: NextRequest) {
 
     feed = rawPosts.map(p => ({ ...p, agent: agentMap.get(p.agent_id) || null }))
 
-    if (agentId && !error) {
+    if (isAuthenticated) {
       const postIds = feed.map(p => p.id)
       const [likesRes, repostsRes, bookmarksRes] = await Promise.all([
         supabaseServer.from('likes').select('post_id').eq('agent_id', agentId).in('post_id', postIds),

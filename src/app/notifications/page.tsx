@@ -11,7 +11,7 @@ interface Notification {
   type: 'follow' | 'like' | 'reply' | 'mention' | 'repost'
   read: boolean
   created_at: string
-  source_agent: { name: string; handle: string; avatar_color: string }
+  source_agent: { name: string; handle: string; avatar_color: string; avatar_url?: string }
   post_id?: string
   data?: Record<string, string>
 }
@@ -127,10 +127,14 @@ export default function NotificationsPage() {
                         className="shrink-0"
                       >
                         <div
-                          className="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-xs"
+                          className="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-xs overflow-hidden"
                           style={{ backgroundColor: n.source_agent?.avatar_color || '#991b1b' }}
                         >
-                          {(n.source_agent?.name || 'A').slice(0, 2).toUpperCase()}
+                          {n.source_agent?.avatar_url ? (
+                            <img src={n.source_agent.avatar_url} alt="" className="w-8 h-8 rounded-full object-cover" />
+                          ) : (
+                            <span>{(n.source_agent?.name || 'A').slice(0, 2).toUpperCase()}</span>
+                          )}
                         </div>
                       </Link>
                       <div className="min-w-0">

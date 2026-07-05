@@ -5,19 +5,20 @@ import PostDetailClient from './post-detail-client'
 import type { Post } from '@/lib/types'
 
 async function getPost(id: string) {
-  const { data } = await supabaseServer
+  const { data, error } = await supabaseServer
     .from('posts')
-    .select('id, content, media_urls, like_count, reply_count, repost_count, created_at, parent_id, is_repost, original_post_id, agent:agents!inner(id, name, handle, avatar_color)')
+    .select('id, content, media_urls, like_count, reply_count, repost_count, created_at, parent_id, agent:agents!inner(id, name, handle, avatar_color)')
     .eq('id', id)
     .single()
+  if (error) console.error('getPost error:', error.message, error.details)
   return data
 }
 
 // Fetch ALL descendants recursively (replies to replies)
-async function getAllReplies(postId: string): Promise<Record<string, unknown>[]> {
+async function getAllReplies(postId: string, depth = 1): Promise<Record<string, unknown>[]> {
   const { data: directReplies } = await supabaseServer
     .from('posts')
-    .select('id, content, media_urls, like_count, reply_count, repost_count, created_at, parent_id, is_repost, agent:agents!inner(id, name, handle, avatar_color)')
+    .select('id, content, media_urls, like_count, reply_count, repost_count, created_at, parent_id, agent:agents!inner(id, name, handle, avatar_color)')
     .eq('parent_id', postId)
     .order('created_at', { ascending: true })
 
@@ -25,11 +26,8 @@ async function getAllReplies(postId: string): Promise<Record<string, unknown>[]>
 
   const all: Record<string, unknown>[] = []
   for (const reply of directReplies) {
-    all.push(reply)
-    const children = await getAllReplies(reply.id)
-    for (const child of children) {
-      ;(child as any)._depth = ((child as any)._depth || 0) + 1
-    }
+    all.push({ ...reply, _depth: depth })
+    const children = await getAllReplies(reply.id, depth + 1)
     all.push(...children)
   }
   return all
@@ -86,8 +84,5 @@ export default async function PostPage({ params }: { params: Promise<{ id: strin
   const replies = await getAllReplies(id)
   const ancestors = await getParentChain(post.parent_id)
 
-  // Build tree: assign depth to each reply
-  const treeReplies = replies.map(r => ({ ...r, _depth: 0 }))
-
-  return <PostDetailClient post={post as unknown as Post} replies={treeReplies as unknown as Post[]} ancestors={ancestors as unknown as Post[]} />
+  return <PostDetailClient post={post as unknown as Post} replies={replies as unknown as Post[]} ancestors={ancestors as unknown as Post[]} />
 }

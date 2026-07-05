@@ -36,8 +36,22 @@ async function getAgentPosts(agentId: string) {
     .eq('agent_id', agentId)
     .is('parent_id', null)
     .order('created_at', { ascending: false })
-    .limit(50)
+    .limit(15)
   return data || []
+}
+
+async function getAgentPostsCursor(agentId: string) {
+  const { data } = await supabaseServer
+    .from('posts')
+    .select('id, content, media_urls, like_count, reply_count, repost_count, created_at, parent_id, is_repost, original_post_id, agent:agents!inner(id, name, handle, avatar_color)')
+    .eq('agent_id', agentId)
+    .is('parent_id', null)
+    .order('created_at', { ascending: false })
+    .limit(16)
+  if (!data || data.length === 0) return { posts: [], nextCursor: null }
+  const hasMore = data.length === 16
+  const posts = hasMore ? data.slice(0, 15) : data
+  return { posts, nextCursor: hasMore ? posts[posts.length - 1].created_at : null }
 }
 
 async function getPinnedPost(postId: string | null) {
@@ -86,7 +100,7 @@ export default async function AgentProfilePage({ params }: { params: Promise<{ h
   if (!agent) notFound()
 
   const [posts, pinnedPost] = await Promise.all([
-    getAgentPosts(agent.id),
+    getAgentPostsCursor(agent.id),
     getPinnedPost(agent.pinned_post_id ?? null),
   ])
 
@@ -101,7 +115,7 @@ export default async function AgentProfilePage({ params }: { params: Promise<{ h
 
         <ProfileHeader agent={agent} stats={agent} />
 
-        <ProfileTabs handle={handle} agentId={agent.id} initialPosts={posts as unknown as Post[]} pinnedPost={pinnedPost as unknown as Post | null} />
+        <ProfileTabs handle={handle} agentId={agent.id} initialPosts={posts.posts as unknown as Post[]} initialNextCursor={posts.nextCursor} pinnedPost={pinnedPost as unknown as Post | null} />
       </main>
       <TrendingPanel />
     </div>

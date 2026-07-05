@@ -1,18 +1,57 @@
 @import "tailwindcss";
 
 @theme {
-  --color-bg: #000000;
+  /* ── Base surfaces ── */
+  --color-bg: #050507;
   --color-surface: #0a0a0f;
-  --color-surface-hover: #13131a;
+  --color-surface-hover: #12121a;
+  --color-elevated: #0e0e16;
   --color-border: #1a1a2e;
   --color-border-hover: #2a2a4e;
+
+  /* ── Text ── */
   --color-text: #f0f0f2;
   --color-text-muted: #8b8b9e;
+  --color-text-faint: #55556a;
+
+  /* ── Crimson (primary accent) ── */
   --color-violet: #991b1b;
   --color-violet-bright: #b91c1c;
+  --color-accent: #991b1b;
+  --color-accent-bright: #dc2626;
+  --color-accent-hot: #ef4444;
+  --color-accent-soft: #fca5a5;
+
+  /* ── Cyan (secondary accent) ── */
   --color-cyan: #06b6d4;
   --color-cyan-bright: #67e8f9;
+
+  /* ── Semantic ── */
+  --color-signal: #34d399;
+  --color-ember: #fbbf24;
+}
+
+/* Light theme overrides on html */
+html.light {
+  --color-bg: #ffffff;
+  --color-surface: #f8f8fa;
+  --color-surface-hover: #f0f0f5;
+  --color-elevated: #fdfdfe;
+  --color-border: #e5e5ea;
+  --color-border-hover: #d4d4d8;
+  --color-text: #111111;
+  --color-text-muted: #71717a;
+  --color-text-faint: #a1a1aa;
+  --color-violet: #991b1b;
+  --color-violet-bright: #b91c1c;
   --color-accent: #991b1b;
+  --color-accent-bright: #dc2626;
+  --color-accent-hot: #ef4444;
+  --color-accent-soft: #b91c1c;
+  --color-cyan: #0891b2;
+  --color-cyan-bright: #06b6d4;
+  --color-signal: #059669;
+  --color-ember: #d97706;
 }
 
 body {
@@ -20,8 +59,88 @@ body {
   color: var(--color-text);
 }
 
+/* ═══ Utility layers ═══ */
+
+/* Cyberpunk grid backdrop — near-invisible circuit grid */
+.cyber-grid {
+  background-image:
+    linear-gradient(rgba(185, 28, 28, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(185, 28, 28, 0.04) 1px, transparent 1px);
+  background-size: 44px 44px;
+}
+html.light .cyber-grid {
+  background-image:
+    linear-gradient(rgba(185, 28, 28, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(185, 28, 28, 0.05) 1px, transparent 1px);
+}
+
+/* Gradient headline text */
+.gradient-text-crimson {
+  background: linear-gradient(100deg, #ef4444 0%, #f59e0b 45%, #ef4444 90%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+.gradient-text-cyan {
+  background: linear-gradient(100deg, #67e8f9 0%, #06b6d4 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+/* Card glow accents */
+.glow-crimson { box-shadow: 0 0 24px -6px rgba(220, 38, 38, 0.35); }
+.glow-cyan { box-shadow: 0 0 24px -6px rgba(6, 182, 212, 0.3); }
+.glow-crimson-sm { box-shadow: 0 0 12px -2px rgba(220, 38, 38, 0.4); }
+.hover-glow-crimson:hover { box-shadow: 0 0 24px -6px rgba(220, 38, 38, 0.4); }
+.hover-glow-cyan:hover { box-shadow: 0 0 24px -6px rgba(6, 182, 212, 0.35); }
+
+/* Hairline gradient border — top edge */
+.edge-glow {
+  position: relative;
+}
+.edge-glow::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 10%;
+  right: 10%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(239, 68, 68, 0.5), transparent);
+  pointer-events: none;
+}
+
+/* ═══ Animations ═══ */
+
+@keyframes cc-fade-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-up { animation: cc-fade-up 0.4s ease-out both; }
+
+@keyframes cc-pulse-glow {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+.animate-pulse-glow { animation: cc-pulse-glow 2.4s ease-in-out infinite; }
+
+@keyframes cc-shimmer {
+  0% { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+
+/* Hide horizontal scrollbars on strips */
+.scrollbar-hide {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+
 /* Scrollbar */
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: #1a1a2e; border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: #2a2a4e; }
+
+html.light ::-webkit-scrollbar-thumb { background: #d4d4d8; }
+html.light ::-webkit-scrollbar-thumb:hover { background: #a1a1aa; }

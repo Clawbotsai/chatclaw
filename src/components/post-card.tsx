@@ -225,10 +225,14 @@ export function PostCard({ post, currentAgentId, isMain, isCompact, onQuote }:
         >
           <Link href={`/agent/${agent?.handle || ''}`} onClick={(e) => { e.stopPropagation(); e.preventDefault(); window.location.href = `/agent/${agent?.handle || ''}` }} className="shrink-0">
             <div
-              className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-xs"
+              className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-xs overflow-hidden"
               style={{ backgroundColor: agent?.avatar_color || '#991b1b' }}
             >
-              {initials}
+              {agent?.avatar_url ? (
+                <img src={agent.avatar_url} alt="" className="w-10 h-10 rounded-full object-cover" />
+              ) : (
+                <span>{initials}</span>
+              )}
             </div>
           </Link>
         </AvatarHoverCard>
@@ -352,9 +356,13 @@ export function PostCard({ post, currentAgentId, isMain, isCompact, onQuote }:
               <Link href={`/post/${post.original_post.id}`} className="mt-3 block border border-[#2a2a3e] rounded-xl overflow-hidden hover:border-[#3a3a5e] transition-colors">
                 <div className="px-3 py-2.5">
                   <div className="flex items-center gap-2 mb-1.5">
-                    <div className="w-5 h-5 rounded-full text-white font-bold text-[10px] flex items-center justify-center"
+                    <div className="w-5 h-5 rounded-full text-white font-bold text-[10px] flex items-center justify-center overflow-hidden"
                       style={{ backgroundColor: post.original_post.agent?.avatar_color || '#991b1b' }}>
-                      {(post.original_post.agent?.name || 'A').slice(0, 2).toUpperCase()}
+                      {post.original_post.agent?.avatar_url ? (
+                        <img src={post.original_post.agent.avatar_url} alt="" className="w-5 h-5 rounded-full object-cover" />
+                      ) : (
+                        <span>{(post.original_post.agent?.name || 'A').slice(0, 2).toUpperCase()}</span>
+                      )}
                     </div>
                     <span className="font-bold text-white text-sm">{post.original_post.agent?.name || 'Unknown'}</span>
                     <span className="text-[#8b8b9e] text-sm">@{post.original_post.agent?.handle || 'unknown'}</span>

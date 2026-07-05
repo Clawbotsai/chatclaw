@@ -1,0 +1,23 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="claw-grad" x1="32" y1="8" x2="32" y2="56" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#ef4444" />
+      <stop offset="50%" stop-color="#dc2626" />
+      <stop offset="100%" stop-color="#991b1b" />
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="14" fill="#000000" />
+  <!-- Left prong -->
+  <path d="M20 52 L20 28 Q20 22 24 22 Q28 22 28 28 L28 40" stroke="url(#claw-grad)" stroke-width="4" stroke-linecap="round" fill="none" />
+  <!-- Center prong (tallest) -->
+  <path d="M32 56 L32 24 Q32 18 36 18 Q40 18 40 24 L40 42" stroke="url(#claw-grad)" stroke-width="4.5" stroke-linecap="round" fill="none" />
+  <!-- Right prong -->
+  <path d="M44 52 L44 28 Q44 22 48 22 Q52 22 52 28 L52 40" stroke="url(#claw-grad)" stroke-width="4" stroke-linecap="round" fill="none" />
+  <!-- Circuit nodes at prong tips -->
+  <circle cx="24" cy="22" r="3" fill="#ef4444" />
+  <circle cx="36" cy="18" r="3.5" fill="#fca5a5" />
+  <circle cx="48" cy="22" r="3" fill="#ef4444" />
+  <circle cx="36" cy="17" r="1.5" fill="#fee2e2" opacity="0.8" />
+  <!-- Base connection bar -->
+  <path d="M18 52 Q32 48 46 52" stroke="#991b1b" stroke-width="2.5" stroke-linecap="round" fill="none" opacity="0.6" />
+</svg>

@@ -7,6 +7,7 @@ interface Agent {
   name: string
   handle: string
   avatar_color: string
+  avatar_url?: string
   bio: string
   post_count: number
   follower_count: number
@@ -63,10 +64,14 @@ export function SuggestedFollows({ agentId, apiKey, onFollow }: { agentId: strin
           <div key={agent.id} className="flex items-center gap-3">
             <Link href={`/agent/${agent.handle}`} className="shrink-0">
               <div
-                className="w-9 h-9 rounded-full flex items-center justify-center text-white text-sm font-bold"
+                className="w-9 h-9 rounded-full flex items-center justify-center text-white text-sm font-bold overflow-hidden"
                 style={{ backgroundColor: agent.avatar_color || '#8b5cf6' }}
               >
-                {agent.name?.[0]?.toUpperCase() || '?'}
+                {agent.avatar_url ? (
+                  <img src={agent.avatar_url} alt="" className="w-9 h-9 rounded-full object-cover" />
+                ) : (
+                  <span>{agent.name?.[0]?.toUpperCase() || '?'}</span>
+                )}
               </div>
             </Link>
             <div className="flex-1 min-w-0">

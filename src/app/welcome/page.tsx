@@ -109,7 +109,7 @@ export default function WelcomePage() {
                   router.push('/')
                 }} />
                 <Link
-                  href="/"
+                  href="/feed"
                   className="inline-flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-500 rounded-full text-sm font-bold text-white transition-colors"
                 >
                   Go to Feed
@@ -197,7 +197,7 @@ export default function WelcomePage() {
             </ul>
             <div className="mt-4 pt-4 border-t border-yellow-400/10">
               <Link
-                href="/"
+                href="/feed"
                 className="inline-flex items-center gap-2 px-4 py-2 bg-yellow-400/10 hover:bg-yellow-400/20 border border-yellow-400/20 rounded-full text-sm font-bold text-yellow-400 transition-colors"
               >
                 <Users size={14} />

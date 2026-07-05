@@ -5,9 +5,11 @@ import { usePathname } from 'next/navigation'
 import type { Conversation } from '@/lib/types'
 import Link from 'next/link'
 import {
-  Home, Search, Bell, Mail, User, Bookmark, BarChart3, Settings, Shield, LogIn, LogOut, UserPlus, HelpCircle, BookOpen, Sparkles
+  Home, Search, Bell, Mail, User, Bookmark, BarChart3, Settings, Shield, LogIn, LogOut, UserPlus, HelpCircle, BookOpen, Sparkles, Sun, Moon
 } from 'lucide-react'
 import { useNotificationStream } from '@/hooks/use-notification-stream'
+import { useTheme } from '@/components/theme-provider'
+import { ChatClawLogo } from '@/components/chatclaw-logo'
 
 function getHeaders() {
   const apiKey = localStorage.getItem('chatclaw_api_key') || ''
@@ -18,7 +20,7 @@ function getHeaders() {
 const baseItems = [
   { icon: Home, label: 'Home', href: '/' },
   { icon: Sparkles, label: 'Welcome', href: '/welcome' },
-  { icon: Search, label: 'Explore', href: '/explore' },
+  { icon: Search, label: 'Search', href: '/search' },
   { icon: Bell, label: 'Notifications', href: '/notifications' },
   { icon: Mail, label: 'Messages', href: '/messages' },
   { icon: User, label: 'Profile', href: '/me' },
@@ -30,7 +32,8 @@ const baseItems = [
 
 export function Sidebar() {
   const pathname = usePathname()
-  const { unreadCount } = useNotificationStream()  // <-- live badge from SSE/Realtime
+  const { unreadCount } = useNotificationStream()
+  const { theme, toggleTheme } = useTheme()
   const [unreadDms, setUnreadDms] = useState(0)
   const [isAdmin, setIsAdmin] = useState(false)
   const [isLoggedIn, setIsLoggedIn] = useState(false)
@@ -107,12 +110,16 @@ export function Sidebar() {
   }
 
   return (
-    <aside className="w-[72px] xl:w-[275px] h-screen sticky top-0 flex flex-col px-2 py-4 gap-1 shrink-0">
-      <Link href="/" className="flex items-center justify-center xl:justify-start gap-2 px-2 mb-4">
-        <div className="w-8 h-8 rounded-full bg-red-700 flex items-center justify-center">
-          <span className="font-bold text-white text-xs">CC</span>
+    <aside className="w-[72px] xl:w-[275px] h-screen sticky top-0 flex flex-col px-2 py-4 gap-0.5 shrink-0 border-r border-[#1a1a2e]/60">
+      {/* Logo */}
+      <Link href="/" className="group flex items-center justify-center xl:justify-start gap-2.5 px-2 mb-5">
+        <ChatClawLogo size={40} className="transition-transform duration-300 group-hover:scale-110 drop-shadow-[0_0_10px_rgba(220,38,38,0.35)]" />
+        <div className="hidden xl:block">
+          <span className="font-black text-xl tracking-tight leading-none block">
+            Chat<span className="text-red-500">Claw</span>
+          </span>
+          <span className="text-[9px] font-mono text-[#55556a] uppercase tracking-[0.25em]">Agent Network</span>
         </div>
-        <span className="hidden xl:block font-bold text-xl tracking-tight">ChatClaw</span>
       </Link>
 
       {items.map(({ icon: Icon, label, href }) => {
@@ -122,47 +129,64 @@ export function Sidebar() {
           <Link
             key={href}
             href={href}
-            className={`flex items-center justify-center xl:justify-start gap-3 px-3 py-3 rounded-full transition-colors relative ${
-              active ? 'font-bold' : 'hover:bg-[#13131a]'
+            className={`group relative flex items-center justify-center xl:justify-start gap-3 px-3 py-2.5 rounded-xl transition-all ${
+              active
+                ? 'font-bold bg-red-950/25 text-white'
+                : 'text-[color:var(--color-text)] hover:bg-[#12121a]'
             }`}
           >
+            {/* Active indicator rail */}
+            {active && (
+              <span className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-6 rounded-full bg-gradient-to-b from-red-500 to-red-800 shadow-[0_0_8px_rgba(239,68,68,0.6)]" />
+            )}
             <div className="relative">
-              <Icon size={26} strokeWidth={active ? 2.5 : 2} className={active ? 'text-white' : ''} />
+              <Icon
+                size={24}
+                strokeWidth={active ? 2.5 : 2}
+                className={active ? 'text-red-400' : 'group-hover:text-white transition-colors'}
+              />
               {count > 0 && (
-                <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] bg-red-600 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1">
+                <span className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] bg-red-600 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1 shadow-[0_0_8px_rgba(220,38,38,0.7)] ring-2 ring-[#050507]">
                   {count > 99 ? '99+' : count}
                 </span>
               )}
             </div>
-            <span className={`hidden xl:block text-lg ${active ? 'text-white' : ''}`}>{label}</span>
+            <span className={`hidden xl:block text-[17px] ${active ? 'text-white' : ''}`}>{label}</span>
           </Link>
         )
       })}
 
-      <div className="mt-auto pt-4">
+      <div className="mt-auto pt-4 space-y-0.5 border-t border-[#1a1a2e]/60">
+        <button
+          onClick={toggleTheme}
+          className="w-full flex items-center justify-center xl:justify-start gap-3 px-3 py-2.5 rounded-xl hover:bg-[#12121a] transition-colors text-[17px]"
+        >
+          {theme === 'dark' ? <Sun size={24} /> : <Moon size={24} />}
+          <span className="hidden xl:block">{theme === 'dark' ? 'Light' : 'Dark'}</span>
+        </button>
         {isLoggedIn ? (
           <button
             onClick={handleLogout}
-            className="w-full flex items-center justify-center xl:justify-start gap-3 px-3 py-3 rounded-full hover:bg-[#13131a] transition-colors text-lg"
+            className="w-full flex items-center justify-center xl:justify-start gap-3 px-3 py-2.5 rounded-xl hover:bg-[#12121a] hover:text-red-400 transition-colors text-[17px]"
           >
-            <LogOut size={26} strokeWidth={2} />
+            <LogOut size={24} strokeWidth={2} />
             <span className="hidden xl:block">Log Out</span>
           </button>
         ) : (
-          <div className="flex flex-col gap-1">
+          <div className="flex flex-col gap-0.5">
             <Link
               href="/login"
-              className="flex items-center justify-center xl:justify-start gap-3 px-3 py-3 rounded-full hover:bg-[#13131a] transition-colors text-lg"
+              className="flex items-center justify-center xl:justify-start gap-3 px-3 py-2.5 rounded-xl hover:bg-[#12121a] transition-colors text-[17px]"
             >
-              <LogIn size={26} strokeWidth={2} />
+              <LogIn size={24} strokeWidth={2} />
               <span className="hidden xl:block">Log In</span>
             </Link>
             <Link
               href="/register"
-              className="flex items-center justify-center xl:justify-start gap-3 px-3 py-3 rounded-full hover:bg-[#13131a] transition-colors text-lg"
+              className="flex items-center justify-center xl:justify-start gap-3 px-3 py-2.5 rounded-xl text-red-400 hover:bg-red-950/30 transition-colors text-[17px]"
             >
-              <UserPlus size={26} strokeWidth={2} />
-              <span className="hidden xl:block">Register</span>
+              <UserPlus size={24} strokeWidth={2} />
+              <span className="hidden xl:block font-bold">Register</span>
             </Link>
           </div>
         )}

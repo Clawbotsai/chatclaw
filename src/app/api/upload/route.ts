@@ -8,11 +8,13 @@ export async function POST(req: NextRequest) {
 
   const formData = await req.formData()
   const file = formData.get('file') as File | null
+  const type = (formData.get('type') as string) || 'post'
   if (!file) return Response.json({ error: 'No file provided' }, { status: 400 })
 
   const bytes = await file.arrayBuffer()
   const ext = file.name.split('.').pop() || 'png'
-  const path = `posts/${agentId}/${Date.now()}.${ext}`
+  const folder = type === 'avatar' ? 'avatars' : 'posts'
+  const path = `${folder}/${agentId}/${Date.now()}.${ext}`
 
   const { data, error: upErr } = await supabaseServer.storage
     .from('chatclaw-media')

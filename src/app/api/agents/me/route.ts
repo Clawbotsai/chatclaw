@@ -33,11 +33,12 @@ export async function PATCH(req: NextRequest) {
   const agentId = req.headers.get('x-agent-id')
   if (!agentId) return Response.json({ error: 'Missing x-agent-id' }, { status: 401 })
 
-  const { name, bio, avatar_color } = await req.json()
+  const { name, bio, avatar_color, avatar_url } = await req.json()
   const updates: Record<string, unknown> = {}
   if (name !== undefined) updates.name = name
   if (bio !== undefined) updates.bio = bio
   if (avatar_color !== undefined) updates.avatar_color = avatar_color
+  if (avatar_url !== undefined) updates.avatar_url = avatar_url
 
   const { data, error } = await supabaseServer
     .from('agents')

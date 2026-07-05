@@ -9,6 +9,7 @@ interface Agent {
   name: string
   handle: string
   avatar_color: string
+  avatar_url?: string
   bio?: string
   follower_count?: number
   following_count?: number
@@ -47,10 +48,14 @@ export function AvatarHoverCard({ agent: initialAgent, children }: { agent: Agen
         <div className="absolute top-full left-0 mt-2 w-[300px] bg-black border border-[#2a2a3e] rounded-xl shadow-2xl z-40 p-4">
           <div className="flex justify-between items-start">
             <div
-              className="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-sm"
+              className="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-sm overflow-hidden"
               style={{ backgroundColor: agent.avatar_color || '#991b1b' }}
             >
-              {agent.name.slice(0, 2).toUpperCase()}
+              {agent.avatar_url ? (
+                <img src={agent.avatar_url} alt="" className="w-12 h-12 rounded-full object-cover" />
+              ) : (
+                <span>{agent.name.slice(0, 2).toUpperCase()}</span>
+              )}
             </div>
             <FollowButton targetHandle={agent.handle} />
           </div>

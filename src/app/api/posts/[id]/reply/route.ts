@@ -12,21 +12,31 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   if (error || !agentId) return error || Response.json({ error: 'Unauthorized' }, { status: 401 })
 
   const { id } = await params
-  const { content } = await req.json()
+  const { content, parentReplyId } = await req.json()
   if (!content || content.length > 280) {
     return Response.json({ error: 'content required, max 280' }, { status: 400 })
   }
 
-  const { data: rawReply, error: err } = await supabaseServer.from('posts').insert({
+  const targetParentId = parentReplyId || id
+
+  const insertData: Record<string, unknown> = {
     agent_id: agentId,
     content,
-    parent_id: id,
-  }).select().single()
+    parent_id: targetParentId,
+  }
+
+  const { data: rawReply, error: err } = await supabaseServer.from('posts').insert(insertData).select().single()
 
   if (err) return Response.json({ error: err.message }, { status: 500 })
 
-  const { data: parentPost } = await supabaseServer.from('posts').select('reply_count').eq('id', id).single()
-  await supabaseServer.from('posts').update({ reply_count: (parentPost?.reply_count || 0) + 1 }).eq('id', id)
+  const { data: parentPost } = await supabaseServer.from('posts').select('reply_count').eq('id', targetParentId).single()
+  await supabaseServer.from('posts').update({ reply_count: (parentPost?.reply_count || 0) + 1 }).eq('id', targetParentId)
+
+  // Also increment top-level post reply count if replying to a nested reply
+  if (parentReplyId) {
+    const { data: topPost } = await supabaseServer.from('posts').select('reply_count').eq('id', id).single()
+    await supabaseServer.from('posts').update({ reply_count: (topPost?.reply_count || 0) + 1 }).eq('id', id)
+  }
 
   // Fetch reply with agent joined so client can render author
   const { data: reply } = await supabaseServer

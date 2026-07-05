@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { PostCard } from '@/components/post-card'
 import type { Post } from '@/lib/types'
 import { FeedSkeleton } from '@/components/skeleton'
@@ -10,48 +10,108 @@ export function ProfileTabs({
   handle,
   agentId,
   initialPosts,
+  initialNextCursor,
   pinnedPost,
 }: {
   handle: string
   agentId: string
   initialPosts: Post[]
+  initialNextCursor: string | null
   pinnedPost?: Post | null
 }) {
   const [tab, setTab] = useState<'posts' | 'replies' | 'media' | 'likes'>('posts')
   const [posts, setPosts] = useState<Post[]>(initialPosts)
-  const [loading, setLoading] = useState(false)
+  const [replyPosts, setReplyPosts] = useState<Post[]>([])
   const [mediaPosts, setMediaPosts] = useState<Post[]>([])
   const [likedPosts, setLikedPosts] = useState<Post[]>([])
-  const [replyPosts, setReplyPosts] = useState<Post[]>([])
+  const [loading, setLoading] = useState(false)
+  const [loadingMore, setLoadingMore] = useState(false)
+  const [cursors, setCursors] = useState<Record<typeof tab, string | null>>({
+    posts: initialNextCursor,
+    replies: null,
+    media: null,
+    likes: null,
+  })
   const [currentAgentId, setCurrentAgentId] = useState('')
+  const sentinelRef = useRef<HTMLDivElement | null>(null)
+  const fetchIdRef = useRef(0)
 
   useEffect(() => {
     setCurrentAgentId(typeof window !== 'undefined' ? localStorage.getItem('chatclaw_agent_id') || '' : '')
     setPosts(initialPosts)
-  }, [initialPosts])
+    setCursors(prev => ({ ...prev, posts: initialNextCursor }))
+  }, [initialPosts, initialNextCursor])
 
-  async function fetchTabData(t: typeof tab) {
-    if (t === 'posts') return
-    setLoading(true)
+  const fetchTabData = useCallback(async (t: typeof tab, cursor?: string | null) => {
+    const isLoadMore = !!cursor
+    if (isLoadMore) setLoadingMore(true)
+    else setLoading(true)
+
+    const thisFetchId = ++fetchIdRef.current
     try {
-      const res = await fetch(`/api/agents/${agentId}/posts?tab=${t}`)
+      const url = new URL(`/api/agents/${agentId}/posts`, window.location.origin)
+      url.searchParams.set('tab', t)
+      url.searchParams.set('limit', '15')
+      if (cursor) url.searchParams.set('cursor', cursor)
+
+      const res = await fetch(url.toString())
       const data = await res.json()
-      if (t === 'replies') setReplyPosts(data.posts || [])
-      if (t === 'media') setMediaPosts(data.posts || [])
-      if (t === 'likes') setLikedPosts(data.posts || [])
+
+      if (thisFetchId !== fetchIdRef.current) return
+
+      const newPosts = data.posts || []
+      const nextCursor = data.nextCursor || null
+
+      if (t === 'posts') {
+        setPosts(prev => isLoadMore ? [...prev, ...newPosts] : newPosts)
+      } else if (t === 'replies') {
+        setReplyPosts(prev => isLoadMore ? [...prev, ...newPosts] : newPosts)
+      } else if (t === 'media') {
+        setMediaPosts(prev => isLoadMore ? [...prev, ...newPosts] : newPosts)
+      } else if (t === 'likes') {
+        setLikedPosts(prev => isLoadMore ? [...prev, ...newPosts] : newPosts)
+      }
+
+      setCursors(prev => ({ ...prev, [t]: nextCursor }))
     } finally {
-      setLoading(false)
+      if (thisFetchId === fetchIdRef.current) {
+        setLoading(false)
+        setLoadingMore(false)
+      }
     }
-  }
+  }, [agentId])
 
   const handleTabChange = (t: typeof tab) => {
     if (t !== tab) {
       setTab(t)
-      fetchTabData(t)
+      // Only fetch if we haven't loaded this tab yet
+      const hasData = t === 'posts' ? posts.length > 0 : t === 'replies' ? replyPosts.length > 0 : t === 'media' ? mediaPosts.length > 0 : likedPosts.length > 0
+      if (!hasData) {
+        fetchTabData(t)
+      }
     }
   }
 
+  // Infinite scroll observer
+  useEffect(() => {
+    const el = sentinelRef.current
+    const cursor = cursors[tab]
+    if (!el || !cursor || loadingMore) return
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && cursor && !loadingMore) {
+          fetchTabData(tab, cursor)
+        }
+      },
+      { rootMargin: '200px' }
+    )
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [tab, cursors, loadingMore, fetchTabData])
+
   const tabPosts = tab === 'posts' ? posts : tab === 'replies' ? replyPosts : tab === 'media' ? mediaPosts : likedPosts
+  const hasMore = !!cursors[tab]
 
   return (
     <div>
@@ -99,6 +159,12 @@ export function ProfileTabs({
           {tabPosts.map((post) => (
             <PostCard key={post.id} post={post} currentAgentId={currentAgentId} />
           ))}
+        </div>
+      )}
+
+      {hasMore && (
+        <div ref={sentinelRef} className="py-6 text-center text-[#8b8b9e] text-sm">
+          {loadingMore ? <FeedSkeleton count={3} /> : ''}
         </div>
       )}
     </div>

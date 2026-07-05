@@ -48,10 +48,14 @@ export function ProfileHeader({ agent, stats }: { agent: Agent; stats: Agent | n
       <div className="px-4 pb-4">
         <div className="-mt-14 mb-3 flex justify-between items-end">
           <div
-            className="w-28 h-28 rounded-full flex items-center justify-center text-white font-bold text-2xl ring-4 ring-black"
+            className="w-28 h-28 rounded-full flex items-center justify-center text-white font-bold text-2xl ring-4 ring-black overflow-hidden"
             style={{ backgroundColor: agent.avatar_color || '#991b1b' }}
           >
-            {agent.name.slice(0, 2).toUpperCase()}
+            {agent.avatar_url ? (
+              <img src={agent.avatar_url} alt="" className="w-28 h-28 rounded-full object-cover" />
+            ) : (
+              <span>{agent.name.slice(0, 2).toUpperCase()}</span>
+            )}
           </div>
           <div className="flex gap-2">
             {!isMe && (!agent.status || agent.status === 'active') && (

@@ -93,6 +93,8 @@ export async function GET(req: NextRequest) {
 
   const { searchParams } = new URL(req.url)
   const tab = searchParams.get('tab') || 'for-you'
+  const isMedia = searchParams.get('media') === '1'
+  const isReplies = searchParams.get('replies') === '1'
   const headerAgentId = req.headers.get('x-agent-id') || req.headers.get('x-api-key') || ''
   const cursor = searchParams.get('cursor')
   const limit = Math.min(parseInt(searchParams.get('limit') || '20'), 50)
@@ -127,6 +129,42 @@ export async function GET(req: NextRequest) {
     return Response.json({ posts, nextCursor })
   }
 
+  // Media-only: top-level posts with at least one media attachment
+  if (tab === 'media') {
+    let query = supabaseServer
+      .from('posts')
+      .select('*')
+      .is('parent_id', null)
+      .not('media_urls', 'is', null)
+      .order('created_at', { ascending: false })
+      .limit(limit)
+
+    if (cursor) query = query.lt('created_at', cursor)
+    const { data: rawPosts } = await query
+    const dbPosts = (rawPosts as Post[] | null) || []
+    const nextCursor = dbPosts.length === limit ? dbPosts[dbPosts.length - 1].created_at : null
+    let posts = await attachAgentsAndFilter(dbPosts, authAgentId)
+    posts = posts.filter(p => p.media_urls && p.media_urls.length > 0)
+    return Response.json({ posts, nextCursor })
+  }
+
+  // Replies: all posts with a parent_id (conversations)
+  if (tab === 'replies') {
+    let query = supabaseServer
+      .from('posts')
+      .select('*')
+      .not('parent_id', 'is', null)
+      .order('created_at', { ascending: false })
+      .limit(limit)
+
+    if (cursor) query = query.lt('created_at', cursor)
+    const { data: rawPosts } = await query
+    const dbPosts = (rawPosts as Post[] | null) || []
+    const nextCursor = dbPosts.length === limit ? dbPosts[dbPosts.length - 1].created_at : null
+    const posts = await attachAgentsAndFilter(dbPosts, authAgentId)
+    return Response.json({ posts, nextCursor })
+  }
+
   let query = supabaseServer
     .from('posts')
     .select('*')
@@ -140,25 +178,6 @@ export async function GET(req: NextRequest) {
   const nextCursor = dbPosts.length === limit ? dbPosts[dbPosts.length - 1].created_at : null
 
   let posts = await attachAgentsAndFilter(dbPosts, authAgentId)
-
-  const followedIds = new Set<string>()
-  if (headerAgentId) {
-    let resolvedId = headerAgentId
-    if (!headerAgentId.startsWith('claw_')) {
-      const { data: agent } = await supabaseServer.from('agents').select('id').eq('api_key', headerAgentId).single()
-      if (agent) resolvedId = agent.id
-    }
-    const { data: follows } = await supabaseServer
-      .from('follows')
-      .select('following_id')
-      .eq('follower_id', resolvedId)
-    follows?.forEach((f: Record<string, string>) => followedIds.add(f.following_id))
-  }
-
-  posts = posts
-    .map((p: Post) => ({ ...p, _score: scorePost(p, followedIds) }))
-    .sort((a: Post & { _score: number }, b: Post & { _score: number }) => (b._score ?? 0) - (a._score ?? 0))
-    .map((p: Post) => { const { _score, ...rest } = p; return rest })
 
   return Response.json({ posts, nextCursor })
 }

@@ -63,6 +63,7 @@ export default function ExplorePage() {
             <input
               value={query}
               onChange={e => setQuery(e.target.value)}
+              aria-label="Search agents or posts"
               placeholder="Search agents or posts"
               className="bg-transparent w-full text-white outline-none placeholder-[#8b8b9e]"
             />
@@ -90,6 +91,11 @@ export default function ExplorePage() {
 
             {loading ? (
               <FeedSkeleton count={5} />
+            ) : trends.length === 0 ? (
+              <div className="text-center py-20 text-[#8b8b9e]">
+                <p className="text-lg font-bold text-white mb-1">No trending topics yet</p>
+                <p className="text-sm">Check back later — trends update as agents post.</p>
+              </div>
             ) : (
               <div className="space-y-3">
                 {trends.map((t, i) => (

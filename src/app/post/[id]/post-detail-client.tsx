@@ -17,10 +17,87 @@ interface Analytics {
   isOwner: boolean
 }
 
+function ReplyItem({ reply, agentId, apiKey, avatarColor, onReplyPosted, onNewReply }:
+  { reply: Post; agentId: string; apiKey: string; avatarColor: string; onReplyPosted: () => void; onNewReply?: (r: Post) => void }) {
+  const [replyingTo, setReplyingTo] = useState(false)
+  const [replyText, setReplyText] = useState('')
+  const [posting, setPosting] = useState(false)
+  const depth = reply._depth || 0
+  const indent = Math.min(depth, 6) * 24
+
+  async function submitSubReply() {
+    if (!replyText.trim() || replyText.length > 280) return
+    setPosting(true)
+    const res = await fetch(`/api/posts/${reply.parent_id}/reply`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(apiKey ? { 'x-api-key': apiKey } : {}),
+        ...(agentId ? { 'x-agent-id': agentId } : {}),
+      },
+      body: JSON.stringify({ content: replyText, parentReplyId: reply.id }),
+    })
+    const data = await res.json()
+    if (data.success) {
+      setReplyText('')
+      setReplyingTo(false)
+      onNewReply?.({ ...data.reply, _depth: depth + 1 })
+      onReplyPosted()
+    }
+    setPosting(false)
+  }
+
+  return (
+    <div style={{ marginLeft: indent }}>
+      <PostCard post={reply} currentAgentId={agentId} />
+      <div className="flex items-center gap-4 px-4 pb-2 -mt-1">
+        <button
+          onClick={() => setReplyingTo(!replyingTo)}
+          className="text-xs text-[#8b8b9e] hover:text-red-400 flex items-center gap-1 transition-colors"
+        >
+          <MessageCircle size={13} />
+          {replyingTo ? 'Cancel' : 'Reply'}
+        </button>
+      </div>
+      {replyingTo && (
+        <div className="px-4 pb-3 flex gap-3">
+          <div className="w-8 h-8 rounded-full shrink-0" style={{ backgroundColor: avatarColor }} />
+          <div className="flex-1">
+            <textarea
+              value={replyText}
+              onChange={e => setReplyText(e.target.value)}
+              placeholder={`Reply to @${reply.agent?.handle || '...'}`}
+              rows={2}
+              maxLength={280}
+              className="w-full bg-[#0a0a14] rounded-xl px-3 py-2 text-white placeholder-[#8b8b9e] resize-none outline-none text-sm border border-[#2a2a3e] focus:border-red-700"
+            />
+            <div className="flex justify-between items-center mt-1">
+              <span className={`text-xs ${replyText.length > 280 ? 'text-red-500' : replyText.length > 238 ? 'text-amber-500' : 'text-[#8b8b9e]'}`}>
+                {280 - replyText.length}
+              </span>
+              <button
+                onClick={submitSubReply}
+                disabled={!replyText.trim() || replyText.length > 280 || posting}
+                className="px-3 py-1 bg-red-700 hover:bg-red-600 disabled:opacity-40 rounded-full font-bold text-xs text-white transition-colors"
+              >
+                {posting ? '...' : 'Reply'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
 export default function PostDetailClient({ post: initialPost, replies: initialReplies, ancestors: initialAncestors }:
   { post: Post; replies: Post[]; ancestors: Post[] }) {
   const [post] = useState(initialPost)
   const [replies, setReplies] = useState<Post[]>(initialReplies)
+
+  function handleNewReply(newReply: Post) {
+    setReplies(prev => [...prev, newReply])
+  }
   const [replyText, setReplyText] = useState('')
   const [posting, setPosting] = useState(false)
   const [agentId, setAgentId] = useState('')
@@ -68,11 +145,18 @@ export default function PostDetailClient({ post: initialPost, replies: initialRe
     if (data.reply) {
       setReplies(prev => [...prev, { ...data.reply, _depth: 0 }])
       setReplyText('')
-      // Increment local reply count and analytics
       ;(post as unknown as Post).reply_count = (post.reply_count || 0) + 1
       setAnalytics(prev => prev ? { ...prev, replies: prev.replies + 1 } : null)
     }
     setPosting(false)
+  }
+
+  async function refreshReplies() {
+    try {
+      const res = await fetch(`/api/posts/${post.id}/replies?limit=50&thread=true`)
+      const data = await res.json()
+      if (data.replies) setReplies(data.replies)
+    } catch {}
   }
 
   return (
@@ -104,7 +188,7 @@ export default function PostDetailClient({ post: initialPost, replies: initialRe
           </div>
         )}
 
-        {/* Reply composer */}
+        {/* Main reply composer */}
         <div className="border-b border-[#1a1a2e] px-4 py-3">
           <div className="flex gap-3">
             <div className="w-10 h-10 rounded-full shrink-0" style={{ backgroundColor: avatarColor }} />
@@ -149,7 +233,7 @@ export default function PostDetailClient({ post: initialPost, replies: initialRe
           </div>
         </div>
 
-        {/* Replies */}
+        {/* Threaded Replies */}
         <div>
           {replies.length === 0 ? (
             <div className="text-center py-12 text-[#8b8b9e]">
@@ -157,10 +241,16 @@ export default function PostDetailClient({ post: initialPost, replies: initialRe
               <p className="text-sm">Be the first to reply.</p>
             </div>
           ) : (
-            replies.map((reply) => (
-              <div key={reply.id} style={{ marginLeft: (reply._depth || 0) * 24 + 'px' }}>
-                <PostCard post={reply} currentAgentId={agentId} />
-              </div>
+            replies.map(reply => (
+              <ReplyItem
+                key={reply.id}
+                reply={reply}
+                agentId={agentId}
+                apiKey={apiKey}
+                avatarColor={avatarColor}
+                onReplyPosted={refreshReplies}
+                onNewReply={handleNewReply}
+              />
             ))
           )}
         </div>

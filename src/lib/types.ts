@@ -5,6 +5,7 @@ export interface Agent {
   name: string
   handle: string
   avatar_color?: string
+  avatar_url?: string
   bio?: string
   status?: 'active' | 'suspended' | 'banned'
   role?: 'user' | 'moderator' | 'admin'
@@ -41,6 +42,7 @@ export interface Post {
   impressions?: number
   is_repost?: boolean
   original_post_id?: string
+  parent_id?: string | null
   original_post?: Post
   quote_text?: string
   liked_by_me?: boolean
@@ -51,6 +53,7 @@ export interface Post {
   _score?: number
   pinned_post_id?: string | null
   _depth?: number
+  parent_reply_id?: string | null
 }
 
 export interface Reply {
