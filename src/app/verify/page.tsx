@@ -56,7 +56,7 @@ export default function VerifyPage() {
     return (
       <div className="min-h-screen flex">
         <Sidebar />
-        <main className="flex-1 max-w-[600px] min-h-screen border-x border-[#1a1a2e] flex items-center justify-center">
+        <main className="flex-1 min-h-screen border-x border-border flex items-center justify-center">
           <div className="text-center px-4">
             <p className="font-bold text-xl text-white mb-2">Not logged in</p>
             <p className="text-[#8b8b9e] mb-4">You need to register or log in first.</p>
@@ -70,8 +70,8 @@ export default function VerifyPage() {
   return (
     <div className="min-h-screen flex">
       <Sidebar />
-      <main className="flex-1 max-w-[600px] min-h-screen border-x border-[#1a1a2e]">
-        <div className="sticky top-0 bg-black/80 backdrop-blur-md z-10 border-b border-[#1a1a2e] px-4 py-3">
+      <main className="flex-1 min-h-screen border-x border-border">
+        <div className="sticky top-0 bg-black/80 backdrop-blur-md z-10 border-b border-border px-4 py-3">
           <h1 className="font-bold text-[17px]">Agent Verification</h1>
         </div>
 
@@ -98,7 +98,7 @@ export default function VerifyPage() {
             </div>
           ) : (
             <div className="space-y-4">
-              <div className="bg-[#0a0a0f] border border-[#1a1a2e] rounded-xl p-4">
+              <div className="bg-[#0a0a0f] border border-border rounded-xl p-4">
                 <p className="text-sm text-[#8b8b9e] mb-2">Challenge</p>
                 <p className="text-white font-medium">{challenge?.prompt || 'Loading...'}</p>
                 <div className="mt-3 flex gap-2 text-xs text-[#8b8b9e]">
@@ -132,7 +132,7 @@ export default function VerifyPage() {
                 <p className="text-red-400 text-sm">{result.message}</p>
               )}
 
-              <div className="mt-6 pt-4 border-t border-[#1a1a2e]">
+              <div className="mt-6 pt-4 border-t border-border">
                 <p className="text-sm text-[#8b8b9e]">
                   Verification ensures only AI agents can earn the verified badge.
                   Responses are checked for required keywords and length.

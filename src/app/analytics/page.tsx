@@ -50,7 +50,7 @@ export default function AnalyticsPage() {
     return (
       <div className="min-h-screen flex">
         <Sidebar />
-        <main className="flex-1 max-w-[800px] min-h-screen border-x border-[#1a1a2e] p-6">
+        <main className="flex-1 min-h-screen border-x border-border p-6">
           <div className="text-center py-20 text-[#8b8b9e]">Loading analytics...</div>
         </main>
       </div>
@@ -61,7 +61,7 @@ export default function AnalyticsPage() {
     return (
       <div className="min-h-screen flex">
         <Sidebar />
-        <main className="flex-1 max-w-[800px] min-h-screen border-x border-[#1a1a2e] p-6 flex flex-col items-center justify-center">
+        <main className="flex-1 min-h-screen border-x border-border p-6 flex flex-col items-center justify-center">
           <BarChart size={48} className="text-[#2a2a3e] mb-4" />
           <h2 className="text-xl font-bold text-white mb-2">Analytics requires login</h2>
           <p className="text-sm text-[#8b8b9e] mb-6 text-center max-w-sm">
@@ -79,7 +79,7 @@ export default function AnalyticsPage() {
     return (
       <div className="min-h-screen flex">
         <Sidebar />
-        <main className="flex-1 max-w-[800px] min-h-screen border-x border-[#1a1a2e] p-6">
+        <main className="flex-1 min-h-screen border-x border-border p-6">
           <div className="text-center py-20 text-[#8b8b9e]">Failed to load analytics.</div>
         </main>
       </div>
@@ -92,8 +92,8 @@ export default function AnalyticsPage() {
   return (
     <div className="min-h-screen flex">
       <Sidebar />
-      <main className="flex-1 max-w-[800px] min-h-screen border-x border-[#1a1a2e]">
-        <div className="sticky top-0 bg-black/80 backdrop-blur-md z-10 border-b border-[#1a1a2e] px-6 py-4">
+      <main className="flex-1 min-h-screen border-x border-border">
+        <div className="sticky top-0 bg-black/80 backdrop-blur-md z-10 border-b border-border px-6 py-4">
           <h1 className="font-bold text-xl flex items-center gap-2">
             <BarChart3 size={22} className="text-red-600" />
             Post Analytics
@@ -113,7 +113,7 @@ export default function AnalyticsPage() {
 
           {/* Daily Activity Chart */}
           {dailyActivity.length > 0 && (
-            <div className="bg-[#13131a] rounded-xl p-4 border border-[#1a1a2e]">
+            <div className="bg-[#13131a] rounded-xl p-4 border border-border">
               <h2 className="font-bold text-sm mb-4 text-[#8b8b9e] uppercase tracking-wider">Daily Activity (30 Days)</h2>
               <div className="flex items-end gap-1 h-32">
                 {dailyActivity.map(d => (
@@ -122,7 +122,7 @@ export default function AnalyticsPage() {
                       style={{ height: `${(d.count / maxDaily) * 100}%`, minHeight: 4 }}
                     />
                     <span className="text-[10px] text-[#8b8b9e]">{d.date.slice(5)}</span>
-                    <div className="absolute -top-8 bg-black border border-[#1a1a2e] px-2 py-1 rounded text-xs opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-20">
+                    <div className="absolute -top-8 bg-black border border-border px-2 py-1 rounded text-xs opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-20">
                       {d.date}: {d.count} posts
                     </div>
                   </div>
@@ -133,14 +133,14 @@ export default function AnalyticsPage() {
 
           {/* Top Posts */}
           {topPosts.length > 0 && (
-            <div className="bg-[#13131a] rounded-xl p-4 border border-[#1a1a2e]">
+            <div className="bg-[#13131a] rounded-xl p-4 border border-border">
               <h2 className="font-bold text-sm mb-4 text-[#8b8b9e] uppercase tracking-wider">Top Performing Posts</h2>
               <div className="space-y-3">
                 {topPosts.map((post, i) => (
                   <a
                     key={post.id}
                     href={`/post/${post.id}`}
-                    className="block p-3 rounded-lg bg-[#0d0d12] border border-[#1a1a2e] hover:border-red-700/40 transition-colors"
+                    className="block p-3 rounded-lg bg-[#0d0d12] border border-border hover:border-red-700/40 transition-colors"
                   >
                     <div className="flex items-start justify-between gap-2">
                       <p className="text-sm text-white line-clamp-2 flex-1">
@@ -174,7 +174,7 @@ export default function AnalyticsPage() {
 
 function Card({ icon: Icon, label, value }: { icon: typeof BarChart3; label: string; value: string | number }) {
   return (
-    <div className="bg-[#13131a] rounded-xl p-4 border border-[#1a1a2e]">
+    <div className="bg-[#13131a] rounded-xl p-4 border border-border">
       <div className="flex items-center gap-2 text-[#8b8b9e] mb-1">
         <Icon size={14} />
         <span className="text-xs uppercase tracking-wider">{label}</span>

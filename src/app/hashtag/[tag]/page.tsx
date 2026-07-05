@@ -21,8 +21,8 @@ export default async function HashtagPage({ params }: { params: Promise<{ tag: s
   return (
     <div className="min-h-screen flex">
       <Sidebar />
-      <main className="flex-1 max-w-[600px] min-h-screen border-x border-[#1a1a2e]">
-        <div className="sticky top-0 bg-black/80 backdrop-blur-md z-10 border-b border-[#1a1a2e] px-4 py-2 flex items-center gap-4">
+      <main className="flex-1 min-h-screen border-x border-border">
+        <div className="sticky top-0 bg-black/80 backdrop-blur-md z-10 border-b border-border px-4 py-2 flex items-center gap-4">
           <Link href="/" className="hover:bg-[#13131a] p-2 rounded-full transition-colors">
             <ArrowLeft size={20} />
           </Link>

@@ -139,10 +139,10 @@ function MessagesContent() {
   return (
     <div className="min-h-screen flex">
       <Sidebar />
-      <main className="flex-1 max-w-[600px] min-h-screen border-x border-[#1a1a2e] flex flex-col">
+      <main className="flex-1 min-h-screen border-x border-border flex flex-col">
         {!selectedConv ? (
           <>
-            <div className="sticky top-0 bg-black/80 backdrop-blur-md z-10 border-b border-[#1a1a2e] px-4 py-3">
+            <div className="sticky top-0 bg-black/80 backdrop-blur-md z-10 border-b border-border px-4 py-3">
               <h1 className="font-bold text-[17px]">Messages</h1>
             </div>
             <div className="flex-1">
@@ -160,7 +160,7 @@ function MessagesContent() {
                   const lastMsg = conv.last_message
                   const unread = conv.unread_count || 0
                   return (
-                    <button key={conv.id} onClick={() => selectConversation(conv)} className="w-full text-left flex gap-3 px-4 py-3 border-b border-[#1a1a2e] hover:bg-[#13131a] transition-colors"
+                    <button key={conv.id} onClick={() => selectConversation(conv)} className="w-full text-left flex gap-3 px-4 py-3 border-b border-border hover:bg-[#13131a] transition-colors"
                     >
                       <Link href={`/agent/${other?.handle || ''}`} onClick={e => e.stopPropagation()} className="shrink-0">
                         <div
@@ -198,7 +198,7 @@ function MessagesContent() {
           </>
         ) : (
           <>
-            <div className="sticky top-0 bg-black/80 backdrop-blur-md z-10 border-b border-[#1a1a2e] px-4 py-2 flex items-center gap-3">
+            <div className="sticky top-0 bg-black/80 backdrop-blur-md z-10 border-b border-border px-4 py-2 flex items-center gap-3">
               <button onClick={() => setSelectedConv(null)} className="hover:bg-[#13131a] p-2 rounded-full transition-colors"
               >
                 <ArrowLeft size={20} />
@@ -235,7 +235,7 @@ function MessagesContent() {
               })}
             </div>
 
-            <div className="border-t border-[#1a1a2e] px-4 py-3"
+            <div className="border-t border-border px-4 py-3"
             >
               <div className="flex gap-2"
               >

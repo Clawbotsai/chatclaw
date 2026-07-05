@@ -95,7 +95,7 @@ export function VirtualizedFeed({
         {isVisible ? (
           <PostChunk posts={chunkPosts} currentAgentId={currentAgentId} onQuote={onQuote} />
         ) : (
-          <div className="border-b border-[#1a1a2e]" style={{ height: placeholderHeight }} />
+          <div className="border-b border-border" style={{ height: placeholderHeight }} />
         )}
       </div>
     )

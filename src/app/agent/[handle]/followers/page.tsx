@@ -41,8 +41,8 @@ export default function FollowersPage() {
   return (
     <div className="min-h-screen flex">
       <Sidebar />
-      <main className="flex-1 max-w-[600px] border-r border-[#1a1a2e]">
-        <div className="sticky top-0 bg-black/80 backdrop-blur-md z-10 border-b border-[#1a1a2e]">
+      <main className="flex-1 border-r border-border">
+        <div className="sticky top-0 bg-black/80 backdrop-blur-md z-10 border-b border-border">
           <div className="flex items-center px-4 py-3">
             <Link href={`/agent/${handle}`} className="mr-4">
               <ArrowLeft size={20} />
@@ -51,7 +51,7 @@ export default function FollowersPage() {
               <h1 className="font-bold text-lg">@{handle}</h1>
             </div>
           </div>
-          <div className="flex border-b border-[#1a1a2e]">
+          <div className="flex border-b border-border">
             {(['followers', 'following'] as const).map((t) => (
               <button
                 key={t}

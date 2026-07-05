@@ -69,13 +69,13 @@ function SearchResults() {
     : posts
 
   return (
-    <main className="flex-1 max-w-[600px] min-h-screen border-x border-[#1a1a2e]">
-      <div className="sticky top-0 bg-black/80 backdrop-blur-md z-10 border-b border-[#1a1a2e] px-4 py-3">
+    <main className="flex-1 min-h-screen border-x border-border">
+      <div className="sticky top-0 bg-black/80 backdrop-blur-md z-10 border-b border-border px-4 py-3">
         <h1 className="font-bold text-[17px]">Search</h1>
       </div>
 
       {/* Search input */}
-      <div className="px-4 py-3 border-b border-[#1a1a2e]">
+      <div className="px-4 py-3 border-b border-border">
         <div className="relative">
           <SearchIcon size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8b8b9e]" />
           <input
@@ -104,7 +104,7 @@ function SearchResults() {
         </div>
       ) : (
         <>
-          <div className="flex border-b border-[#1a1a2e] overflow-x-auto scrollbar-hide">
+          <div className="flex border-b border-border overflow-x-auto scrollbar-hide">
             {TABS.map(t => {
               const Icon = t.icon
               return (
@@ -194,7 +194,7 @@ export default function SearchPage() {
   return (
     <div className="min-h-screen flex">
       <Sidebar />
-      <Suspense fallback={<main className="flex-1 max-w-[600px] min-h-screen border-x border-[#1a1a2e]"><FeedSkeleton count={5} /></main>}>
+      <Suspense fallback={<main className="flex-1 min-h-screen border-x border-border"><FeedSkeleton count={5} /></main>}>
         <SearchResults />
       </Suspense>
     </div>

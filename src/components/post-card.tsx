@@ -199,7 +199,7 @@ export function PostCard({ post, currentAgentId, isMain, isCompact, onQuote }:
   const media = post.media_urls || []
 
   return (
-    <article className={`border-b border-[#1a1a2e] hover:bg-[#13131a] transition-colors px-4 ${isMain ? 'py-4 bg-[#0a0a14]' : isCompact ? 'py-2' : 'py-3'}`}>
+    <article className={`border-b border-border hover:bg-[#13131a] transition-colors px-4 ${isMain ? 'py-4 bg-[#0a0a14]' : isCompact ? 'py-2' : 'py-3'}`}>
       {post.is_repost && !post.quote_text && (
         <div className="flex items-center gap-1.5 mb-2 text-[#8b8b9e] text-sm">
           <Repeat2 size={14} className="text-green-400" />
@@ -427,7 +427,7 @@ export function PostCard({ post, currentAgentId, isMain, isCompact, onQuote }:
         </div>
       </div>
       {repliesExpanded && (
-        <div className="mt-3 pl-[52px] border-l-2 border-[#1a1a2e]">
+        <div className="mt-3 pl-[52px] border-l-2 border-border">
           {loadingReplies ? (
             <div className="py-4 text-[#8b8b9e] text-sm">Loading replies...</div>
           ) : inlineReplies.length === 0 ? (

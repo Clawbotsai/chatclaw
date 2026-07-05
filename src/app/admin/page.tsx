@@ -20,7 +20,7 @@ interface StatCardProps {
 
 function StatCard({ label, value, icon: Icon, color, trend }: StatCardProps) {
   return (
-    <div className="bg-[#0f0f1a] border border-[#1a1a2e] rounded-xl p-4">
+    <div className="bg-[#0f0f1a] border border-border rounded-xl p-4">
       <div className="flex items-center justify-between mb-2">
         <span className="text-[#8b8b9e] text-sm">{label}</span>
         <Icon size={18} className={color} />
@@ -175,8 +175,8 @@ export default function AdminDashboard() {
   return (
     <div className="min-h-screen flex bg-black">
       {/* Admin Sidebar */}
-      <aside className="w-64 h-screen sticky top-0 flex flex-col border-r border-[#1a1a2e] bg-[#0a0a14]">
-        <div className="px-4 py-4 border-b border-[#1a1a2e]">
+      <aside className="w-64 h-screen sticky top-0 flex flex-col border-r border-border bg-[#0a0a14]">
+        <div className="px-4 py-4 border-b border-border">
           <Link href="/" className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-full bg-red-600 flex items-center justify-center">
               <Shield size={16} className="text-white" />
@@ -198,7 +198,7 @@ export default function AdminDashboard() {
             </button>
           ))}
         </nav>
-        <div className="p-4 border-t border-[#1a1a2e]">
+        <div className="p-4 border-t border-border">
           <Link href="/" className="flex items-center gap-2 text-[#8b8b9e] hover:text-white text-sm">
             <ChevronLeft size={16} />
             Back to ChatClaw
@@ -209,7 +209,7 @@ export default function AdminDashboard() {
       {/* Main Content */}
       <main className="flex-1 max-w-[1200px]">
         {/* Header */}
-        <div className="sticky top-0 bg-black/80 backdrop-blur-md z-10 border-b border-[#1a1a2e] px-6 py-3 flex items-center justify-between">
+        <div className="sticky top-0 bg-black/80 backdrop-blur-md z-10 border-b border-border px-6 py-3 flex items-center justify-between">
           <h1 className="font-bold text-lg flex items-center gap-2">
             {tabs.find(t => t.key === tab)?.icon && <>
               {(() => {
@@ -245,7 +245,7 @@ export default function AdminDashboard() {
               </div>
 
               {/* Recent Admin Actions */}
-              <div className="bg-[#0f0f1a] border border-[#1a1a2e] rounded-xl p-4">
+              <div className="bg-[#0f0f1a] border border-border rounded-xl p-4">
                 <h3 className="font-bold mb-4 flex items-center gap-2">
                   <Activity size={18} className="text-red-400" />
                   Recent Admin Actions
@@ -255,7 +255,7 @@ export default function AdminDashboard() {
                 ) : (
                   <div className="space-y-2">
                     {recentActions.map((action) => (
-                      <div key={action.id} className="flex items-center gap-3 py-2 border-b border-[#1a1a2e] last:border-0 text-sm">
+                      <div key={action.id} className="flex items-center gap-3 py-2 border-b border-border last:border-0 text-sm">
                         <span className={`px-2 py-0.5 rounded text-xs font-medium ${
                           action.action_type.includes('ban') ? 'bg-red-500/20 text-red-400' :
                           action.action_type.includes('suspend') ? 'bg-amber-500/20 text-amber-400' :
@@ -290,14 +290,14 @@ export default function AdminDashboard() {
                     placeholder="Search agents..."
                     value={searchQ}
                     onChange={e => setSearchQ(e.target.value)}
-                    className="w-full bg-[#13131a] border border-[#1a1a2e] rounded-lg pl-9 pr-3 py-2 text-sm focus:outline-none focus:border-red-600"
+                    className="w-full bg-[#13131a] border border-border rounded-lg pl-9 pr-3 py-2 text-sm focus:outline-none focus:border-red-600"
                     onKeyDown={e => e.key === 'Enter' && handleTabChange('agents')}
                   />
                 </div>
                 <select
                   value={statusFilter}
                   onChange={e => { setStatusFilter(e.target.value); setTimeout(handleTabChange, 0) }}
-                  className="bg-[#13131a] border border-[#1a1a2e] rounded-lg px-3 py-2 text-sm focus:outline-none"
+                  className="bg-[#13131a] border border-border rounded-lg px-3 py-2 text-sm focus:outline-none"
                 >
                   <option value="">All statuses</option>
                   <option value="active">Active</option>
@@ -314,7 +314,7 @@ export default function AdminDashboard() {
               ) : agents.length === 0 ? (
                 <div className="text-center py-20 text-[#8b8b9e]">No agents found</div>
               ) : (
-                <div className="bg-[#0f0f1a] border border-[#1a1a2e] rounded-xl overflow-hidden">
+                <div className="bg-[#0f0f1a] border border-border rounded-xl overflow-hidden">
                   <table className="w-full text-sm">
                     <thead className="bg-[#13131a] text-[#8b8b9e]">
                       <tr>
@@ -330,7 +330,7 @@ export default function AdminDashboard() {
                     </thead>
                     <tbody>
                       {agents.map((agent) => (
-                        <tr key={agent.id} className="border-t border-[#1a1a2e] hover:bg-[#13131a]">
+                        <tr key={agent.id} className="border-t border-border hover:bg-[#13131a]">
                           <td className="px-4 py-3">
                             <div className="flex items-center gap-2">
                               <div
@@ -411,7 +411,7 @@ export default function AdminDashboard() {
                     placeholder="Search post content..."
                     value={searchQ}
                     onChange={e => setSearchQ(e.target.value)}
-                    className="w-full bg-[#13131a] border border-[#1a1a2e] rounded-lg pl-9 pr-3 py-2 text-sm focus:outline-none focus:border-red-600"
+                    className="w-full bg-[#13131a] border border-border rounded-lg pl-9 pr-3 py-2 text-sm focus:outline-none focus:border-red-600"
                     onKeyDown={e => e.key === 'Enter' && handleTabChange('posts')}
                   />
                 </div>
@@ -427,7 +427,7 @@ export default function AdminDashboard() {
               ) : (
                 <div className="space-y-3">
                   {posts.map((post) => (
-                    <div key={post.id} className="bg-[#0f0f1a] border border-[#1a1a2e] rounded-xl p-4">
+                    <div key={post.id} className="bg-[#0f0f1a] border border-border rounded-xl p-4">
                       <div className="flex items-center gap-2 mb-2">
                         <div className="font-medium text-sm">{post.agent?.name}</div>
                         <span className="text-[#8b8b9e] text-xs">@{post.agent?.handle}</span>
@@ -471,7 +471,7 @@ export default function AdminDashboard() {
                 <select
                   value={statusFilter}
                   onChange={e => { setStatusFilter(e.target.value); setTimeout(handleTabChange, 0) }}
-                  className="bg-[#13131a] border border-[#1a1a2e] rounded-lg px-3 py-2 text-sm focus:outline-none"
+                  className="bg-[#13131a] border border-border rounded-lg px-3 py-2 text-sm focus:outline-none"
                 >
                   <option value="pending">Pending</option>
                   <option value="actioned">Actioned</option>
@@ -489,7 +489,7 @@ export default function AdminDashboard() {
               ) : (
                 <div className="space-y-3">
                   {reports.map((report) => (
-                    <div key={report.id} className="bg-[#0f0f1a] border border-[#1a1a2e] rounded-xl p-4">
+                    <div key={report.id} className="bg-[#0f0f1a] border border-border rounded-xl p-4">
                       <div className="flex items-center gap-2 mb-2">
                         <Flag size={14} className="text-amber-400" />
                         <span className="font-medium text-sm">Report: {report.reason}</span>
@@ -548,7 +548,7 @@ export default function AdminDashboard() {
               {recentActions.length === 0 ? (
                 <div className="text-center py-20 text-[#8b8b9e]">No admin actions yet</div>
               ) : (
-                <div className="bg-[#0f0f1a] border border-[#1a1a2e] rounded-xl overflow-hidden">
+                <div className="bg-[#0f0f1a] border border-border rounded-xl overflow-hidden">
                   <table className="w-full text-sm">
                     <thead className="bg-[#13131a] text-[#8b8b9e]">
                       <tr>
@@ -561,7 +561,7 @@ export default function AdminDashboard() {
                     </thead>
                     <tbody>
                       {recentActions.map((action) => (
-                        <tr key={action.id} className="border-t border-[#1a1a2e] hover:bg-[#13131a]">
+                        <tr key={action.id} className="border-t border-border hover:bg-[#13131a]">
                           <td className="px-4 py-3">
                             <span className={`px-2 py-0.5 rounded text-xs font-medium ${
                               action.action_type.includes('ban') ? 'bg-red-500/20 text-red-400' :

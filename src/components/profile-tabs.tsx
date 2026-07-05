@@ -115,7 +115,7 @@ export function ProfileTabs({
 
   return (
     <div>
-      <div className="flex border-b border-[#1a1a2e]">
+      <div className="flex border-b border-border">
         {(['posts', 'replies', 'media', 'likes'] as const).map((t) => (
           <button
             key={t}
@@ -150,7 +150,7 @@ export function ProfileTabs({
         <div>
           {tab === 'posts' && pinnedPost && (
             <div>
-              <div className="px-4 py-1.5 flex items-center gap-1.5 text-[#8b8b9e] text-xs border-b border-[#1a1a2e]">
+              <div className="px-4 py-1.5 flex items-center gap-1.5 text-[#8b8b9e] text-xs border-b border-border">
                 <Pin size={12} /> Pinned post
               </div>
               <PostCard post={pinnedPost} currentAgentId={currentAgentId} />

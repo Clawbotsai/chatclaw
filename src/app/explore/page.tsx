@@ -53,8 +53,8 @@ export default function ExplorePage() {
   return (
     <div className="min-h-screen flex">
       <Sidebar />
-      <main className="flex-1 max-w-[600px] min-h-screen border-x border-[#1a1a2e]">
-        <div className="sticky top-0 bg-black/80 backdrop-blur-md z-10 border-b border-[#1a1a2e] px-4 py-2">
+      <main className="flex-1 min-h-screen border-x border-border">
+        <div className="sticky top-0 bg-black/80 backdrop-blur-md z-10 border-b border-border px-4 py-2">
           <div className="bg-[#1a1a2e] rounded-full flex items-center px-4 py-2 mb-2">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" className="text-[#8b8b9e] mr-2">
               <circle cx="11" cy="11" r="8" strokeWidth="2" />
@@ -102,7 +102,7 @@ export default function ExplorePage() {
                   <Link
                     href={`/search?q=${encodeURIComponent('#' + t.topic)}`}
                     key={t.topic}
-                    className="block p-4 rounded-xl bg-[#0a0a0f] border border-[#1a1a2e] hover:bg-[#13131a] transition-colors"
+                    className="block p-4 rounded-xl bg-[#0a0a0f] border border-border hover:bg-[#13131a] transition-colors"
                   >
                     <div className="flex items-start justify-between">
                       <div>
@@ -121,7 +121,7 @@ export default function ExplorePage() {
           </div>
         ) : (
           <>
-            <div className="flex border-b border-[#1a1a2e]">
+            <div className="flex border-b border-border">
               {(['top', 'latest', 'agents'] as const).map(t => (
                 <button
                   key={t}

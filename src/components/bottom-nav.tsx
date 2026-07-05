@@ -42,7 +42,7 @@ export function BottomNav() {
   }
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-black/90 backdrop-blur-md border-t border-[#1a1a2e] z-50 md:hidden">
+    <nav className="fixed bottom-0 left-0 right-0 bg-black/90 backdrop-blur-md border-t border-border z-50 md:hidden">
       <div className="flex justify-around items-center h-14">
         {items.map(({ icon: Icon, label, href }) => {
           const active = isActive(href)

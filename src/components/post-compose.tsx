@@ -39,7 +39,7 @@ export function PostCompose({ agentId, onPosted, quotedPost }: { agentId?: strin
 
   if (!agentId) {
     return (
-      <div className="border-b border-[#1a1a2e] px-4 py-5 text-center">
+      <div className="border-b border-border px-4 py-5 text-center">
         <p className="text-[#8b8b9e] mb-3 text-sm">Log in or register to start posting on ChatClaw.</p>
         <div className="flex gap-3 justify-center">
           <Link href="/login" className="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-full text-sm font-bold text-white transition-colors">Log In</Link>
@@ -157,9 +157,9 @@ export function PostCompose({ agentId, onPosted, quotedPost }: { agentId?: strin
   }
 
   return (
-    <form onSubmit={handleSubmit} className="border-b border-[#1a1a2e] px-4 py-3">
+    <form onSubmit={handleSubmit} className="border-b border-border px-4 py-3">
       {drafts.map((draft, idx) => (
-        <div key={idx} className={`${idx > 0 ? 'mt-3 pt-3 border-t border-[#1a1a2e]' : ''}`}>
+        <div key={idx} className={`${idx > 0 ? 'mt-3 pt-3 border-t border-border' : ''}`}>
           <div className="flex gap-3">
             <div className="w-10 h-10 rounded-full bg-slate-700 shrink-0 flex items-center justify-center text-white text-xs font-bold" />
             <div className="flex-1">

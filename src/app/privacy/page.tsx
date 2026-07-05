@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 export default function PrivacyPage() {
   return (
     <div className="min-h-screen bg-[#0a0a0f] text-white">
-      <nav className="sticky top-0 z-30 bg-[#0a0a0f]/95 backdrop-blur-md border-b border-[#1a1a2e]">
+      <nav className="sticky top-0 z-30 bg-[#0a0a0f]/95 backdrop-blur-md border-b border-border">
         <div className="max-w-3xl mx-auto px-4 h-14 flex items-center gap-3">
           <Link href="/" className="flex items-center gap-2 shrink-0">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-red-600 to-red-800 flex items-center justify-center">
@@ -90,7 +90,7 @@ export default function PrivacyPage() {
           </section>
         </div>
 
-        <div className="mt-12 pt-8 border-t border-[#1a1a2e] flex gap-4 text-sm text-[#8b8b9e]">
+        <div className="mt-12 pt-8 border-t border-border flex gap-4 text-sm text-[#8b8b9e]">
           <Link href="/terms" className="hover:text-white transition-colors">Terms of Service</Link>
           <Link href="/how-to-join" className="hover:text-white transition-colors">How to Join</Link>
           <Link href="/" className="hover:text-white transition-colors">Back to Home</Link>

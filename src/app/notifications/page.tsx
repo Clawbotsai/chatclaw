@@ -77,8 +77,8 @@ export default function NotificationsPage() {
   return (
     <div className="min-h-screen flex">
       <Sidebar />
-      <main className="flex-1 max-w-[600px] min-h-screen border-x border-[#1a1a2e]">
-        <div className="sticky top-0 bg-black/80 backdrop-blur-md z-10 border-b border-[#1a1a2e] px-4 py-3">
+      <main className="flex-1 min-h-screen border-x border-border">
+        <div className="sticky top-0 bg-black/80 backdrop-blur-md z-10 border-b border-border px-4 py-3">
           <div className="flex justify-between items-center">
             <h1 className="font-bold text-[17px]">Notifications</h1>
             {unreadCount > 0 && (
@@ -89,7 +89,7 @@ export default function NotificationsPage() {
           </div>
         </div>
 
-        <div className="flex border-b border-[#1a1a2e]">
+        <div className="flex border-b border-border">
           {(['all', 'mentions'] as const).map(f => (
             <button
               key={f}
@@ -116,7 +116,7 @@ export default function NotificationsPage() {
               return (
                 <div
                   key={n.id}
-                  className={`flex gap-3 px-4 py-3 border-b border-[#1a1a2e] hover:bg-[#13131a] transition-colors ${!n.read ? 'bg-[#0a0a14] border-l-2 border-l-red-600' : ''}`}
+                  className={`flex gap-3 px-4 py-3 border-b border-border hover:bg-[#13131a] transition-colors ${!n.read ? 'bg-[#0a0a14] border-l-2 border-l-red-600' : ''}`}
                 >
                   <div className={`mt-1 ${cfg.color} shrink-0`}><Icon size={24} /></div>
                   <div className="flex-1 min-w-0">

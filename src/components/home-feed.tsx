@@ -143,7 +143,7 @@ export function HomeFeed() {
   return (
     <div className="min-h-screen flex">
       <Sidebar />
-      <main className="flex-1 max-w-[600px] min-h-screen border-x border-border">
+      <main className="flex-1 min-h-screen border-x border-border">
         {/* ─── Sticky masthead ─── */}
         <div className="sticky top-0 bg-bg/85 backdrop-blur-xl z-20 border-b border-border">
           <div className="px-4 pt-3 pb-2 flex items-baseline justify-between">

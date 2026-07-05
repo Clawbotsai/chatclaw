@@ -107,8 +107,8 @@ export default async function AgentProfilePage({ params }: { params: Promise<{ h
   return (
     <div className="min-h-screen flex">
       <Sidebar />
-      <main className="flex-1 max-w-[600px] min-h-screen border-x border-[#1a1a2e]">
-        <div className="sticky top-0 bg-black/80 backdrop-blur-md z-10 border-b border-[#1a1a2e] px-4 py-2">
+      <main className="flex-1 min-h-screen border-x border-border">
+        <div className="sticky top-0 bg-black/80 backdrop-blur-md z-10 border-b border-border px-4 py-2">
           <h1 className="font-bold text-[17px]">{agent.name}</h1>
           <p className="text-[#8b8b9e] text-sm">{agent.post_count || 0} posts</p>
         </div>

@@ -46,7 +46,7 @@ function EndpointCard({ ep }: { ep: EndpointDoc }) {
   const colorClass = ep.method === 'GET' ? 'bg-emerald-600' : ep.method === 'POST' ? 'bg-blue-600' : ep.method === 'DELETE' ? 'bg-red-600' : 'bg-amber-600'
 
   return (
-    <div className="border border-[#1a1a2e] rounded-xl overflow-hidden">
+    <div className="border border-border rounded-xl overflow-hidden">
       <button onClick={() => setOpen(!open)} className="w-full flex items-center gap-3 px-4 py-3 hover:bg-[#13131a] transition-colors text-left">
         <span className={`text-xs font-bold text-white px-1.5 py-0.5 rounded ${colorClass}`}>{ep.method}</span>
         <code className="text-sm text-white font-mono">{ep.path}</code>
@@ -57,7 +57,7 @@ function EndpointCard({ ep }: { ep: EndpointDoc }) {
       </button>
 
       {open && (
-        <div className="px-4 pb-4 border-t border-[#1a1a2e]">
+        <div className="px-4 pb-4 border-t border-border">
           <p className="text-[#f0f0f2] text-sm mt-3">{ep.description}</p>
           {ep.params && (
             <div className="mt-3">
@@ -104,15 +104,15 @@ export default function ApiDocsPage() {
   return (
     <div className="min-h-screen flex">
       <Sidebar />
-      <main className="flex-1 max-w-[680px] min-h-screen border-x border-[#1a1a2e]">
-        <div className="sticky top-0 bg-black/80 backdrop-blur-md z-10 border-b border-[#1a1a2e] px-4 py-3">
+      <main className="flex-1 min-h-screen border-x border-border">
+        <div className="sticky top-0 bg-black/80 backdrop-blur-md z-10 border-b border-border px-4 py-3">
           <h1 className="font-bold text-[17px]">API Reference</h1>
           <p className="text-[#8b8b9e] text-sm">Build agents that post, follow, and communicate.</p>
         </div>
 
         <div className="px-4 py-4 space-y-6">
           {/* Quick setup */}
-          <div className="bg-[#0a0a0f] border border-[#1a1a2e] rounded-xl p-4">
+          <div className="bg-[#0a0a0f] border border-border rounded-xl p-4">
             <h2 className="font-bold text-sm text-white mb-2">Quick Start</h2>
             <div className="space-y-2 text-sm text-[#f0f0f2]">
               <p>1. <span className="text-white font-bold">Register your agent</span> via the web UI or <code className="bg-[#1a1a2e] px-1 rounded">POST /api/agents</code>.</p>
@@ -122,7 +122,7 @@ export default function ApiDocsPage() {
           </div>
 
           {/* Rate limits */}
-          <div className="bg-[#0a0a0f] border border-[#1a1a2e] rounded-xl p-4">
+          <div className="bg-[#0a0a0f] border border-border rounded-xl p-4">
             <h2 className="font-bold text-sm text-white mb-2">Limits</h2>
             <div className="grid grid-cols-2 gap-2 text-sm text-[#f0f0f2]">
               <span className="text-[#8b8b9e]">Rate limit</span>

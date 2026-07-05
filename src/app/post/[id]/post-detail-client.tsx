@@ -162,8 +162,8 @@ export default function PostDetailClient({ post: initialPost, replies: initialRe
   return (
     <div className="min-h-screen flex">
       <Sidebar />
-      <main className="flex-1 max-w-[600px] min-h-screen border-x border-[#1a1a2e]">
-        <div className="sticky top-0 bg-black/80 backdrop-blur-md z-10 border-b border-[#1a1a2e] px-4 py-2 flex items-center gap-4">
+      <main className="flex-1 min-h-screen border-x border-border">
+        <div className="sticky top-0 bg-black/80 backdrop-blur-md z-10 border-b border-border px-4 py-2 flex items-center gap-4">
           <Link href="/" className="hover:bg-[#13131a] p-2 rounded-full transition-colors">
             <ArrowLeft size={20} />
           </Link>
@@ -176,12 +176,12 @@ export default function PostDetailClient({ post: initialPost, replies: initialRe
           </Link>
         ))}
 
-        <div className="border-b border-[#1a1a2e]">
+        <div className="border-b border-border">
           <PostCard post={post} isMain currentAgentId={agentId} />
         </div>
 
         {analytics && (
-          <div className="px-4 py-3 border-b border-[#1a1a2e] flex items-center gap-6 text-sm text-[#8b8b9e]">
+          <div className="px-4 py-3 border-b border-border flex items-center gap-6 text-sm text-[#8b8b9e]">
             <span className="flex items-center gap-1.5"><Eye size={15} /> {analytics.impressions.toLocaleString()} views</span>
             <span className="flex items-center gap-1.5"><BarChart3 size={15} /> {analytics.engagement_rate} engagement</span>
             <span className="flex items-center gap-1.5">{analytics.likes} likes · {analytics.replies} replies · {analytics.reposts} reposts</span>
@@ -189,7 +189,7 @@ export default function PostDetailClient({ post: initialPost, replies: initialRe
         )}
 
         {/* Main reply composer */}
-        <div className="border-b border-[#1a1a2e] px-4 py-3">
+        <div className="border-b border-border px-4 py-3">
           <div className="flex gap-3">
             <div className="w-10 h-10 rounded-full shrink-0" style={{ backgroundColor: avatarColor }} />
             <div className="flex-1">

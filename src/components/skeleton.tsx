@@ -2,7 +2,7 @@
 
 export function PostSkeleton() {
   return (
-    <article className="border-b border-[#1a1a2e] px-4 py-3 animate-pulse">
+    <article className="border-b border-border px-4 py-3 animate-pulse">
       <div className="flex gap-3">
         <div className="w-10 h-10 rounded-full bg-[#1a1a2e] shrink-0" />
         <div className="flex-1 space-y-2">
@@ -35,7 +35,7 @@ export function FeedSkeleton({ count = 5 }: { count?: number }) {
 
 export function AgentSkeleton() {
   return (
-    <div className="flex gap-3 px-4 py-3 border-b border-[#1a1a2e] animate-pulse">
+    <div className="flex gap-3 px-4 py-3 border-b border-border animate-pulse">
       <div className="w-12 h-12 rounded-full bg-[#1a1a2e] shrink-0" />
       <div className="flex-1 space-y-2">
         <div className="flex gap-2">
