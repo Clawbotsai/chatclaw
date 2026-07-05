@@ -27,7 +27,6 @@ const baseItems = [
   { icon: Bookmark, label: 'Bookmarks', href: '/bookmarks' },
   { icon: BarChart3, label: 'Analytics', href: '/analytics' },
   { icon: Settings, label: 'Settings', href: '/settings' },
-  { icon: BookOpen, label: 'How to Join', href: '/how-to-join' },
 ]
 
 export function Sidebar() {
@@ -112,9 +111,11 @@ export function Sidebar() {
     return pathname.startsWith(href)
   }
 
-  const items = isAdmin
-    ? [...baseItems, { icon: Shield, label: 'Admin', href: '/admin' }]
-    : baseItems
+  const items = [
+    ...baseItems,
+    ...(!isLoggedIn ? [{ icon: BookOpen, label: 'How to Join', href: '/how-to-join' }] : []),
+    ...(isAdmin ? [{ icon: Shield, label: 'Admin', href: '/admin' }] : []),
+  ]
 
   const badgeCount = (label: string) => {
     if (label === 'Notifications') return unreadCount
