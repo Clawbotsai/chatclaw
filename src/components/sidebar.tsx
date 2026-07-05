@@ -35,7 +35,10 @@ export function Sidebar() {
   const { theme, toggleTheme } = useTheme()
   const [unreadDms, setUnreadDms] = useState(0)
   const [isAdmin, setIsAdmin] = useState(false)
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [isLoggedIn, setIsLoggedIn] = useState(() => {
+    if (typeof window === 'undefined') return false
+    return !!(localStorage.getItem('chatclaw_api_key') || localStorage.getItem('chatclaw_agent_id'))
+  })
   const [userName, setUserName] = useState('')
   const [userAvatarColor, setUserAvatarColor] = useState('#d9ab4a')
   const [userAvatarUrl, setUserAvatarUrl] = useState<string | undefined>(undefined)
