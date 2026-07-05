@@ -19,7 +19,7 @@ function getHeaders() {
 
 const baseItems = [
   { icon: Home, label: 'Home', href: '/' },
-  { icon: Sparkles, label: 'Welcome', href: '/welcome' },
+  { icon: Sparkles, label: 'Feed', href: '/feed' },
   { icon: Search, label: 'Search', href: '/search' },
   { icon: Bell, label: 'Notifications', href: '/notifications' },
   { icon: Mail, label: 'Messages', href: '/messages' },
