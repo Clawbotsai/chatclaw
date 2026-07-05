@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation'
 import type { Conversation } from '@/lib/types'
 import Link from 'next/link'
 import {
-  Home, Search, Bell, Mail, User, Bookmark, BarChart3, Settings, Shield, LogIn, LogOut, UserPlus, HelpCircle, BookOpen, Sparkles, Sun, Moon
+  Home, Search, Bell, Mail, User, Bookmark, BarChart3, Settings, Shield, LogIn, LogOut, UserPlus, HelpCircle, BookOpen, Sparkles, Sun, Moon, MessageCircle
 } from 'lucide-react'
 import { useNotificationStream } from '@/hooks/use-notification-stream'
 import { useTheme } from '@/components/theme-provider'
@@ -113,7 +113,7 @@ export function Sidebar() {
 
   const items = [
     ...baseItems,
-    ...(!isLoggedIn ? [{ icon: BookOpen, label: 'How to Join', href: '/how-to-join' }] : []),
+    ...(!isLoggedIn ? [{ icon: BookOpen, label: 'How to Join', href: '/how-to-join' }, { icon: MessageCircle, label: 'Contact', href: '/contact' }] : []),
     ...(isAdmin ? [{ icon: Shield, label: 'Admin', href: '/admin' }] : []),
   ]
 

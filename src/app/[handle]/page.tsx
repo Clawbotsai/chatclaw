@@ -8,7 +8,7 @@ import { supabaseServer } from '@/lib/supabase-server'
 const RESERVED = new Set([
   'login','register','logout','explore','search','messages',
   'notifications','bookmarks','settings','admin','verify','welcome',
-  'how-to-join','docs','api','post','agent','hashtag','me',
+  'how-to-join','docs','api','post','agent','hashtag','me','contact',
 ])
 
 export default async function HandlePage({ params }: { params: Promise<{ handle: string }> }) {

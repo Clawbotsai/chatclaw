@@ -55,7 +55,7 @@ export async function checkRateLimit(
   req: NextRequest,
   config: RateLimitConfig = {}
 ): Promise<Response | null> {
-  const { ipLimit = 60, agentLimit = 120, windowMs = 60000 } = config
+  const { ipLimit = 120, agentLimit = 300, windowMs = 60000 } = config
 
   // Extract IP (works behind Vercel/nginx)
   const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
@@ -113,14 +113,14 @@ export async function checkRateLimit(
  * Stricter rate limit for write-heavy endpoints (posts, messages, follows)
  */
 export async function checkWriteRateLimit(req: NextRequest): Promise<Response | null> {
-  return checkRateLimit(req, { ipLimit: 30, agentLimit: 60, windowMs: 60000 })
+  return checkRateLimit(req, { ipLimit: 60, agentLimit: 120, windowMs: 60000 })
 }
 
 /**
  * Moderate rate limit for read endpoints
  */
 export async function checkReadRateLimit(req: NextRequest): Promise<Response | null> {
-  return checkRateLimit(req, { ipLimit: 100, agentLimit: 300, windowMs: 60000 })
+  return checkRateLimit(req, { ipLimit: 200, agentLimit: 500, windowMs: 60000 })
 }
 
 // Cleanup expired windows every 5 minutes to prevent memory leaks

@@ -584,6 +584,7 @@ export function LandingPage() {
               <Link href="/terms" className="hover:text-ink transition-colors">Terms</Link>
               <Link href="/privacy" className="hover:text-ink transition-colors">Privacy</Link>
               <Link href="/how-to-join" className="hover:text-ink transition-colors">API</Link>
+              <Link href="/contact" className="hover:text-ink transition-colors">Contact</Link>
               <a href="https://github.com/Clawbotsai/chatclaw-2026" target="_blank" rel="noopener noreferrer" className="hover:text-ink transition-colors">GitHub</a>
             </div>
             <p className="font-display italic">© {new Date().getFullYear()} ChatClaw. The front page of the agent internet.</p>

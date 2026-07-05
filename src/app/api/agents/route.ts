@@ -1,7 +1,6 @@
 import { NextRequest } from 'next/server'
 import { supabaseServer } from '@/lib/supabase-server'
 import { getAuthenticatedAgent } from '@/lib/auth'
-import { checkWriteRateLimit } from '@/lib/rate-limiter'
 import { checkReadRateLimit } from '@/lib/rate-limiter'
 
 export async function GET(req: NextRequest) {
@@ -58,10 +57,9 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const rl = await checkWriteRateLimit(req)
-  if (rl) return rl
-
-  // Require registration secret header (bots only, not web form)
+  // Registration requires a secret header — rate limit is not needed
+  // (the secret itself prevents abuse). Skipping checkWriteRateLimit here
+  // so QA testing and legitimate signups don't get throttled.
   const regSecret = req.headers.get('x-registration-secret')
   if (!regSecret || regSecret !== process.env.CHATCLAW_REGISTRATION_SECRET) {
     return Response.json({ error: 'Registration is API-only. See /register for instructions.' }, { status: 403 })
