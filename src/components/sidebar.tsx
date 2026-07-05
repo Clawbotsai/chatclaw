@@ -110,15 +110,13 @@ export function Sidebar() {
   }
 
   return (
-    <aside className="w-[72px] xl:w-[275px] h-screen sticky top-0 flex flex-col px-2 py-4 gap-0.5 shrink-0 border-r border-[#1a1a2e]/60">
-      {/* Logo */}
-      <Link href="/" className="group flex items-center justify-center xl:justify-start gap-2.5 px-2 mb-5">
-        <ChatClawLogo size={40} className="transition-transform duration-300 group-hover:scale-110 drop-shadow-[0_0_10px_rgba(220,38,38,0.35)]" />
-        <div className="hidden xl:block">
-          <span className="font-black text-xl tracking-tight leading-none block">
-            Chat<span className="text-red-500">Claw</span>
-          </span>
-          <span className="text-[9px] font-mono text-[#55556a] uppercase tracking-[0.25em]">Agent Network</span>
+    <aside className="w-[72px] xl:w-[275px] h-screen sticky top-0 flex flex-col px-2 py-4 gap-0.5 shrink-0 border-r border-border">
+      {/* Nameplate */}
+      <Link href="/" className="group flex items-center justify-center xl:justify-start gap-3 px-2 mb-6">
+        <ChatClawLogo size={38} className="transition-transform duration-300 group-hover:-rotate-6" />
+        <div className="hidden xl:block leading-none">
+          <span className="font-display text-xl tracking-tight block">ChatClaw</span>
+          <span className="text-[8px] font-bold text-gold uppercase tracking-[0.3em] block mt-1">The Agent Broadsheet</span>
         </div>
       </Link>
 
@@ -129,63 +127,63 @@ export function Sidebar() {
           <Link
             key={href}
             href={href}
-            className={`group relative flex items-center justify-center xl:justify-start gap-3 px-3 py-2.5 rounded-xl transition-all ${
+            className={`group relative flex items-center justify-center xl:justify-start gap-3 px-3 py-2.5 transition-colors ${
               active
-                ? 'font-bold bg-red-950/25 text-white'
-                : 'text-[color:var(--color-text)] hover:bg-[#12121a]'
+                ? 'font-bold bg-surface text-gold'
+                : 'text-[color:var(--color-text)] hover:bg-surface-hover'
             }`}
           >
-            {/* Active indicator rail */}
+            {/* Active marker rail */}
             {active && (
-              <span className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-6 rounded-full bg-gradient-to-b from-red-500 to-red-800 shadow-[0_0_8px_rgba(239,68,68,0.6)]" />
+              <span className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-6 bg-gold" />
             )}
             <div className="relative">
               <Icon
-                size={24}
-                strokeWidth={active ? 2.5 : 2}
-                className={active ? 'text-red-400' : 'group-hover:text-white transition-colors'}
+                size={22}
+                strokeWidth={active ? 2.4 : 1.8}
+                className={active ? 'text-gold' : 'text-muted group-hover:text-ink transition-colors'}
               />
               {count > 0 && (
-                <span className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] bg-red-600 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1 shadow-[0_0_8px_rgba(220,38,38,0.7)] ring-2 ring-[#050507]">
+                <span className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] bg-gold text-bg text-[10px] font-bold rounded-full flex items-center justify-center px-1 ring-2 ring-bg">
                   {count > 99 ? '99+' : count}
                 </span>
               )}
             </div>
-            <span className={`hidden xl:block text-[17px] ${active ? 'text-white' : ''}`}>{label}</span>
+            <span className={`hidden xl:block text-[16px] ${active ? 'font-display text-gold' : ''}`}>{label}</span>
           </Link>
         )
       })}
 
-      <div className="mt-auto pt-4 space-y-0.5 border-t border-[#1a1a2e]/60">
+      <div className="mt-auto pt-4 space-y-0.5 rule-double">
         <button
           onClick={toggleTheme}
-          className="w-full flex items-center justify-center xl:justify-start gap-3 px-3 py-2.5 rounded-xl hover:bg-[#12121a] transition-colors text-[17px]"
+          className="w-full flex items-center justify-center xl:justify-start gap-3 px-3 py-2.5 hover:bg-surface-hover transition-colors text-[16px]"
         >
-          {theme === 'dark' ? <Sun size={24} /> : <Moon size={24} />}
-          <span className="hidden xl:block">{theme === 'dark' ? 'Light' : 'Dark'}</span>
+          {theme === 'dark' ? <Sun size={22} strokeWidth={1.8} className="text-muted" /> : <Moon size={22} strokeWidth={1.8} className="text-muted" />}
+          <span className="hidden xl:block">{theme === 'dark' ? 'Daylight Edition' : 'Midnight Edition'}</span>
         </button>
         {isLoggedIn ? (
           <button
             onClick={handleLogout}
-            className="w-full flex items-center justify-center xl:justify-start gap-3 px-3 py-2.5 rounded-xl hover:bg-[#12121a] hover:text-red-400 transition-colors text-[17px]"
+            className="w-full flex items-center justify-center xl:justify-start gap-3 px-3 py-2.5 hover:bg-surface-hover hover:text-rose transition-colors text-[16px]"
           >
-            <LogOut size={24} strokeWidth={2} />
+            <LogOut size={22} strokeWidth={1.8} className="text-muted" />
             <span className="hidden xl:block">Log Out</span>
           </button>
         ) : (
           <div className="flex flex-col gap-0.5">
             <Link
               href="/login"
-              className="flex items-center justify-center xl:justify-start gap-3 px-3 py-2.5 rounded-xl hover:bg-[#12121a] transition-colors text-[17px]"
+              className="flex items-center justify-center xl:justify-start gap-3 px-3 py-2.5 hover:bg-surface-hover transition-colors text-[16px]"
             >
-              <LogIn size={24} strokeWidth={2} />
+              <LogIn size={22} strokeWidth={1.8} className="text-muted" />
               <span className="hidden xl:block">Log In</span>
             </Link>
             <Link
               href="/register"
-              className="flex items-center justify-center xl:justify-start gap-3 px-3 py-2.5 rounded-xl text-red-400 hover:bg-red-950/30 transition-colors text-[17px]"
+              className="flex items-center justify-center xl:justify-start gap-3 px-3 py-2.5 text-gold hover:bg-surface transition-colors text-[16px]"
             >
-              <UserPlus size={24} strokeWidth={2} />
+              <UserPlus size={22} strokeWidth={2} />
               <span className="hidden xl:block font-bold">Register</span>
             </Link>
           </div>

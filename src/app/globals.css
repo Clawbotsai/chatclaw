@@ -1,113 +1,140 @@
 @import "tailwindcss";
 
+/* ═══════════════════════════════════════════════════════════════
+   MIDNIGHT ATLAS — the editorial broadsheet identity
+   Deep indigo ink · warm ivory · brass accents · serif display
+   Light mode = the "daylight edition": warm paper & indigo ink
+   ═══════════════════════════════════════════════════════════════ */
+
 @theme {
-  /* ── Base surfaces ── */
-  --color-bg: #050507;
-  --color-surface: #0a0a0f;
-  --color-surface-hover: #12121a;
-  --color-elevated: #0e0e16;
-  --color-border: #1a1a2e;
-  --color-border-hover: #2a2a4e;
+  /* ── Surfaces ── */
+  --color-bg: #0a0d18;
+  --color-surface: #111525;
+  --color-surface-hover: #171c30;
+  --color-elevated: #141a2b;
+  --color-border: #232a44;
+  --color-border-hover: #38416a;
 
-  /* ── Text ── */
-  --color-text: #f0f0f2;
-  --color-text-muted: #8b8b9e;
-  --color-text-faint: #55556a;
+  /* ── Ink ── */
+  --color-ink: #ece7da;
+  --color-text: #ece7da;
+  --color-muted: #9199af;
+  --color-text-muted: #9199af;
+  --color-faint: #5b6178;
+  --color-text-faint: #5b6178;
 
-  /* ── Crimson (primary accent) ── */
-  --color-violet: #991b1b;
-  --color-violet-bright: #b91c1c;
-  --color-accent: #991b1b;
-  --color-accent-bright: #dc2626;
-  --color-accent-hot: #ef4444;
-  --color-accent-soft: #fca5a5;
+  /* ── Brass (primary accent) ── */
+  --color-gold: #d9ab4a;
+  --color-gold-bright: #f0c86e;
+  --color-gold-deep: #a87e28;
+  --color-accent: #d9ab4a;
+  --color-accent-bright: #f0c86e;
 
-  /* ── Cyan (secondary accent) ── */
-  --color-cyan: #06b6d4;
-  --color-cyan-bright: #67e8f9;
-
-  /* ── Semantic ── */
-  --color-signal: #34d399;
-  --color-ember: #fbbf24;
+  /* ── Secondary hues ── */
+  --color-moon: #a9b5e6;
+  --color-rose: #e0888f;
+  --color-signal: #82c8a0;
+  --color-ember: #d9ab4a;
 }
 
-/* Light theme overrides on html */
+/* Daylight edition — warm paper & indigo ink */
 html.light {
-  --color-bg: #ffffff;
-  --color-surface: #f8f8fa;
-  --color-surface-hover: #f0f0f5;
-  --color-elevated: #fdfdfe;
-  --color-border: #e5e5ea;
-  --color-border-hover: #d4d4d8;
-  --color-text: #111111;
-  --color-text-muted: #71717a;
-  --color-text-faint: #a1a1aa;
-  --color-violet: #991b1b;
-  --color-violet-bright: #b91c1c;
-  --color-accent: #991b1b;
-  --color-accent-bright: #dc2626;
-  --color-accent-hot: #ef4444;
-  --color-accent-soft: #b91c1c;
-  --color-cyan: #0891b2;
-  --color-cyan-bright: #06b6d4;
-  --color-signal: #059669;
-  --color-ember: #d97706;
+  --color-bg: #f7f3e9;
+  --color-surface: #f1ebdd;
+  --color-surface-hover: #e9e1cd;
+  --color-elevated: #fcf9f1;
+  --color-border: #ddd3bc;
+  --color-border-hover: #c2b493;
+  --color-ink: #1e2233;
+  --color-text: #1e2233;
+  --color-muted: #6a6d80;
+  --color-text-muted: #6a6d80;
+  --color-faint: #9d9fae;
+  --color-text-faint: #9d9fae;
+  --color-gold: #8f6b1d;
+  --color-gold-bright: #a87e28;
+  --color-gold-deep: #6f5316;
+  --color-accent: #8f6b1d;
+  --color-accent-bright: #a87e28;
+  --color-moon: #4a58a8;
+  --color-rose: #b04a55;
+  --color-signal: #257a52;
+  --color-ember: #8f6b1d;
 }
 
 body {
   background-color: var(--color-bg);
   color: var(--color-text);
+  -webkit-font-smoothing: antialiased;
 }
 
-/* ═══ Utility layers ═══ */
-
-/* Cyberpunk grid backdrop — near-invisible circuit grid */
-.cyber-grid {
-  background-image:
-    linear-gradient(rgba(185, 28, 28, 0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(185, 28, 28, 0.04) 1px, transparent 1px);
-  background-size: 44px 44px;
-}
-html.light .cyber-grid {
-  background-image:
-    linear-gradient(rgba(185, 28, 28, 0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(185, 28, 28, 0.05) 1px, transparent 1px);
+::selection {
+  background: color-mix(in srgb, var(--color-gold) 30%, transparent);
 }
 
-/* Gradient headline text */
-.gradient-text-crimson {
-  background: linear-gradient(100deg, #ef4444 0%, #f59e0b 45%, #ef4444 90%);
+/* ═══ Typography ═══ */
+
+/* Serif display face for headlines, numerals, and ornaments */
+.font-display {
+  font-family: "Iowan Old Style", "Palatino Linotype", Palatino,
+    "Book Antiqua", Georgia, "Times New Roman", serif;
+}
+
+/* Brass gradient headline text */
+.gradient-text-gold {
+  background: linear-gradient(
+    105deg,
+    var(--color-gold-bright) 0%,
+    var(--color-gold) 55%,
+    var(--color-gold-deep) 100%
+  );
   background-clip: text;
   -webkit-background-clip: text;
   color: transparent;
 }
-.gradient-text-cyan {
-  background: linear-gradient(100deg, #67e8f9 0%, #06b6d4 100%);
-  background-clip: text;
-  -webkit-background-clip: text;
-  color: transparent;
+
+/* ═══ Rules & frames — the editorial hairline language ═══ */
+
+/* Double rule, like a newspaper masthead separator */
+.rule-double {
+  border-top: 3px double var(--color-border-hover);
+}
+.rule-double-gold {
+  border-top: 3px double color-mix(in srgb, var(--color-gold) 60%, transparent);
 }
 
-/* Card glow accents */
-.glow-crimson { box-shadow: 0 0 24px -6px rgba(220, 38, 38, 0.35); }
-.glow-cyan { box-shadow: 0 0 24px -6px rgba(6, 182, 212, 0.3); }
-.glow-crimson-sm { box-shadow: 0 0 12px -2px rgba(220, 38, 38, 0.4); }
-.hover-glow-crimson:hover { box-shadow: 0 0 24px -6px rgba(220, 38, 38, 0.4); }
-.hover-glow-cyan:hover { box-shadow: 0 0 24px -6px rgba(6, 182, 212, 0.35); }
-
-/* Hairline gradient border — top edge */
-.edge-glow {
-  position: relative;
+/* Soft brass halo for primary cards & CTAs */
+.halo-gold {
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--color-gold) 28%, transparent),
+    0 12px 32px -14px color-mix(in srgb, var(--color-gold) 35%, transparent);
 }
-.edge-glow::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 10%;
-  right: 10%;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(239, 68, 68, 0.5), transparent);
-  pointer-events: none;
+.hover-halo-gold:hover {
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--color-gold) 45%, transparent),
+    0 14px 36px -12px color-mix(in srgb, var(--color-gold) 45%, transparent);
+}
+
+/* ═══ Star-chart backdrop — faint celestial speckle ═══ */
+.starfield {
+  background-image:
+    radial-gradient(1px 1px at 12% 26%, color-mix(in srgb, var(--color-gold) 55%, transparent) 50%, transparent 51%),
+    radial-gradient(1px 1px at 78% 18%, color-mix(in srgb, var(--color-ink) 35%, transparent) 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 55% 64%, color-mix(in srgb, var(--color-gold) 35%, transparent) 50%, transparent 51%),
+    radial-gradient(1px 1px at 30% 82%, color-mix(in srgb, var(--color-ink) 28%, transparent) 50%, transparent 51%),
+    radial-gradient(1px 1px at 90% 56%, color-mix(in srgb, var(--color-moon) 40%, transparent) 50%, transparent 51%),
+    radial-gradient(1px 1px at 44% 10%, color-mix(in srgb, var(--color-ink) 25%, transparent) 50%, transparent 51%);
+  background-size: 460px 460px;
+}
+html.light .starfield {
+  background-image:
+    radial-gradient(1px 1px at 12% 26%, color-mix(in srgb, var(--color-gold) 40%, transparent) 50%, transparent 51%),
+    radial-gradient(1px 1px at 78% 18%, color-mix(in srgb, var(--color-ink) 18%, transparent) 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 55% 64%, color-mix(in srgb, var(--color-gold) 28%, transparent) 50%, transparent 51%),
+    radial-gradient(1px 1px at 30% 82%, color-mix(in srgb, var(--color-ink) 14%, transparent) 50%, transparent 51%),
+    radial-gradient(1px 1px at 90% 56%, color-mix(in srgb, var(--color-moon) 25%, transparent) 50%, transparent 51%),
+    radial-gradient(1px 1px at 44% 10%, color-mix(in srgb, var(--color-ink) 12%, transparent) 50%, transparent 51%);
+  background-size: 460px 460px;
 }
 
 /* ═══ Animations ═══ */
@@ -116,18 +143,15 @@ html.light .cyber-grid {
   from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: translateY(0); }
 }
-.animate-fade-up { animation: cc-fade-up 0.4s ease-out both; }
+.animate-fade-up { animation: cc-fade-up 0.5s ease-out both; }
 
 @keyframes cc-pulse-glow {
   0%, 100% { opacity: 1; }
-  50% { opacity: 0.4; }
+  50% { opacity: 0.35; }
 }
-.animate-pulse-glow { animation: cc-pulse-glow 2.4s ease-in-out infinite; }
+.animate-pulse-glow { animation: cc-pulse-glow 2.6s ease-in-out infinite; }
 
-@keyframes cc-shimmer {
-  0% { background-position: -400px 0; }
-  100% { background-position: 400px 0; }
-}
+/* ═══ Scrollbars ═══ */
 
 /* Hide horizontal scrollbars on strips */
 .scrollbar-hide {
@@ -136,11 +160,7 @@ html.light .cyber-grid {
 }
 .scrollbar-hide::-webkit-scrollbar { display: none; }
 
-/* Scrollbar */
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #1a1a2e; border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: #2a2a4e; }
-
-html.light ::-webkit-scrollbar-thumb { background: #d4d4d8; }
-html.light ::-webkit-scrollbar-thumb:hover { background: #a1a1aa; }
+::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--color-border-hover); }
