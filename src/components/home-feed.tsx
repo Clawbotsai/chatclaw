@@ -10,7 +10,7 @@ import { PostCard } from '@/components/post-card'
 import { PromptTemplates } from '@/components/prompt-templates'
 import { VirtualizedFeed } from '@/components/virtualized-feed'
 import { FeedSkeleton } from '@/components/skeleton'
-import { ArrowUp, Sparkles, Users, Flame, Image as ImageIcon, MessageSquare, Bot, Radio } from 'lucide-react'
+import { ArrowUp, Sparkles, Users, Flame, Image as ImageIcon, MessageSquare, Bot, Radio, LogOut } from 'lucide-react'
 
 type FeedTab = 'for-you' | 'following' | 'hot' | 'media' | 'replies'
 
@@ -39,6 +39,9 @@ export function HomeFeed() {
   const [nextCursor, setNextCursor] = useState<string | null>(null)
   const [agentId, setAgentId] = useState('')
   const [apiKey, setApiKey] = useState('')
+  const [userName, setUserName] = useState('')
+  const [userAvatarColor, setUserAvatarColor] = useState('#d9ab4a')
+  const [userAvatarUrl, setUserAvatarUrl] = useState<string | undefined>(undefined)
   const [quotedPost, setQuotedPost] = useState<Post | undefined>(undefined)
   const sentinelRef = useRef<HTMLDivElement>(null)
   const fetchIdRef = useRef(0)
@@ -48,6 +51,12 @@ export function HomeFeed() {
     const id = localStorage.getItem('chatclaw_agent_id') || ''
     setApiKey(apiKey)
     setAgentId(id)
+    const name = localStorage.getItem('chatclaw_agent_name')
+    if (name) setUserName(name)
+    const color = localStorage.getItem('chatclaw_agent_avatar_color')
+    if (color) setUserAvatarColor(color)
+    const url = localStorage.getItem('chatclaw_agent_avatar_url')
+    if (url) setUserAvatarUrl(url)
   }, [])
 
   const fetchFeed = useCallback(async (cursor?: string | null) => {
@@ -148,6 +157,41 @@ export function HomeFeed() {
               <span className="animate-pulse-glow" aria-hidden="true">◆</span>
               Live
             </span>
+            {userName && (
+              <div className="flex items-center gap-2">
+                <Link href="/me" className="flex items-center gap-2 group">
+                  <div
+                    className="w-7 h-7 rounded-full flex items-center justify-center text-white font-bold text-[9px] overflow-hidden ring-1 ring-border group-hover:ring-gold/50 transition-all"
+                    style={{ backgroundColor: userAvatarColor }}
+                  >
+                    {userAvatarUrl ? (
+                      <img src={userAvatarUrl} alt="" className="w-7 h-7 rounded-full object-cover" />
+                    ) : (
+                      <span>{userName.slice(0, 2).toUpperCase()}</span>
+                    )}
+                  </div>
+                  <span className="hidden sm:block text-xs font-bold text-ink group-hover:text-gold transition-colors">
+                    {userName}
+                  </span>
+                </Link>
+                <button
+                  onClick={() => {
+                    localStorage.removeItem('chatclaw_api_key')
+                    localStorage.removeItem('chatclaw_agent_id')
+                    localStorage.removeItem('chatclaw_agent_name')
+                    localStorage.removeItem('chatclaw_agent_handle')
+                    localStorage.removeItem('chatclaw_agent_avatar_color')
+                    localStorage.removeItem('chatclaw_agent_avatar_url')
+                    window.location.href = '/'
+                  }}
+                  className="text-muted hover:text-rose transition-colors"
+                  aria-label="Log out"
+                  title="Log out"
+                >
+                  <LogOut size={16} />
+                </button>
+              </div>
+            )}
           </div>
           <div className="flex overflow-x-auto scrollbar-hide">
             {TABS.map(({ key, label, icon: Icon, activeClass, iconClass }) => (

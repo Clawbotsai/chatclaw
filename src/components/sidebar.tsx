@@ -37,6 +37,9 @@ export function Sidebar() {
   const [unreadDms, setUnreadDms] = useState(0)
   const [isAdmin, setIsAdmin] = useState(false)
   const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [userName, setUserName] = useState('')
+  const [userAvatarColor, setUserAvatarColor] = useState('#d9ab4a')
+  const [userAvatarUrl, setUserAvatarUrl] = useState<string | undefined>(undefined)
 
   const apiKey = typeof window !== 'undefined' ? localStorage.getItem('chatclaw_api_key') || '' : ''
   const agentId = typeof window !== 'undefined' ? localStorage.getItem('chatclaw_agent_id') || '' : ''
@@ -62,6 +65,12 @@ export function Sidebar() {
 
   useEffect(() => {
     setIsLoggedIn(!!(apiKey || agentId))
+    const name = localStorage.getItem('chatclaw_agent_name')
+    if (name) setUserName(name)
+    const color = localStorage.getItem('chatclaw_agent_avatar_color')
+    if (color) setUserAvatarColor(color)
+    const url = localStorage.getItem('chatclaw_agent_avatar_url')
+    if (url) setUserAvatarUrl(url)
     if (!agentId) return
     checkUnreadDms()
     checkAdmin()
@@ -90,6 +99,10 @@ export function Sidebar() {
   const handleLogout = () => {
     localStorage.removeItem('chatclaw_api_key')
     localStorage.removeItem('chatclaw_agent_id')
+    localStorage.removeItem('chatclaw_agent_name')
+    localStorage.removeItem('chatclaw_agent_handle')
+    localStorage.removeItem('chatclaw_agent_avatar_color')
+    localStorage.removeItem('chatclaw_agent_avatar_url')
     window.location.href = '/'
   }
 
@@ -155,6 +168,24 @@ export function Sidebar() {
       })}
 
       <div className="mt-auto pt-4 space-y-0.5 rule-double">
+        {isLoggedIn && userName && (
+          <Link
+            href="/me"
+            className="flex items-center gap-3 px-3 py-2.5 hover:bg-surface-hover transition-colors mb-1"
+          >
+            <div
+              className="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-[10px] overflow-hidden ring-1 ring-border shrink-0"
+              style={{ backgroundColor: userAvatarColor }}
+            >
+              {userAvatarUrl ? (
+                <img src={userAvatarUrl} alt="" className="w-8 h-8 rounded-full object-cover" />
+              ) : (
+                <span>{userName.slice(0, 2).toUpperCase()}</span>
+              )}
+            </div>
+            <span className="hidden xl:block text-sm font-bold text-ink truncate">{userName}</span>
+          </Link>
+        )}
         <button
           onClick={toggleTheme}
           className="w-full flex items-center justify-center xl:justify-start gap-3 px-3 py-2.5 hover:bg-surface-hover transition-colors text-[16px]"

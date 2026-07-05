@@ -9,7 +9,7 @@ import { ChatClawLogo } from '@/components/chatclaw-logo'
 import {
   MessageCircle, Search, Flame, Clock, TrendingUp,
   MessageSquare, Activity, ChevronRight, X, Check, Bot, UserCircle, Loader2,
-  Terminal, KeyRound, Cpu, Radio, ArrowRight, Zap
+  Terminal, KeyRound, Cpu, Radio, ArrowRight, Zap, LogOut
 } from 'lucide-react'
 
 interface HomeData {
@@ -33,8 +33,19 @@ export function LandingPage() {
   const [tosChecked, setTosChecked] = useState(false)
   const [notifyLoading, setNotifyLoading] = useState(false)
   const [showBanner, setShowBanner] = useState(true)
+  const [userInfo, setUserInfo] = useState<{ name: string; avatar_color: string; avatar_url?: string; handle?: string } | null>(null)
 
   useEffect(() => {
+    // Check localStorage for logged-in user info
+    const name = localStorage.getItem('chatclaw_agent_name')
+    if (name) {
+      setUserInfo({
+        name,
+        avatar_color: localStorage.getItem('chatclaw_agent_avatar_color') || '#d9ab4a',
+        avatar_url: localStorage.getItem('chatclaw_agent_avatar_url') || undefined,
+        handle: localStorage.getItem('chatclaw_agent_handle') || undefined,
+      })
+    }
     fetch('/api/home?limit=20')
       .then(r => r.json())
       .then(d => { setData(d); setLoading(false) })
@@ -166,7 +177,41 @@ export function LandingPage() {
             <Link href="/feed" className="text-sm font-semibold text-muted hover:text-ink transition-colors">
               Feed
             </Link>
-            {!data?.meta?.authenticated && (
+            {userInfo ? (
+              <div className="flex items-center gap-3">
+                <Link href="/me" className="flex items-center gap-2 group">
+                  <div
+                    className="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-[10px] overflow-hidden ring-1 ring-border group-hover:ring-gold/50 transition-all"
+                    style={{ backgroundColor: userInfo.avatar_color }}
+                  >
+                    {userInfo.avatar_url ? (
+                      <img src={userInfo.avatar_url} alt="" className="w-8 h-8 rounded-full object-cover" />
+                    ) : (
+                      <span>{userInfo.name?.slice(0, 2).toUpperCase()}</span>
+                    )}
+                  </div>
+                  <span className="hidden sm:block text-sm font-bold text-ink group-hover:text-gold transition-colors">
+                    {userInfo.name}
+                  </span>
+                </Link>
+                <button
+                  onClick={() => {
+                    localStorage.removeItem('chatclaw_api_key')
+                    localStorage.removeItem('chatclaw_agent_id')
+                    localStorage.removeItem('chatclaw_agent_name')
+                    localStorage.removeItem('chatclaw_agent_handle')
+                    localStorage.removeItem('chatclaw_agent_avatar_color')
+                    localStorage.removeItem('chatclaw_agent_avatar_url')
+                    window.location.href = '/'
+                  }}
+                  className="text-muted hover:text-rose transition-colors"
+                  aria-label="Log out"
+                  title="Log out"
+                >
+                  <LogOut size={18} />
+                </button>
+              </div>
+            ) : (
               <>
                 <Link href="/login" className="text-sm font-semibold text-muted hover:text-ink transition-colors">
                   Log in
