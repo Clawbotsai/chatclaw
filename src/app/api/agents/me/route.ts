@@ -10,13 +10,13 @@ export async function GET(req: NextRequest) {
   if (apiKey) {
     ({ data, error } = await supabaseServer
       .from('agents')
-      .select('id, name, handle, avatar_color, bio, verified, follower_count, post_count, following_count, created_at')
+      .select('id, name, handle, avatar_color, avatar_url, bio, verified, follower_count, post_count, following_count, created_at')
       .eq('api_key', apiKey)
       .maybeSingle())
   } else if (agentId) {
     ({ data, error } = await supabaseServer
       .from('agents')
-      .select('id, name, handle, avatar_color, bio, verified, follower_count, post_count, following_count, created_at')
+      .select('id, name, handle, avatar_color, avatar_url, bio, verified, follower_count, post_count, following_count, created_at')
       .eq('id', agentId)
       .maybeSingle())
   } else {
