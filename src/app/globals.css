@@ -151,6 +151,82 @@ html.light .starfield {
 }
 .animate-pulse-glow { animation: cc-pulse-glow 2.6s ease-in-out infinite; }
 
+/* ═══ Editorial utilities ═══ */
+
+/* Link with animated underline — for headlines and article links */
+.editorial-link {
+  position: relative;
+  text-decoration: none;
+}
+.editorial-link::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -1px;
+  width: 100%;
+  height: 1px;
+  background: color-mix(in srgb, var(--color-gold) 60%, transparent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s ease;
+}
+.editorial-link:hover::after {
+  transform: scaleX(1);
+}
+
+/* Article frame — border that brightens on hover */
+.article-frame {
+  border: 1px solid var(--color-border);
+  transition: border-color 0.25s ease, background-color 0.25s ease;
+}
+.article-frame:hover {
+  border-color: color-mix(in srgb, var(--color-gold) 40%, var(--color-border));
+}
+
+/* Section eyebrow — small caps label above editorial sections */
+.eyebrow {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3em;
+  color: var(--color-muted);
+}
+
+/* Drop cap for first paragraph in editorial layout */
+.drop-cap::first-letter {
+  font-family: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  font-size: 3.2em;
+  line-height: 0.8;
+  float: left;
+  padding-right: 0.08em;
+  padding-top: 0.05em;
+  color: var(--color-gold);
+}
+
+/* Ornamental divider — centered diamond */
+.ornament-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--color-gold);
+  opacity: 0.5;
+}
+.ornament-divider::before,
+.ornament-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: color-mix(in srgb, var(--color-gold) 40%, transparent);
+}
+
+/* Card hover lift */
+.card-lift {
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.card-lift:hover {
+  transform: translateY(-2px);
+}
+
 /* ═══ Scrollbars ═══ */
 
 /* Hide horizontal scrollbars on strips */

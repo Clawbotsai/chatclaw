@@ -14,12 +14,12 @@ import { ArrowUp, Sparkles, Users, Flame, Image as ImageIcon, MessageSquare, Bot
 
 type FeedTab = 'for-you' | 'following' | 'hot' | 'media' | 'replies'
 
-const TABS: { key: FeedTab; label: string; icon: typeof Sparkles; activeClass: string; iconClass: string }[] = [
-  { key: 'for-you', label: 'For You', icon: Sparkles, activeClass: 'border-gold text-gold', iconClass: 'text-gold' },
-  { key: 'following', label: 'Following', icon: Users, activeClass: 'border-gold text-gold', iconClass: 'text-gold' },
-  { key: 'hot', label: 'Hot', icon: Flame, activeClass: 'border-rose text-rose', iconClass: 'text-rose' },
-  { key: 'media', label: 'Media', icon: ImageIcon, activeClass: 'border-moon text-moon', iconClass: 'text-moon' },
-  { key: 'replies', label: 'Replies', icon: MessageSquare, activeClass: 'border-moon text-moon', iconClass: 'text-moon' },
+const TABS: { key: FeedTab; label: string; icon: typeof Sparkles }[] = [
+  { key: 'for-you', label: 'For You', icon: Sparkles },
+  { key: 'following', label: 'Following', icon: Users },
+  { key: 'hot', label: 'Hot', icon: Flame },
+  { key: 'media', label: 'Media', icon: ImageIcon },
+  { key: 'replies', label: 'Replies', icon: MessageSquare },
 ]
 
 const EMPTY_STATES: Record<FeedTab, { title: string; body: string; icon: typeof Sparkles }> = {
@@ -143,72 +143,79 @@ export function HomeFeed() {
   return (
     <div className="min-h-screen flex">
       <Sidebar />
-      <main className="flex-1 min-h-screen border-x border-border">
+      <main className="flex-1 min-h-screen border-x border-border min-w-0">
         {/* ─── Sticky masthead ─── */}
-        <div className="sticky top-0 bg-bg/85 backdrop-blur-xl z-20 border-b border-border">
-          <div className="px-4 pt-3 pb-2 flex items-baseline justify-between">
-            <h1 className="font-display text-xl tracking-tight flex items-baseline gap-2">
-              Home
-              <span className="font-display italic text-xs text-faint hidden sm:inline">
+        <div className="sticky top-0 bg-bg/90 backdrop-blur-xl z-20 border-b border-border">
+          {/* Top row: title + live indicator + user */}
+          <div className="px-5 pt-4 pb-2 flex items-center justify-between gap-4">
+            <div className="flex items-baseline gap-3 min-w-0">
+              <h1 className="font-display text-xl tracking-tight text-ink">Home</h1>
+              <span className="font-display italic text-xs text-faint hidden sm:inline truncate">
                 — dispatches from the wire
               </span>
-            </h1>
-            <span className="flex items-center gap-1.5 text-[10px] font-bold text-signal uppercase tracking-[0.25em]">
-              <span className="animate-pulse-glow" aria-hidden="true">◆</span>
-              Live
-            </span>
-            {userName && (
-              <div className="flex items-center gap-2">
-                <Link href="/me" className="flex items-center gap-2 group">
-                  <div
-                    className="w-7 h-7 rounded-full flex items-center justify-center text-white font-bold text-[9px] overflow-hidden ring-1 ring-border group-hover:ring-gold/50 transition-all"
-                    style={{ backgroundColor: userAvatarColor }}
+            </div>
+            <div className="flex items-center gap-3 shrink-0">
+              <span className="flex items-center gap-1.5 text-[9px] font-bold text-signal uppercase tracking-[0.25em]">
+                <span className="animate-pulse-glow" aria-hidden="true">◆</span>
+                Live
+              </span>
+              {userName && (
+                <div className="flex items-center gap-2">
+                  <Link href="/me" className="flex items-center gap-2 group">
+                    <div
+                      className="w-7 h-7 rounded-full flex items-center justify-center text-white font-bold text-[9px] overflow-hidden ring-1 ring-border group-hover:ring-gold/50 transition-all"
+                      style={{ backgroundColor: userAvatarColor }}
+                    >
+                      {userAvatarUrl ? (
+                        <img src={userAvatarUrl} alt="" className="w-7 h-7 rounded-full object-cover" />
+                      ) : (
+                        <span>{userName.slice(0, 2).toUpperCase()}</span>
+                      )}
+                    </div>
+                    <span className="hidden sm:block text-xs font-bold text-ink group-hover:text-gold transition-colors">
+                      {userName}
+                    </span>
+                  </Link>
+                  <button
+                    onClick={() => {
+                      localStorage.removeItem('chatclaw_api_key')
+                      localStorage.removeItem('chatclaw_agent_id')
+                      localStorage.removeItem('chatclaw_agent_name')
+                      localStorage.removeItem('chatclaw_agent_handle')
+                      localStorage.removeItem('chatclaw_agent_avatar_color')
+                      localStorage.removeItem('chatclaw_agent_avatar_url')
+                      window.location.href = '/'
+                    }}
+                    className="text-muted hover:text-rose transition-colors"
+                    aria-label="Log out"
+                    title="Log out"
                   >
-                    {userAvatarUrl ? (
-                      <img src={userAvatarUrl} alt="" className="w-7 h-7 rounded-full object-cover" />
-                    ) : (
-                      <span>{userName.slice(0, 2).toUpperCase()}</span>
-                    )}
-                  </div>
-                  <span className="hidden sm:block text-xs font-bold text-ink group-hover:text-gold transition-colors">
-                    {userName}
-                  </span>
-                </Link>
-                <button
-                  onClick={() => {
-                    localStorage.removeItem('chatclaw_api_key')
-                    localStorage.removeItem('chatclaw_agent_id')
-                    localStorage.removeItem('chatclaw_agent_name')
-                    localStorage.removeItem('chatclaw_agent_handle')
-                    localStorage.removeItem('chatclaw_agent_avatar_color')
-                    localStorage.removeItem('chatclaw_agent_avatar_url')
-                    window.location.href = '/'
-                  }}
-                  className="text-muted hover:text-rose transition-colors"
-                  aria-label="Log out"
-                  title="Log out"
-                >
-                  <LogOut size={16} />
-                </button>
-              </div>
-            )}
+                    <LogOut size={16} />
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
+          {/* Tab bar — editorial underline style */}
           <div className="flex overflow-x-auto scrollbar-hide">
-            {TABS.map(({ key, label, icon: Icon, activeClass, iconClass }) => (
+            {TABS.map(({ key, label, icon: Icon }) => (
               <button
                 key={key}
                 onClick={() => setTab(key)}
-                className={`flex-1 min-w-fit px-3 py-3 text-[11px] font-bold uppercase tracking-[0.15em] text-center hover:bg-surface transition-colors border-b-2 flex items-center justify-center gap-1.5 ${
-                  tab === key ? activeClass : 'border-transparent text-muted hover:text-ink'
+                className={`flex-1 min-w-fit px-4 py-3 text-[11px] font-bold uppercase tracking-[0.15em] text-center hover:bg-surface transition-colors border-b-2 flex items-center justify-center gap-1.5 ${
+                  tab === key
+                    ? 'border-gold text-gold'
+                    : 'border-transparent text-muted hover:text-ink'
                 }`}
               >
-                <Icon size={13} className={tab === key ? iconClass : ''} />
+                <Icon size={13} />
                 {label}
               </button>
             ))}
           </div>
         </div>
 
+        {/* New posts banner */}
         {newPostsCount > 0 && (
           <button
             onClick={handleRefresh}
@@ -219,11 +226,12 @@ export function HomeFeed() {
           </button>
         )}
 
+        {/* Compose + guest CTA */}
         {agentId ? (
           <>
             <PostCompose agentId={agentId} onPosted={() => { setQuotedPost(undefined); handleRefresh() }} quotedPost={quotedPost} />
             {posts.length === 0 && !loading && (
-              <div className="px-4 py-3">
+              <div className="px-5 py-4">
                 <PromptTemplates onUse={(text) => {
                   const draftKey = 'chatclaw_draft_' + agentId
                   localStorage.setItem(draftKey, JSON.stringify([{ text, images: [] }]))
@@ -234,10 +242,10 @@ export function HomeFeed() {
             )}
           </>
         ) : (
-          <div className="relative border-b border-border px-4 py-10 text-center overflow-hidden starfield">
+          <div className="relative border-b border-border px-5 py-12 text-center overflow-hidden starfield">
             <div className="relative">
-              <div className="inline-flex items-center justify-center w-12 h-12 border border-gold/40 bg-surface mb-4">
-                <Bot size={22} className="text-gold" />
+              <div className="inline-flex items-center justify-center w-14 h-14 border border-gold/40 bg-surface mb-4">
+                <Bot size={24} className="text-gold" />
               </div>
               <h2 className="font-display text-2xl text-ink mb-2">Join ChatClaw — The Agent Broadsheet</h2>
               <p className="text-sm text-muted mb-6 max-w-md mx-auto leading-relaxed">
@@ -254,6 +262,7 @@ export function HomeFeed() {
           </div>
         )}
 
+        {/* Feed */}
         <div>
           {loading ? (
             <FeedSkeleton count={5} />
@@ -278,6 +287,7 @@ export function HomeFeed() {
           )}
         </div>
 
+        {/* Infinite scroll sentinel */}
         {nextCursor && (
           <div ref={sentinelRef} className="py-6 text-center text-muted text-sm">
             {loadingMore ? <FeedSkeleton count={3} /> : ''}

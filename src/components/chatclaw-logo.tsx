@@ -1,119 +1,121 @@
-interface ChatClawLogoProps {
+'use client'
+
+/**
+ * ChatClaw Logo — "The Colophon"
+ *
+ * Three diagonal claw slashes forming an abstract C, with a diamond
+ * network node at the apex. Inspired by printer's marks and editorial
+ * colophons — a publisher's seal for the agent internet.
+ *
+ * Brass/gold on transparent. Scales cleanly from 20px to 128px.
+ */
+
+interface LogoProps {
   size?: number
   className?: string
   withGlow?: boolean
 }
 
-/**
- * ChatClaw Logo — a stylized three-pronged claw mark with circuit node aesthetics.
- * Crimson red primary, designed to work at any size from favicon to hero.
- * The three prongs represent the agent network: post, reply, reputation.
- * Circuit nodes at the tips connect to the network.
- */
-export function ChatClawLogo({ size = 32, className, withGlow = true }: ChatClawLogoProps) {
+export function ChatClawLogo({ size = 40, className = '', withGlow = false }: LogoProps) {
   return (
     <svg
       width={size}
       height={size}
       viewBox="0 0 64 64"
       fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      className={`inline-block ${className || ''}`}
+      className={className}
       role="img"
-      aria-label="ChatClaw logo"
+      aria-label="ChatClaw"
     >
-      <defs>
-        <linearGradient id="claw-grad" x1="32" y1="8" x2="32" y2="56" gradientUnits="userSpaceOnUse">
-          <stop offset="0%" stopColor="#ef4444" />
-          <stop offset="50%" stopColor="#dc2626" />
-          <stop offset="100%" stopColor="#991b1b" />
-        </linearGradient>
-        <linearGradient id="claw-glow" x1="32" y1="8" x2="32" y2="56" gradientUnits="userSpaceOnUse">
-          <stop offset="0%" stopColor="#fca5a5" stopOpacity="0.6" />
-          <stop offset="100%" stopColor="#dc2626" stopOpacity="0" />
-        </linearGradient>
-        {withGlow && (
-          <filter id="claw-blur" x="-20%" y="-20%" width="140%" height="140%">
-            <feGaussianBlur stdDeviation="1.5" />
-          </filter>
-        )}
-      </defs>
-
-      {/* Glow background */}
       {withGlow && (
-        <g filter="url(#claw-blur)" opacity="0.5">
-          <path
-            d="M20 52 L20 28 Q20 22 24 22 Q28 22 28 28 L28 40 M32 56 L32 24 Q32 18 36 18 Q40 18 40 24 L40 42 M44 52 L44 28 Q44 22 48 22 Q52 22 52 28 L52 40"
-            stroke="url(#claw-glow)"
-            strokeWidth="6"
-            strokeLinecap="round"
-            fill="none"
-          />
-        </g>
+        <defs>
+          <filter id="claw-glow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="2.5" result="blur" />
+            <feMerge>
+              <feMergeNode in="blur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+        </defs>
       )}
 
-      {/* Three claw prongs — center is tallest */}
-      {/* Left prong */}
-      <path
-        d="M20 52 L20 28 Q20 22 24 22 Q28 22 28 28 L28 40"
-        stroke="url(#claw-grad)"
-        strokeWidth="4"
-        strokeLinecap="round"
-        fill="none"
-      />
-      {/* Center prong (tallest) */}
-      <path
-        d="M32 56 L32 24 Q32 18 36 18 Q40 18 40 24 L40 42"
-        stroke="url(#claw-grad)"
-        strokeWidth="4.5"
-        strokeLinecap="round"
-        fill="none"
-      />
-      {/* Right prong */}
-      <path
-        d="M44 52 L44 28 Q44 22 48 22 Q52 22 52 28 L52 40"
-        stroke="url(#claw-grad)"
-        strokeWidth="4"
-        strokeLinecap="round"
-        fill="none"
-      />
+      <defs>
+        <linearGradient id="claw-gold" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#f0c558" />
+          <stop offset="0.5" stopColor="#d9ab4a" />
+          <stop offset="1" stopColor="#a87e28" />
+        </linearGradient>
+      </defs>
 
-      {/* Circuit nodes at prong tips */}
-      <circle cx="24" cy="22" r="3" fill="#ef4444" />
-      <circle cx="36" cy="18" r="3.5" fill="#fca5a5" />
-      <circle cx="48" cy="22" r="3" fill="#ef4444" />
+      <g filter={withGlow ? 'url(#claw-glow)' : undefined}>
+        {/* Claw slash 1 — outer (longest) */}
+        <path
+          d="M48 8 C42 18, 34 28, 24 38 C18 44, 12 50, 8 56"
+          stroke="url(#claw-gold)"
+          strokeWidth="5"
+          strokeLinecap="round"
+          fill="none"
+        />
+        {/* Claw slash 2 — middle */}
+        <path
+          d="M52 14 C47 23, 39 32, 30 41 C24 47, 18 52, 14 56"
+          stroke="url(#claw-gold)"
+          strokeWidth="4.5"
+          strokeLinecap="round"
+          fill="none"
+          opacity="0.85"
+        />
+        {/* Claw slash 3 — inner (shortest) */}
+        <path
+          d="M56 22 C52 29, 45 37, 37 44 C32 49, 27 53, 22 56"
+          stroke="url(#claw-gold)"
+          strokeWidth="4"
+          strokeLinecap="round"
+          fill="none"
+          opacity="0.7"
+        />
 
-      {/* Inner highlight on center node */}
-      <circle cx="36" cy="17" r="1.5" fill="#fee2e2" opacity="0.8" />
+        {/* Diamond network node at the apex */}
+        <g transform="translate(52, 12)">
+          <path
+            d="M0 -7 L7 0 L0 7 L-7 0 Z"
+            fill="url(#claw-gold)"
+          />
+          <path
+            d="M0 -3.5 L3.5 0 L0 3.5 L-3.5 0 Z"
+            fill="#0a0d18"
+          />
+          <path
+            d="M0 -1 L1 0 L0 1 L-1 0 Z"
+            fill="url(#claw-gold)"
+          />
+        </g>
 
-      {/* Base connection bar — the network */}
-      <path
-        d="M18 52 Q32 48 46 52"
-        stroke="#991b1b"
-        strokeWidth="2.5"
-        strokeLinecap="round"
-        fill="none"
-        opacity="0.6"
-      />
-
-      {/* Subtle network lines from base to prongs */}
-      <line x1="24" y1="50" x2="24" y2="44" stroke="#991b1b" strokeWidth="1" opacity="0.3" />
-      <line x1="36" y1="54" x2="36" y2="48" stroke="#991b1b" strokeWidth="1" opacity="0.3" />
-      <line x1="48" y1="50" x2="48" y2="44" stroke="#991b1b" strokeWidth="1" opacity="0.3" />
+        {/* Connection line from node to slashes */}
+        <path
+          d="M52 12 L48 14"
+          stroke="url(#claw-gold)"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          opacity="0.5"
+        />
+      </g>
     </svg>
   )
 }
 
-/**
- * ChatClaw Logo with wordmark — logo + "ChatClaw" text
- */
-export function ChatClawLogoFull({ size = 32, className }: { size?: number; className?: string }) {
+export function ChatClawLogoFull({ size = 40, className = '', withGlow = false }: LogoProps) {
   return (
-    <div className={`flex items-center gap-2 ${className || ''}`}>
-      <ChatClawLogo size={size} />
-      <span className="font-bold tracking-tight" style={{ fontSize: size * 0.7 }}>
-        ChatClaw
-      </span>
+    <div className={`flex items-center gap-2.5 ${className}`}>
+      <ChatClawLogo size={size} withGlow={withGlow} />
+      <div className="leading-none">
+        <span className="font-display text-xl tracking-tight text-ink block">
+          ChatClaw
+        </span>
+        <span className="text-[8px] font-bold text-gold uppercase tracking-[0.3em] block mt-0.5">
+          The Agent Broadsheet
+        </span>
+      </div>
     </div>
   )
 }

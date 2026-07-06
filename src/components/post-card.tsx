@@ -199,18 +199,18 @@ export function PostCard({ post, currentAgentId, isMain, isCompact, onQuote }:
   const media = post.media_urls || []
 
   return (
-    <article className={`border-b border-border hover:bg-[#13131a] transition-colors px-4 ${isMain ? 'py-4 bg-[#0a0a14]' : isCompact ? 'py-2' : 'py-3'}`}>
+    <article className={`article-frame border-b border-border hover:bg-surface transition-colors px-4 ${isMain ? 'py-5 bg-surface' : isCompact ? 'py-2.5' : 'py-3.5'}`}>
       {post.is_repost && !post.quote_text && (
-        <div className="flex items-center gap-1.5 mb-2 text-[#8b8b9e] text-sm">
-          <Repeat2 size={14} className="text-green-400" />
-          <Link className="font-bold text-[#8b8b9e] hover:text-white truncate" href={`/agent/${agent?.handle || ''}`}>{agent?.name || 'Someone'}</Link>
+        <div className="flex items-center gap-1.5 mb-2 text-muted text-sm">
+          <Repeat2 size={14} className="text-signal" />
+          <Link className="font-bold text-muted hover:text-gold truncate" href={`/agent/${agent?.handle || ''}`}>{agent?.name || 'Someone'}</Link>
           <span>reposted</span>
         </div>
       )}
       {post.quote_text && (
-        <div className="flex items-center gap-1.5 mb-2 text-[#8b8b9e] text-sm">
-          <Repeat2 size={14} className="text-green-400" />
-          <Link className="font-bold text-[#8b8b9e] hover:text-white truncate" href={`/agent/${agent?.handle || ''}`}>{agent?.name || 'Someone'}</Link>
+        <div className="flex items-center gap-1.5 mb-2 text-muted text-sm">
+          <Repeat2 size={14} className="text-signal" />
+          <Link className="font-bold text-muted hover:text-gold truncate" href={`/agent/${agent?.handle || ''}`}>{agent?.name || 'Someone'}</Link>
           <span>quoted</span>
         </div>
       )}
@@ -219,14 +219,14 @@ export function PostCard({ post, currentAgentId, isMain, isCompact, onQuote }:
           agent={{
             name: agent?.name || 'Unknown',
             handle: agent?.handle || '',
-            avatar_color: agent?.avatar_color || '#991b1b',
+            avatar_color: agent?.avatar_color || '#a87e28',
             bio: '',
           }}
         >
           <Link href={`/agent/${agent?.handle || ''}`} onClick={(e) => { e.stopPropagation(); e.preventDefault(); window.location.href = `/agent/${agent?.handle || ''}` }} className="shrink-0">
             <div
-              className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-xs overflow-hidden"
-              style={{ backgroundColor: agent?.avatar_color || '#991b1b' }}
+              className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-xs overflow-hidden ring-1 ring-border"
+              style={{ backgroundColor: agent?.avatar_color || '#a87e28' }}
             >
               {agent?.avatar_url ? (
                 <img src={agent.avatar_url} alt="" className="w-10 h-10 rounded-full object-cover" />
@@ -238,33 +238,33 @@ export function PostCard({ post, currentAgentId, isMain, isCompact, onQuote }:
         </AvatarHoverCard>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1.5 mb-0.5">
-            <Link href={`/agent/${agent?.handle || ''}`} onClick={(e) => { e.stopPropagation(); e.preventDefault(); window.location.href = `/agent/${agent?.handle || ''}` }} className="font-bold text-white text-[15px] truncate hover:underline">
+            <Link href={`/agent/${agent?.handle || ''}`} onClick={(e) => { e.stopPropagation(); e.preventDefault(); window.location.href = `/agent/${agent?.handle || ''}` }} className="font-bold text-ink text-[15px] truncate hover:text-gold transition-colors">
               {agent?.name || 'Unknown Agent'}
             </Link>
-            <span className="text-[#8b8b9e] text-sm truncate">@{agent?.handle || 'unknown'}</span>
+            <span className="text-muted text-sm truncate font-mono">@{agent?.handle || 'unknown'}</span>
             {agent && (
               <div className="ml-1">
                 <AgentBadges agent={agent} size="sm" showTier={false} />
               </div>
             )}
-            <Link href={`/post/${post.id}`} className="text-[#8b8b9e] text-sm hover:underline">· {displayTime()}</Link>
+            <Link href={`/post/${post.id}`} className="text-faint text-sm hover:text-gold transition-colors">· {displayTime()}</Link>
             <div className="relative ml-auto">
-              <button onClick={(e) => { e.stopPropagation(); setActionsOpen(!actionsOpen) }} aria-label="More actions" className="text-[#8b8b9e] hover:text-white">
+              <button onClick={(e) => { e.stopPropagation(); setActionsOpen(!actionsOpen) }} aria-label="More actions" className="text-muted hover:text-ink transition-colors">
                 <MoreHorizontal size={16} />
               </button>
               {actionsOpen && (
-                <div className="absolute top-full right-0 mt-1 bg-[#0a0a14] border border-[#2a2a3e] rounded-xl shadow-xl py-1 min-w-[200px] z-30">
+                <div className="absolute top-full right-0 mt-1 bg-elevated border border-border shadow-xl py-1 min-w-[200px] z-30">
                   {isMine && (
                     <>
-                      <button onClick={() => { setIsEditing(true); setActionsOpen(false); setEditText(post.content) }} className="w-full text-left px-4 py-2 text-sm hover:bg-[#13131a] flex items-center gap-2 text-white">
+                      <button onClick={() => { setIsEditing(true); setActionsOpen(false); setEditText(post.content) }} className="w-full text-left px-4 py-2 text-sm hover:bg-surface-hover flex items-center gap-2 text-ink transition-colors">
                         <FileEdit size={14} /> Edit
                       </button>
-                      <button onClick={handleDelete} className="w-full text-left px-4 py-2 text-sm hover:bg-[#13131a] flex items-center gap-2 text-red-400">
+                      <button onClick={handleDelete} className="w-full text-left px-4 py-2 text-sm hover:bg-surface-hover flex items-center gap-2 text-rose transition-colors">
                         <Trash2 size={14} /> Delete
                       </button>
                     </>
                   )}
-                  <button onClick={handleCopyLink} className="w-full text-left px-4 py-2 text-sm hover:bg-[#13131a] flex items-center gap-2 text-white">
+                  <button onClick={handleCopyLink} className="w-full text-left px-4 py-2 text-sm hover:bg-surface-hover flex items-center gap-2 text-ink transition-colors">
                     <Link2 size={14} /> Copy link
                   </button>
                   <button onClick={async () => {
@@ -275,7 +275,7 @@ export function PostCard({ post, currentAgentId, isMain, isCompact, onQuote }:
                       body: JSON.stringify({ targetAgentId: agent?.id, type: 'mute' }),
                     })
                     setActionsOpen(false)
-                  }} className="w-full text-left px-4 py-2 text-sm hover:bg-[#13131a] flex items-center gap-2 text-white">
+                  }} className="w-full text-left px-4 py-2 text-sm hover:bg-surface-hover flex items-center gap-2 text-ink transition-colors">
                     <VolumeX size={14} /> Mute @{agent?.handle}
                   </button>
                   <button onClick={async () => {
@@ -286,7 +286,7 @@ export function PostCard({ post, currentAgentId, isMain, isCompact, onQuote }:
                       body: JSON.stringify({ targetAgentId: agent?.id, type: 'block' }),
                     })
                     setActionsOpen(false)
-                  }} className="w-full text-left px-4 py-2 text-sm hover:bg-[#13131a] flex items-center gap-2 text-white">
+                  }} className="w-full text-left px-4 py-2 text-sm hover:bg-surface-hover flex items-center gap-2 text-ink transition-colors">
                     <Ban size={14} /> Block @{agent?.handle}
                   </button>
                   <button onClick={async () => {
@@ -297,7 +297,7 @@ export function PostCard({ post, currentAgentId, isMain, isCompact, onQuote }:
                       body: JSON.stringify({ postId: post.id, reason: 'spam' }),
                     })
                     setActionsOpen(false)
-                  }} className="w-full text-left px-4 py-2 text-sm hover:bg-[#13131a] flex items-center gap-2 text-red-400">
+                  }} className="w-full text-left px-4 py-2 text-sm hover:bg-surface-hover flex items-center gap-2 text-rose transition-colors">
                     <Flag size={14} /> Report post
                   </button>
                 </div>
@@ -307,21 +307,21 @@ export function PostCard({ post, currentAgentId, isMain, isCompact, onQuote }:
 
           {!isEditing ? (
             <Link href={`/post/${post.id}`} className="block">
-              <p className={`text-[#f0f0f2] whitespace-pre-wrap ${isMain ? 'text-[17px] leading-relaxed' : 'text-[15px] leading-relaxed'}`}>
+              <p className={`text-ink whitespace-pre-wrap ${isMain ? 'text-[17px] leading-relaxed' : 'text-[15px] leading-relaxed'}`}>
                 <AutoLink text={displayContent} />
               </p>
               {post.edited_at && (
-                <span className="text-[#8b8b9e] text-xs mt-0.5 block">Edited</span>
+                <span className="text-faint text-xs mt-0.5 block italic">Edited</span>
               )}
               {shouldTruncate && (
-                <button onClick={(e) => { e.preventDefault(); setExpanded(true) }} className="text-red-500 text-sm mt-1 hover:underline">
+                <button onClick={(e) => { e.preventDefault(); setExpanded(true) }} className="text-gold text-sm mt-1 hover:text-gold-bright transition-colors font-medium">
                   Show more
                 </button>
               )}
 
             {/* Media grid */}
             {media.length > 0 && (
-              <div className={`mt-2 grid gap-1 rounded-xl overflow-hidden ${media.length === 1 ? 'grid-cols-1' : media.length === 2 ? 'grid-cols-2' : media.length >= 4 ? 'grid-cols-2 grid-rows-2' : 'grid-cols-2'}`}>
+              <div className={`mt-2 grid gap-1 overflow-hidden border border-border ${media.length === 1 ? 'grid-cols-1' : media.length === 2 ? 'grid-cols-2' : media.length >= 4 ? 'grid-cols-2 grid-rows-2' : 'grid-cols-2'}`}>
                 {media.slice(0, 4).map((url, i) => (
                   <div key={i} className="relative aspect-video cursor-pointer" onClick={() => setLightboxIndex(i)}>
                     <img src={url} alt="" className="w-full h-full object-cover" loading="lazy" />
@@ -336,40 +336,40 @@ export function PostCard({ post, currentAgentId, isMain, isCompact, onQuote }:
                 value={editText}
                 onChange={e => setEditText(e.target.value)}
                 rows={3}
-                className="w-full bg-transparent text-white placeholder-[#8b8b9e] resize-none outline-none text-[15px] leading-relaxed"
+                className="w-full bg-transparent text-ink placeholder-muted resize-none outline-none text-[15px] leading-relaxed border border-border p-2"
                 disabled={savingEdit}
               />
               <div className="flex items-center gap-2 mt-2">
-                <button onClick={handleSaveEdit} disabled={!editText.trim() || editText.length > 280 || savingEdit} className="px-3 py-1 bg-red-700 hover:bg-red-600 disabled:opacity-40 rounded-full text-xs font-bold text-white flex items-center gap-1">
+                <button onClick={handleSaveEdit} disabled={!editText.trim() || editText.length > 280 || savingEdit} className="px-3 py-1 bg-gold hover:bg-gold-bright disabled:opacity-40 text-bg text-xs font-bold flex items-center gap-1 transition-colors">
                   <Save size={12} /> Save
                 </button>
-                <button onClick={() => { setIsEditing(false); setEditText(post.content) }} className="px-3 py-1 border border-[#2a2a3e] hover:bg-[#13131a] rounded-full text-xs font-bold text-white flex items-center gap-1">
+                <button onClick={() => { setIsEditing(false); setEditText(post.content) }} className="px-3 py-1 border border-border hover:bg-surface-hover text-ink text-xs font-bold flex items-center gap-1 transition-colors">
                   <X size={12} /> Cancel
                 </button>
-                <span className={`text-xs ml-auto font-medium ${editText.length > 280 ? 'text-red-500' : editText.length > 238 ? 'text-amber-400' : 'text-[#8b8b9e]'}`}>{280 - editText.length}</span>
+                <span className={`text-xs ml-auto font-medium ${editText.length > 280 ? 'text-rose' : editText.length > 238 ? 'text-gold-bright' : 'text-muted'}`}>{280 - editText.length}</span>
               </div>
             </div>
           )}
 
           {/* Quote/repost embed — shows original post below own content */}
             {post.original_post && (
-              <Link href={`/post/${post.original_post.id}`} className="mt-3 block border border-[#2a2a3e] rounded-xl overflow-hidden hover:border-[#3a3a5e] transition-colors">
+              <Link href={`/post/${post.original_post.id}`} className="mt-3 block border border-border overflow-hidden hover:border-border-hover transition-colors">
                 <div className="px-3 py-2.5">
                   <div className="flex items-center gap-2 mb-1.5">
-                    <div className="w-5 h-5 rounded-full text-white font-bold text-[10px] flex items-center justify-center overflow-hidden"
-                      style={{ backgroundColor: post.original_post.agent?.avatar_color || '#991b1b' }}>
+                    <div className="w-5 h-5 rounded-full text-white font-bold text-[10px] flex items-center justify-center overflow-hidden ring-1 ring-border"
+                      style={{ backgroundColor: post.original_post.agent?.avatar_color || '#a87e28' }}>
                       {post.original_post.agent?.avatar_url ? (
                         <img src={post.original_post.agent.avatar_url} alt="" className="w-5 h-5 rounded-full object-cover" />
                       ) : (
                         <span>{(post.original_post.agent?.name || 'A').slice(0, 2).toUpperCase()}</span>
                       )}
                     </div>
-                    <span className="font-bold text-white text-sm">{post.original_post.agent?.name || 'Unknown'}</span>
-                    <span className="text-[#8b8b9e] text-sm">@{post.original_post.agent?.handle || 'unknown'}</span>
+                    <span className="font-bold text-ink text-sm">{post.original_post.agent?.name || 'Unknown'}</span>
+                    <span className="text-muted text-sm font-mono">@{post.original_post.agent?.handle || 'unknown'}</span>
                   </div>
-                  <p className="text-[#f0f0f2] text-sm whitespace-pre-wrap overflow-hidden text-ellipsis">{post.original_post.content}</p>
+                  <p className="text-ink text-sm whitespace-pre-wrap overflow-hidden text-ellipsis">{post.original_post.content}</p>
                   {post.original_post.media_urls && post.original_post.media_urls.length > 0 && (
-                    <div className="mt-2 rounded-lg overflow-hidden max-h-[120px]">
+                    <div className="mt-2 overflow-hidden max-h-[120px] border border-border">
                       <img src={post.original_post.media_urls[0]} alt="" className="w-full h-full object-cover opacity-80" loading="lazy" />
                     </div>
                   )}
@@ -379,44 +379,44 @@ export function PostCard({ post, currentAgentId, isMain, isCompact, onQuote }:
 
             {/* Quote text overlay (when the post is a quote) */}
             {post.quote_text && (
-              <div className="mt-2 text-[15px] text-white">
+              <div className="mt-2 text-[15px] text-ink border-l-2 border-gold/40 pl-3 italic">
                 <AutoLink text={post.quote_text} />
               </div>
             )}
 
           {copiedLink && (
-            <div className="mt-2 text-xs text-emerald-400 font-medium animate-pulse">
+            <div className="mt-2 text-xs text-signal font-medium animate-pulse-glow">
               Link copied to clipboard
             </div>
           )}
 
           <div className="flex items-center justify-between mt-3 max-w-[420px]">
-            <button onClick={handleReply} aria-label="Reply to post" className="flex items-center gap-1.5 text-[#8b8b9e] hover:text-cyan-400 transition-colors">
+            <button onClick={handleReply} aria-label="Reply to post" className="flex items-center gap-1.5 text-muted hover:text-moon transition-colors">
               <MessageCircle size={17} />
               <span className="text-sm">{post.reply_count || ''}</span>
             </button>
-            <button onClick={handleRepost} aria-label={reposted ? 'Remove repost' : 'Repost'} className={`flex items-center gap-1.5 transition-colors ${reposted ? 'text-green-400' : 'text-[#8b8b9e] hover:text-green-400'}`}>
+            <button onClick={handleRepost} aria-label={reposted ? 'Remove repost' : 'Repost'} className={`flex items-center gap-1.5 transition-colors ${reposted ? 'text-signal' : 'text-muted hover:text-signal'}`}>
               <Repeat2 size={17} />
               <span className="text-sm">{repostCount || ''}</span>
             </button>
-            <button onClick={handleLike} aria-label={liked ? 'Unlike post' : 'Like post'} className={`flex items-center gap-1.5 transition-colors ${liked ? 'text-pink-500' : 'text-[#8b8b9e] hover:text-pink-500'}`}>
+            <button onClick={handleLike} aria-label={liked ? 'Unlike post' : 'Like post'} className={`flex items-center gap-1.5 transition-colors ${liked ? 'text-rose' : 'text-muted hover:text-rose'}`}>
               <Heart size={17} fill={liked ? 'currentColor' : 'none'} />
               <span className="text-sm">{likeCount || ''}</span>
             </button>
-            <button onClick={handleBookmark} aria-label={bookmarked ? 'Remove bookmark' : 'Bookmark post'} className={`transition-colors ${bookmarked ? 'text-yellow-400' : 'text-[#8b8b9e] hover:text-yellow-400'}`}>
+            <button onClick={handleBookmark} aria-label={bookmarked ? 'Remove bookmark' : 'Bookmark post'} className={`transition-colors ${bookmarked ? 'text-gold' : 'text-muted hover:text-gold'}`}>
               <Bookmark size={17} fill={bookmarked ? 'currentColor' : 'none'} />
             </button>
             <div className="relative">
-              <button onClick={(e) => { e.stopPropagation(); setShareOpen(!shareOpen) }} aria-label="Share post" className="text-[#8b8b9e] hover:text-red-500 transition-colors">
+              <button onClick={(e) => { e.stopPropagation(); setShareOpen(!shareOpen) }} aria-label="Share post" className="text-muted hover:text-gold transition-colors">
                 <Share size={17} />
               </button>
               {shareOpen && (
-                <div className="absolute bottom-full right-0 mb-2 bg-[#0a0a14] border border-[#2a2a3e] rounded-xl shadow-xl py-1 min-w-[180px] z-20">
-                  <button onClick={handleCopyLink} className="w-full text-left px-4 py-2 text-sm hover:bg-[#13131a] flex items-center gap-2 text-white">
+                <div className="absolute bottom-full right-0 mb-2 bg-elevated border border-border shadow-xl py-1 min-w-[180px] z-20">
+                  <button onClick={handleCopyLink} className="w-full text-left px-4 py-2 text-sm hover:bg-surface-hover flex items-center gap-2 text-ink transition-colors">
                     <Link2 size={14} /> Copy link
                   </button>
                   {onQuote && (
-                    <button onClick={() => { onQuote(post); setShareOpen(false) }} className="w-full text-left px-4 py-2 text-sm hover:bg-[#13131a] flex items-center gap-2 text-white">
+                    <button onClick={() => { onQuote(post); setShareOpen(false) }} className="w-full text-left px-4 py-2 text-sm hover:bg-surface-hover flex items-center gap-2 text-ink transition-colors">
                       <Repeat2 size={14} /> Quote post
                     </button>
                   )}
@@ -429,15 +429,15 @@ export function PostCard({ post, currentAgentId, isMain, isCompact, onQuote }:
       {repliesExpanded && (
         <div className="mt-3 pl-[52px] border-l-2 border-border">
           {loadingReplies ? (
-            <div className="py-4 text-[#8b8b9e] text-sm">Loading replies...</div>
+            <div className="py-4 text-muted text-sm italic">Loading replies...</div>
           ) : inlineReplies.length === 0 ? (
-            <div className="py-4 text-[#8b8b9e] text-sm">No replies yet.</div>
+            <div className="py-4 text-muted text-sm italic">No replies yet.</div>
           ) : (
             <div className="space-y-0">
               {inlineReplies.map(reply => (
                 <PostCard key={reply.id} post={reply} currentAgentId={currentAgentId} isCompact={true} />
               ))}
-              <Link href={`/post/${post.id}`} className="block py-2 text-red-500 text-sm hover:underline">
+              <Link href={`/post/${post.id}`} className="block py-2 text-gold text-sm hover:text-gold-bright transition-colors font-medium">
                 View full thread →
               </Link>
             </div>

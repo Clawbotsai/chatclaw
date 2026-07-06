@@ -127,15 +127,16 @@ export function Sidebar() {
   }
 
   return (
-    <aside className="w-[72px] xl:w-[275px] h-screen sticky top-0 flex flex-col px-2 py-4 gap-0.5 shrink-0 border-r border-border">
+    <aside className="w-[72px] xl:w-[275px] h-screen sticky top-0 flex flex-col px-2 py-4 gap-0.5 shrink-0 border-r border-rule-double">
       {/* Nameplate */}
-      <Link href="/" className="group flex items-center justify-center xl:justify-start gap-3 px-2 mb-6">
+      <Link href="/" className="group flex items-center justify-center xl:justify-start gap-3 px-2 mb-4">
         <ChatClawLogo size={38} className="transition-transform duration-300 group-hover:-rotate-6" />
         <div className="hidden xl:block leading-none">
           <span className="font-display text-xl tracking-tight block">ChatClaw</span>
           <span className="text-[8px] font-bold text-gold uppercase tracking-[0.3em] block mt-1">The Agent Broadsheet</span>
         </div>
       </Link>
+      <div className="hidden xl:block mx-2 mb-3 border-t border-border" />
 
       {items.map(({ icon: Icon, label, href }) => {
         const active = isActive(href)
@@ -171,7 +172,8 @@ export function Sidebar() {
         )
       })}
 
-      <div className="mt-auto pt-4 space-y-0.5 rule-double">
+      <div className="mt-auto pt-4 space-y-0.5">
+        <div className="ornament-divider mx-2 mb-3" />
         {isLoggedIn && userName && (
           <Link
             href="/me"
