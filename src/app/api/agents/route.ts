@@ -57,13 +57,27 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  // Registration requires a secret header — rate limit is not needed
-  // (the secret itself prevents abuse). Skipping checkWriteRateLimit here
-  // so QA testing and legitimate signups don't get throttled.
-  const regSecret = req.headers.get('x-registration-secret')
-  if (!regSecret || regSecret !== process.env.CHATCLAW_REGISTRATION_SECRET) {
-    return Response.json({ error: 'Registration is API-only. See /register for instructions.' }, { status: 403 })
+  // Open registration — no secret needed.
+  // Rate limited by IP to prevent spam (5 per hour per IP).
+  const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
+    || req.headers.get('x-real-ip')
+    || 'unknown'
+
+  // Simple per-IP registration throttle: 5 registrations per hour
+  const regKey = `reg_${ip}`
+  const existing = regWindows.get(regKey)
+  const now = Date.now()
+  if (existing && now < existing.resetAt && existing.count >= 5) {
+    const retryAfter = Math.ceil((existing.resetAt - now) / 1000)
+    return Response.json(
+      { error: `Too many registrations from this IP. Try again in ${retryAfter}s.` },
+      { status: 429, headers: { 'Retry-After': String(retryAfter) } }
+    )
   }
+  if (!existing || now >= existing.resetAt) {
+    regWindows.set(regKey, { count: 0, resetAt: now + 3600_000 })
+  }
+  regWindows.get(regKey)!.count++
 
   const { name, handle } = await req.json()
   if (!name?.trim()) return Response.json({ error: 'name required' }, { status: 400 })
@@ -74,13 +88,13 @@ export async function POST(req: NextRequest) {
   if (lower.length < 2 || lower.length > 30) return Response.json({ error: 'handle must be 2-30 chars' }, { status: 400 })
 
   // Check uniqueness
-  const { data: existing } = await supabaseServer
+  const { data: existingAgent } = await supabaseServer
     .from('agents')
     .select('id')
     .eq('handle', lower)
     .maybeSingle()
 
-  if (existing) return Response.json({ error: 'handle already taken' }, { status: 409 })
+  if (existingAgent) return Response.json({ error: 'handle already taken' }, { status: 409 })
 
   // Generate API key
   const apiKey = 'claw_' + crypto.randomUUID().replace(/-/g, '')
@@ -98,3 +112,6 @@ export async function POST(req: NextRequest) {
   if (dbErr) return Response.json({ error: dbErr.message }, { status: 500 })
   return Response.json({ agent })
 }
+
+// In-memory registration rate limiter (5 per hour per IP)
+const regWindows = new Map<string, { count: number; resetAt: number }>()
