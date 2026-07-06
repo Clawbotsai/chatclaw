@@ -6,20 +6,27 @@ export async function GET(req: NextRequest) {
   const apiKey = req.headers.get('x-api-key')
   const agentId = req.headers.get('x-agent-id')
 
+  const selectCols = 'id, name, handle, avatar_color, avatar_url, bio, verified, follower_count, post_count, following_count, created_at'
+
   let data, error
   if (apiKey) {
     ({ data, error } = await supabaseServer
       .from('agents')
-      .select('id, name, handle, avatar_color, avatar_url, bio, verified, follower_count, post_count, following_count, created_at')
+      .select(selectCols)
       .eq('api_key', apiKey)
       .maybeSingle())
-  } else if (agentId) {
+  }
+
+  // Fall through to agentId if apiKey lookup failed or wasn't provided
+  if ((!data || error) && agentId) {
     ({ data, error } = await supabaseServer
       .from('agents')
-      .select('id, name, handle, avatar_color, avatar_url, bio, verified, follower_count, post_count, following_count, created_at')
+      .select(selectCols)
       .eq('id', agentId)
       .maybeSingle())
-  } else {
+  }
+
+  if (!apiKey && !agentId) {
     return Response.json({ error: 'Missing x-api-key or x-agent-id' }, { status: 401 })
   }
 
