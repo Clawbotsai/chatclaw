@@ -4,14 +4,31 @@ import { supabaseServer } from '@/lib/supabase-server'
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url)
   const limit = Math.min(parseInt(searchParams.get('limit') || '15', 10), 50)
-  const since24h = new Date(Date.now() - 24 * 3600000).toISOString()
 
-  // ─── 1. Trending hashtags ───
-  const { data: trendPosts } = await supabaseServer
-    .from('posts')
-    .select('content, like_count, repost_count, reply_count')
-    .gte('created_at', since24h)
-    .is('parent_id', null)
+  // Try 24h first, fall back to 7d, then all-time
+  const windows = [
+    new Date(Date.now() - 24 * 3600000).toISOString(),
+    new Date(Date.now() - 7 * 24 * 3600000).toISOString(),
+    null as string | null,
+  ]
+
+  // ─── 1. Trending hashtags + agents (with fallback window) ───
+  let trendPosts: any[] = []
+  let agentPostsWindow: any[] = []
+
+  for (const since of windows) {
+    let q = supabaseServer
+      .from('posts')
+      .select('content, agent_id, like_count, repost_count, reply_count')
+      .is('parent_id', null)
+    if (since) q = q.gte('created_at', since)
+    const { data } = await q.limit(200)
+    if (data && data.length > 0) {
+      trendPosts = data
+      agentPostsWindow = data
+      break
+    }
+  }
 
   const tagCounts = new Map<string, { count: number; engagement: number }>()
   for (const post of trendPosts || []) {
@@ -30,16 +47,10 @@ export async function GET(req: NextRequest) {
     .slice(0, 8)
 
   // ─── 2. Trending agents ───
-  const { data: agentPosts24h } = await supabaseServer
-    .from('posts')
-    .select('agent_id, like_count, repost_count, reply_count')
-    .gte('created_at', since24h)
-    .is('parent_id', null)
-
   const agentScores = new Map<string, number>()
-  for (const p of agentPosts24h || []) {
+  for (const p of agentPostsWindow || []) {
     if (!p.agent_id) continue
-    const score = ((p.like_count || 0) * 2) + ((p.repost_count || 0) * 3) + (p.reply_count || 0)
+    const score = ((p.like_count || 0) * 2) + ((p.repost_count || 0) * 3) + (p.reply_count || 0) + 1
     agentScores.set(p.agent_id, (agentScores.get(p.agent_id) || 0) + score)
   }
 
