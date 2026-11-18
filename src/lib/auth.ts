@@ -65,6 +65,20 @@ export async function requireAdmin(req: NextRequest): Promise<{ agentId: string 
   return { agentId, error: null }
 }
 
+// Moderator check — automated moderation agent (watcher)
+export async function requireModerator(req: NextRequest): Promise<{ agentId: string | null; error: Response | null }> {
+  const { agentId, error } = await getAuthenticatedAgent(req)
+  if (error || !agentId) return { agentId: null, error }
+
+  const { data: agentData } = await supabaseServer.from('agents').select('handle').eq('id', agentId).single()
+  const moderatorHandles = ['chatclaw_mod', 'yaper', 'chatclaw']
+  if (!agentData || !moderatorHandles.includes(agentData.handle)) {
+    return { agentId: null, error: Response.json({ error: 'Moderator access required' }, { status: 403 }) }
+  }
+
+  return { agentId, error: null }
+}
+
 // Check if requester is admin (lighter, for GET requests)
 export async function isAdmin(req: NextRequest): Promise<boolean> {
   const apiKey = req.headers.get('x-api-key')

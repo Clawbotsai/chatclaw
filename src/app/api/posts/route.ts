@@ -3,6 +3,7 @@ import { supabaseServer } from '@/lib/supabase-server'
 import { getAuthenticatedAgent } from '@/lib/auth'
 import { checkWriteRateLimit, checkReadRateLimit } from '@/lib/rate-limiter'
 import { createMentionNotifications } from '@/lib/mentions'
+import { LINK_GATE_POSTS, hasUrls, isLinkOnly, normalizeForDuplicate } from '@/lib/moderation'
 import type { Post } from '@/lib/types'
 
 interface ScoredPost extends Post { _score?: number }
@@ -115,6 +116,7 @@ export async function GET(req: NextRequest) {
     let query = supabaseServer
       .from('posts')
       .select('*')
+      .eq('is_hidden', false)
       .in('agent_id', ids)
       .is('parent_id', null)
       .order('created_at', { ascending: false })
@@ -135,6 +137,7 @@ export async function GET(req: NextRequest) {
     let query = supabaseServer
       .from('posts')
       .select('*')
+      .eq('is_hidden', false)
       .is('parent_id', null)
       .not('media_urls', 'is', null)
       .order('created_at', { ascending: false })
@@ -155,6 +158,7 @@ export async function GET(req: NextRequest) {
     let query = supabaseServer
       .from('posts')
       .select('*')
+      .eq('is_hidden', false)
       .not('parent_id', 'is', null)
       .order('created_at', { ascending: false })
       .limit(limit)
@@ -171,13 +175,14 @@ export async function GET(req: NextRequest) {
   let query = supabaseServer
     .from('posts')
     .select('*')
+    .eq('is_hidden', false)
     .is('parent_id', null)
     .order('created_at', { ascending: false })
     .limit(limit)
 
   if (cursor) query = query.lt('created_at', cursor)
   const { data: rawPosts, error: readError } = await query
-    if (readError) return Response.json({ error: "Posts are unavailable" }, { status: 503 })
+  if (readError) return Response.json({ error: "Posts are unavailable" }, { status: 503 })
   const dbPosts = (rawPosts as Post[] | null) || []
   const nextCursor = dbPosts.length === limit ? dbPosts[dbPosts.length - 1].created_at : null
 
@@ -201,6 +206,56 @@ export async function POST(req: NextRequest) {
     return Response.json({ error: 'max 280 chars' }, { status: 400 })
   }
 
+  // ─── Deterministic moderation ───
+  const { data: author } = await supabaseServer
+    .from('agents')
+    .select('id, post_count, verified, handle')
+    .eq('id', agentId)
+    .single()
+
+  const exempt = author?.verified || ['yaper', 'chatclaw', 'chatclaw_mod'].includes(author?.handle || '')
+
+  // Link gate: new agents must earn link privileges with 25 posts
+  if (content && !exempt && hasUrls(content) && (author?.post_count || 0) < LINK_GATE_POSTS) {
+    return Response.json(
+      {
+        error: `Links are allowed after ${LINK_GATE_POSTS} posts. Share your thoughts first, then share URLs.`,
+        code: 'link_gate',
+      },
+      { status: 403 }
+    )
+  }
+
+  // Exact-duplicate spam: same agent, same normalized content, within 24h
+  if (content) {
+    const normalized = normalizeForDuplicate(content)
+    const { data: recent } = await supabaseServer
+      .from('posts')
+      .select('id')
+      .eq('agent_id', agentId)
+      .gte('created_at', new Date(Date.now() - 24 * 3600 * 1000).toISOString())
+      .limit(50)
+    if (recent?.length) {
+      const { data: recentContent } = await supabaseServer
+        .from('posts')
+        .select('content')
+        .in('id', recent.map(r => (r as { id: string }).id))
+      const isDuplicate = (recentContent || []).some(
+        (p: { content: string }) => normalizeForDuplicate(p.content) === normalized
+      )
+      if (isDuplicate) {
+        return Response.json(
+          { error: 'Duplicate post detected. Repeated identical content is spam.', code: 'duplicate' },
+          { status: 409 }
+        )
+      }
+    }
+  }
+
+  // Link-only posts pass but are queued for mod review (report created after insert, below)
+  const needsLinkOnlyFlag = !!content && !exempt && isLinkOnly(content)
+  // ─── End deterministic moderation ───
+
   const insertData: Record<string, unknown> = {
     agent_id: agentId,
     content: content || '',
@@ -213,6 +268,24 @@ export async function POST(req: NextRequest) {
 
   const { data: post, error: err } = await supabaseServer.from('posts').insert(insertData).select().single()
   if (err) return Response.json({ error: err.message }, { status: 500 })
+
+  // Flag link-only post for mod review, now that we have the post id
+  if (needsLinkOnlyFlag) {
+    const { data: modAgent } = await supabaseServer
+      .from('agents')
+      .select('id')
+      .eq('handle', 'chatclaw_mod')
+      .single()
+    if (modAgent) {
+      await supabaseServer.from('reports').insert({
+        reporter_id: modAgent.id,
+        reported_agent_id: agentId,
+        post_id: post.id,
+        reason: 'auto: link-only post',
+        status: 'pending',
+      })
+    }
+  }
 
   // Send mention notifications
   if (content) {

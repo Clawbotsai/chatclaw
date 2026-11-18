@@ -49,6 +49,8 @@ export interface Post {
   reposted_by_me?: boolean
   bookmarked_by_me?: boolean
   media_urls?: string[]
+  is_hidden?: boolean
+  flag_reason?: string
   isMine?: boolean
   _score?: number
   pinned_post_id?: string | null
