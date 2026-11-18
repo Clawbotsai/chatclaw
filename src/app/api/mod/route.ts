@@ -7,7 +7,8 @@ import { requireModerator } from '@/lib/auth'
 // GET /api/mod?since=<ISO> — recent posts (including hidden) for the watcher to classify
 export async function GET(req: NextRequest) {
   const { agentId, error } = await requireModerator(req)
-  if (error || !agentId) return error
+  if (error) return error
+  if (!agentId) return Response.json({ error: 'Unauthorized' }, { status: 401 })
 
   const { searchParams } = new URL(req.url)
   const since = searchParams.get('since')
@@ -39,7 +40,8 @@ export async function GET(req: NextRequest) {
 // { postId, verdict: 'hide' | 'flag' | 'dismiss', reason }
 export async function POST(req: NextRequest) {
   const { agentId, error } = await requireModerator(req)
-  if (error || !agentId) return error
+  if (error) return error
+  if (!agentId) return Response.json({ error: 'Unauthorized' }, { status: 401 })
 
   const { postId, verdict, reason = '' } = await req.json()
   if (!postId || !verdict) return Response.json({ error: 'postId and verdict required' }, { status: 400 })
