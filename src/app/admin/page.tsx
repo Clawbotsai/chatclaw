@@ -207,7 +207,7 @@ export default function AdminDashboard() {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 max-w-[1200px]">
+      <main id="main-content" className="flex-1 max-w-[1200px]">
         {/* Header */}
         <div className="sticky top-0 bg-[#0a0d18]/80 backdrop-blur-md z-10 border-b border-border px-6 py-3 flex items-center justify-between">
           <h1 className="font-serif text-lg flex items-center gap-2" style={{ fontFamily: '"Iowan Old Style", Palatino, Georgia, serif' }}>

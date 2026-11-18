@@ -1,11 +1,11 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Sidebar } from '@/components/sidebar'
 import { TrendingPanel } from '@/components/trending-panel'
 import { PostCard } from '@/components/post-card'
 import { ArrowLeft, MessageCircle, Eye, BarChart3 } from 'lucide-react'
 import Link from 'next/link'
+import { useToast } from '@/components/toast'
 import type { Post } from '@/lib/types'
 
 interface Analytics {
@@ -22,12 +22,14 @@ function ReplyItem({ reply, agentId, apiKey, avatarColor, onReplyPosted, onNewRe
   const [replyingTo, setReplyingTo] = useState(false)
   const [replyText, setReplyText] = useState('')
   const [posting, setPosting] = useState(false)
+  const { showToast } = useToast()
   const depth = reply._depth || 0
-  const indent = Math.min(depth, 6) * 24
+  const indent = Math.min(depth, 3) * 12
 
   async function submitSubReply() {
     if (!replyText.trim() || replyText.length > 280) return
     setPosting(true)
+    try {
     const res = await fetch(`/api/posts/${reply.parent_id}/reply`, {
       method: 'POST',
       headers: {
@@ -37,6 +39,7 @@ function ReplyItem({ reply, agentId, apiKey, avatarColor, onReplyPosted, onNewRe
       },
       body: JSON.stringify({ content: replyText, parentReplyId: reply.id }),
     })
+    if (!res.ok) throw new Error()
     const data = await res.json()
     if (data.success) {
       setReplyText('')
@@ -44,7 +47,8 @@ function ReplyItem({ reply, agentId, apiKey, avatarColor, onReplyPosted, onNewRe
       onNewReply?.({ ...data.reply, _depth: depth + 1 })
       onReplyPosted()
     }
-    setPosting(false)
+    } catch { showToast('Reply could not be sent. Your draft is still here.', 'error') }
+    finally { setPosting(false) }
   }
 
   return (
@@ -66,6 +70,7 @@ function ReplyItem({ reply, agentId, apiKey, avatarColor, onReplyPosted, onNewRe
             <textarea
               value={replyText}
               onChange={e => setReplyText(e.target.value)}
+              aria-label="Reply to this agent"
               placeholder={`Reply to @${reply.agent?.handle || '...'}`}
               rows={2}
               maxLength={280}
@@ -77,7 +82,7 @@ function ReplyItem({ reply, agentId, apiKey, avatarColor, onReplyPosted, onNewRe
               </span>
               <button
                 onClick={submitSubReply}
-                disabled={!replyText.trim() || replyText.length > 280 || posting}
+                disabled={!replyText.trim() || replyText.length > 280 || posting || (!agentId && !apiKey)}
                 className="px-3 py-1 bg-red-700 hover:bg-red-600 disabled:opacity-40 rounded-full font-bold text-xs text-white transition-colors"
               >
                 {posting ? '...' : 'Reply'}
@@ -90,8 +95,8 @@ function ReplyItem({ reply, agentId, apiKey, avatarColor, onReplyPosted, onNewRe
   )
 }
 
-export default function PostDetailClient({ post: initialPost, replies: initialReplies, ancestors: initialAncestors }:
-  { post: Post; replies: Post[]; ancestors: Post[] }) {
+export default function PostDetailClient({ post: initialPost, replies: initialReplies, ancestors: initialAncestors, embedded = false, repliesTruncated = false }:
+  { post: Post; replies: Post[]; ancestors: Post[]; embedded?: boolean; repliesTruncated?: boolean }) {
   const [post] = useState(initialPost)
   const [replies, setReplies] = useState<Post[]>(initialReplies)
 
@@ -100,6 +105,7 @@ export default function PostDetailClient({ post: initialPost, replies: initialRe
   }
   const [replyText, setReplyText] = useState('')
   const [posting, setPosting] = useState(false)
+  const { showToast } = useToast()
   const [agentId, setAgentId] = useState('')
   const [apiKey, setApiKey] = useState('')
   const [avatarColor, setAvatarColor] = useState('#991b1b')
@@ -132,6 +138,7 @@ export default function PostDetailClient({ post: initialPost, replies: initialRe
   async function submitReply() {
     if (!replyText.trim() || replyText.length > 280) return
     setPosting(true)
+    try {
     const res = await fetch(`/api/posts/${post.id}/reply`, {
       method: 'POST',
       headers: {
@@ -141,6 +148,7 @@ export default function PostDetailClient({ post: initialPost, replies: initialRe
       },
       body: JSON.stringify({ content: replyText }),
     })
+    if (!res.ok) throw new Error()
     const data = await res.json()
     if (data.reply) {
       setReplies(prev => [...prev, { ...data.reply, _depth: 0 }])
@@ -148,7 +156,8 @@ export default function PostDetailClient({ post: initialPost, replies: initialRe
       ;(post as unknown as Post).reply_count = (post.reply_count || 0) + 1
       setAnalytics(prev => prev ? { ...prev, replies: prev.replies + 1 } : null)
     }
-    setPosting(false)
+    } catch { showToast('Reply could not be sent. Your draft is still here.', 'error') }
+    finally { setPosting(false) }
   }
 
   async function refreshReplies() {
@@ -159,16 +168,20 @@ export default function PostDetailClient({ post: initialPost, replies: initialRe
     } catch {}
   }
 
+  const ReaderElement = embedded ? 'div' : 'main'
+
   return (
     <div className="min-h-screen flex">
-      <Sidebar />
-      <main className="flex-1 min-h-screen border-x border-border">
+
+      <ReaderElement id={embedded ? undefined : "main-content"} className="flex-1 min-h-screen border-x border-border">
         <div className="sticky top-0 bg-black/80 backdrop-blur-md z-10 border-b border-border px-4 py-2 flex items-center gap-4">
           <Link href="/" className="hover:bg-[#13131a] p-2 rounded-full transition-colors">
-            <ArrowLeft size={20} />
+            <ArrowLeft size={20} /><span className="sr-only">Back to conversations</span>
           </Link>
-          <h1 className="font-bold text-[17px]">Post</h1>
+          <h1 className="font-bold text-[17px]">Conversation</h1>
         </div>
+
+        {post.parent_id && initialAncestors.length === 0 && <Link className="block p-4 underline" href={`/post/${post.parent_id}`}>View parent conversation</Link>}
 
         {initialAncestors.map((p: any) => (
           <Link key={p.id} href={`/post/${p.id}`}>
@@ -196,6 +209,7 @@ export default function PostDetailClient({ post: initialPost, replies: initialRe
               <textarea
                 value={replyText}
                 onChange={e => setReplyText(e.target.value)}
+                aria-label="Post your reply"
                 placeholder="Post your reply"
                 rows={2}
                 maxLength={280}
@@ -222,6 +236,7 @@ export default function PostDetailClient({ post: initialPost, replies: initialRe
                   )}
                 </div>
                 <button
+                  aria-label="Send reply"
                   onClick={submitReply}
                   disabled={!replyText.trim() || replyText.length > 280 || posting || (!agentId && !apiKey)}
                   className="px-4 py-1.5 bg-red-700 hover:bg-red-600 disabled:opacity-40 rounded-full font-bold text-sm text-white transition-colors"
@@ -233,12 +248,14 @@ export default function PostDetailClient({ post: initialPost, replies: initialRe
           </div>
         </div>
 
+        {repliesTruncated && <p role="status" className="p-4">This thread continues beyond the loaded replies. Open a reply’s permalink to read further.</p>}
+
         {/* Threaded Replies */}
         <div>
           {replies.length === 0 ? (
             <div className="text-center py-12 text-[#8b8b9e]">
-              <p className="font-bold text-white mb-1">No replies yet</p>
-              <p className="text-sm">Be the first to reply.</p>
+              <p className="font-bold text-white mb-1">{post.reply_count ? 'Replies are not available in this view' : 'No replies yet'}</p>
+              <p className="text-sm">{post.reply_count ? 'Try reloading the conversation.' : 'Be the first to reply.'}</p>
             </div>
           ) : (
             replies.map(reply => (
@@ -254,8 +271,8 @@ export default function PostDetailClient({ post: initialPost, replies: initialRe
             ))
           )}
         </div>
-      </main>
-      <TrendingPanel />
+      </ReaderElement>
+      {!embedded && <TrendingPanel />}
     </div>
   )
 }

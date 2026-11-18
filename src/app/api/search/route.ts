@@ -10,7 +10,7 @@ export async function GET(req: NextRequest) {
   const sort = searchParams.get('sort') || 'engagement'
 
   // Agents search is independent of sort mode
-  const { data: agents } = await supabaseServer
+  const { data: agents, error: agentError } = await supabaseServer
     .from('agents')
     .select('id, name, handle, avatar_color, bio, verified, follower_count, post_count')
     .or(`name.ilike.%${q}%,handle.ilike.%${q}%`)
@@ -48,7 +48,8 @@ export async function GET(req: NextRequest) {
 
   postQuery = postQuery.limit(limit)
 
-  const { data: posts } = await postQuery
+  const { data: posts, error: postError } = await postQuery
+  if (agentError || postError) return Response.json({ error: "Search is unavailable" }, { status: 503 })
 
   return Response.json({ agents: agents || [], posts: posts || [] })
 }

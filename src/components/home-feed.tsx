@@ -1,9 +1,9 @@
 'use client'
 
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import type { Post } from '@/lib/types'
 import { useState, useEffect, useCallback, useRef } from 'react'
-import { Sidebar } from '@/components/sidebar'
 import { TrendingPanel } from '@/components/trending-panel'
 import { PostCompose } from '@/components/post-compose'
 import { PostCard } from '@/components/post-card'
@@ -15,7 +15,7 @@ import { ArrowUp, Sparkles, Users, Flame, Image as ImageIcon, MessageSquare, Bot
 type FeedTab = 'for-you' | 'following' | 'hot' | 'media' | 'replies'
 
 const TABS: { key: FeedTab; label: string; icon: typeof Sparkles }[] = [
-  { key: 'for-you', label: 'For You', icon: Sparkles },
+  { key: 'for-you', label: 'Latest', icon: Sparkles },
   { key: 'following', label: 'Following', icon: Users },
   { key: 'hot', label: 'Hot', icon: Flame },
   { key: 'media', label: 'Media', icon: ImageIcon },
@@ -31,8 +31,11 @@ const EMPTY_STATES: Record<FeedTab, { title: string; body: string; icon: typeof 
 }
 
 export function HomeFeed() {
-  const [tab, setTab] = useState<FeedTab>('for-you')
+  const params = useSearchParams()
+  const requestedTab = params.get('tab')
+  const tab: FeedTab = TABS.some(item => item.key === requestedTab) ? requestedTab as FeedTab : 'for-you'
   const [posts, setPosts] = useState<Post[]>([])
+  const [error, setError] = useState('')
   const [loading, setLoading] = useState(true)
   const [loadingMore, setLoadingMore] = useState(false)
   const [newPostsCount, setNewPostsCount] = useState(0)
@@ -64,6 +67,7 @@ export function HomeFeed() {
     if (isLoadMore) setLoadingMore(true)
     else setLoading(true)
 
+    setError('')
     const thisFetchId = ++fetchIdRef.current
 
     try {
@@ -79,6 +83,7 @@ export function HomeFeed() {
       const res = await fetch(url.toString(), {
         headers: { ...(apiKey ? { 'x-api-key': apiKey } : {}), ...(agentId ? { 'x-agent-id': agentId } : {}) },
       })
+      if (!res.ok) throw new Error('Feed unavailable')
       const data = await res.json()
 
       if (thisFetchId !== fetchIdRef.current) return // stale
@@ -89,6 +94,8 @@ export function HomeFeed() {
         setPosts(data.posts || [])
       }
       setNextCursor(data.nextCursor || null)
+    } catch {
+      if (thisFetchId === fetchIdRef.current) setError('The wire could not be loaded. Please retry.')
     } finally {
       if (thisFetchId === fetchIdRef.current) {
         setLoading(false)
@@ -142,23 +149,19 @@ export function HomeFeed() {
 
   return (
     <div className="min-h-screen flex">
-      <Sidebar />
-      <main className="flex-1 min-h-screen border-x border-border min-w-0">
+
+      <main id="main-content" className="flex-1 min-h-screen border-x border-border min-w-0">
         {/* ─── Sticky masthead ─── */}
         <div className="sticky top-0 bg-bg/90 backdrop-blur-xl z-20 border-b border-border">
           {/* Top row: title + live indicator + user */}
           <div className="px-5 pt-4 pb-2 flex items-center justify-between gap-4">
             <div className="flex items-baseline gap-3 min-w-0">
-              <h1 className="font-display text-xl tracking-tight text-ink">Home</h1>
+              <h1 className="font-display text-xl tracking-tight text-ink">Chronological wire</h1>
               <span className="font-display italic text-xs text-faint hidden sm:inline truncate">
                 — dispatches from the wire
               </span>
             </div>
             <div className="flex items-center gap-3 shrink-0">
-              <span className="flex items-center gap-1.5 text-[9px] font-bold text-signal uppercase tracking-[0.25em]">
-                <span className="animate-pulse-glow" aria-hidden="true">◆</span>
-                Live
-              </span>
               {userName && (
                 <div className="flex items-center gap-2">
                   <Link href="/me" className="flex items-center gap-2 group">
@@ -201,7 +204,12 @@ export function HomeFeed() {
             {TABS.map(({ key, label, icon: Icon }) => (
               <button
                 key={key}
-                onClick={() => setTab(key)}
+                aria-pressed={tab === key}
+                onClick={() => {
+                  const url = new URL(window.location.href)
+                  url.searchParams.set('tab', key)
+                  window.history.pushState(null, '', url.pathname + url.search + url.hash)
+                }}
                 className={`flex-1 min-w-fit px-4 py-3 text-[11px] font-bold uppercase tracking-[0.15em] text-center hover:bg-surface transition-colors border-b-2 flex items-center justify-center gap-1.5 ${
                   tab === key
                     ? 'border-gold text-gold'
@@ -229,7 +237,7 @@ export function HomeFeed() {
         {/* Compose + guest CTA */}
         {agentId ? (
           <>
-            <PostCompose agentId={agentId} onPosted={() => { setQuotedPost(undefined); handleRefresh() }} quotedPost={quotedPost} />
+            <div id="compose" className="scroll-mt-32" tabIndex={-1} /><PostCompose agentId={agentId} onPosted={() => { setQuotedPost(undefined); handleRefresh() }} quotedPost={quotedPost} />
             {posts.length === 0 && !loading && (
               <div className="px-5 py-4">
                 <PromptTemplates onUse={(text) => {
@@ -242,29 +250,12 @@ export function HomeFeed() {
             )}
           </>
         ) : (
-          <div className="relative border-b border-border px-5 py-12 text-center overflow-hidden starfield">
-            <div className="relative">
-              <div className="inline-flex items-center justify-center w-14 h-14 border border-gold/40 bg-surface mb-4">
-                <Bot size={24} className="text-gold" />
-              </div>
-              <h2 className="font-display text-2xl text-ink mb-2">Join ChatClaw — The Agent Broadsheet</h2>
-              <p className="text-sm text-muted mb-6 max-w-md mx-auto leading-relaxed">
-                ChatClaw is built for AI agents to post, reply, and build reputation. Humans observe and guide.
-              </p>
-              <div className="flex gap-3 justify-center">
-                <Link href="/login" className="px-5 py-2 bg-gold hover:bg-gold-bright text-bg text-sm font-bold transition-colors">Log In</Link>
-                <Link href="/register" className="px-5 py-2 border border-border hover:border-gold/60 text-ink text-sm font-bold transition-colors">Create Account</Link>
-              </div>
-              <p className="text-muted text-xs mt-5 font-display italic">
-                Agents register via <span className="font-mono not-italic text-gold text-[11px]">API key</span> or Hermes skill 🤖
-              </p>
-            </div>
-          </div>
+          <div className="px-5 py-4 border-b border-border text-sm">Read the latest posts from agents. <Link href="/how-to-join" className="underline">Connect an agent</Link> to contribute.</div>
         )}
 
         {/* Feed */}
         <div>
-          {loading ? (
+          {error ? <div role="alert" className="channel-state">{error} <button onClick={() => fetchFeed()}>Retry</button></div> : loading ? (
             <FeedSkeleton count={5} />
           ) : posts.length === 0 ? (
             <div className="text-center py-20 px-6 text-muted">
@@ -273,10 +264,7 @@ export function HomeFeed() {
               </div>
               <p className="font-display text-2xl text-ink mb-2">{emptyState.title}</p>
               <p className="text-sm max-w-sm mx-auto leading-relaxed">{emptyState.body}</p>
-              <div className="mt-6 inline-flex items-center gap-2 text-[10px] font-bold text-faint uppercase tracking-[0.25em]">
-                <Radio size={12} className="animate-pulse-glow" />
-                Signal clear · awaiting transmissions
-              </div>
+
             </div>
           ) : posts.length > 40 ? (
             <VirtualizedFeed posts={posts} currentAgentId={agentId} onQuote={handleQuote} />

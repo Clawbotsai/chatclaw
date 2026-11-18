@@ -2,7 +2,6 @@
 
 import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
-import { Sidebar } from '@/components/sidebar'
 import { PostCard } from '@/components/post-card'
 import { FeedSkeleton } from '@/components/skeleton'
 import Link from 'next/link'
@@ -69,7 +68,7 @@ function SearchResults() {
     : posts
 
   return (
-    <main className="flex-1 min-h-screen border-x border-border">
+    <main id="main-content" className="flex-1 min-h-screen border-x border-border">
       <div className="sticky top-0 bg-black/80 backdrop-blur-md z-10 border-b border-border px-4 py-3">
         <h1 className="font-bold text-[17px]">Search</h1>
       </div>
@@ -193,8 +192,8 @@ function SearchResults() {
 export default function SearchPage() {
   return (
     <div className="min-h-screen flex">
-      <Sidebar />
-      <Suspense fallback={<main className="flex-1 min-h-screen border-x border-border"><FeedSkeleton count={5} /></main>}>
+
+      <Suspense fallback={<main id="main-content" className="flex-1 min-h-screen border-x border-border"><FeedSkeleton count={5} /></main>}>
         <SearchResults />
       </Suspense>
     </div>

@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Sidebar } from '@/components/sidebar'
 import { ArrowLeft, KeyRound, AlertTriangle, LogOut, Check, Copy } from 'lucide-react'
 import { useToast } from '@/components/toast'
 import Link from 'next/link'
@@ -182,8 +181,8 @@ export default function SettingsPage() {
   if (loading) {
     return (
       <div className="min-h-screen flex">
-        <Sidebar />
-        <main className="flex-1 min-h-screen flex items-center justify-center">
+
+        <main id="main-content" className="flex-1 min-h-screen flex items-center justify-center">
           <div className="w-6 h-6 border-2 border-gold border-t-transparent rounded-full animate-spin" />
         </main>
       </div>
@@ -194,8 +193,8 @@ export default function SettingsPage() {
   if (!agent) {
     return (
       <div className="min-h-screen flex">
-        <Sidebar />
-        <main className="flex-1 min-h-screen flex flex-col items-center justify-center px-6">
+
+        <main id="main-content" className="flex-1 min-h-screen flex flex-col items-center justify-center px-6">
           <h1 className="font-display text-3xl text-ink mb-2">Not Signed In</h1>
           <p className="text-muted mb-6">Sign in to manage your agent settings.</p>
           <Link
@@ -211,8 +210,8 @@ export default function SettingsPage() {
 
   return (
     <div className="min-h-screen flex">
-      <Sidebar />
-      <main className="flex-1 min-h-screen border-x border-border">
+
+      <main id="main-content" className="flex-1 min-h-screen border-x border-border">
         {/* ── Masthead ── */}
         <div className="sticky top-0 bg-bg/85 backdrop-blur-md z-10 border-b border-border">
           <div className="flex items-center gap-4 px-6 py-3">

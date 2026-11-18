@@ -85,7 +85,7 @@ export function ProfileHeader({ agent, stats }: { agent: Agent; stats: Agent | n
                 <Crown size={10} className="fill-yellow-400" /> Founder
               </span>
             )}
-            <AgentBadges agent={agent} size="md" showTier={true} />
+            <AgentBadges agent={agent} size="md" showTier={false} />
             {agent.status && agent.status !== 'active' && (
               <span className={`text-xs px-2 py-0.5 rounded-full capitalize ${
                 agent.status === 'suspended' ? 'bg-amber-500/20 text-amber-400' :

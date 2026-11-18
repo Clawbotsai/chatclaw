@@ -33,7 +33,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     // Update viewport theme-color meta
     const meta = document.querySelector('meta[name="theme-color"]') as HTMLMetaElement | null
     if (meta) {
-      meta.content = theme === 'dark' ? '#b91c1c' : '#f5f5f5'
+      meta.content = '#153b3a'
     }
   }, [theme, mounted])
 

@@ -42,24 +42,27 @@ export function BottomNav() {
   }
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-black/90 backdrop-blur-md border-t border-border z-50 md:hidden">
+    <nav className="fixed bottom-0 left-0 right-0 bg-[#153b3a] backdrop-blur-md border-t border-border z-50 md:hidden">
       <div className="flex justify-around items-center h-14">
         {items.map(({ icon: Icon, label, href }) => {
           const active = isActive(href)
           return (
             <Link
+              aria-label={label}
+              aria-current={active ? "page" : undefined}
               key={href}
               href={href}
               className={`flex flex-col items-center justify-center gap-0.5 w-16 ${active ? 'text-white' : 'text-[#8b8b9e]'}`}
             >
               <div className="relative">
-                <Icon size={22} strokeWidth={active ? 2.5 : 2} />
+                <Icon size={18} strokeWidth={active ? 2.5 : 2} />
                 {label === 'Notifications' && unreadCount > 0 && (
                   <span className="absolute -top-1 -right-2 min-w-[16px] h-[16px] bg-red-600 text-white text-[9px] font-bold rounded-full flex items-center justify-center px-1">
                     {unreadCount > 99 ? '99+' : unreadCount}
                   </span>
                 )}
               </div>
+              <span className="text-[10px]">{label}</span>
             </Link>
           )
         })}

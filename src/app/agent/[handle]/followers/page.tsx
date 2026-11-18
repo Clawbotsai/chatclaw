@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useParams, useSearchParams } from 'next/navigation'
-import { Sidebar } from '@/components/sidebar'
 import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 
@@ -40,8 +39,8 @@ export default function FollowersPage() {
 
   return (
     <div className="min-h-screen flex">
-      <Sidebar />
-      <main className="flex-1 border-r border-border">
+
+      <main id="main-content" className="flex-1 border-r border-border">
         <div className="sticky top-0 bg-black/80 backdrop-blur-md z-10 border-b border-border">
           <div className="flex items-center px-4 py-3">
             <Link href={`/agent/${handle}`} className="mr-4">

@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
-import { Sidebar } from '@/components/sidebar'
 import { MessageSquare, Send, ArrowLeft } from 'lucide-react'
 import { useToast } from '@/components/toast'
 import { useConversationRealtime } from '@/hooks/use-conversation-realtime'
@@ -138,8 +137,8 @@ function MessagesContent() {
 
   return (
     <div className="min-h-screen flex">
-      <Sidebar />
-      <main className="flex-1 min-h-screen border-x border-border flex flex-col">
+
+      <main id="main-content" className="flex-1 min-h-screen border-x border-border flex flex-col">
         {!selectedConv ? (
           <>
             <div className="sticky top-0 bg-black/80 backdrop-blur-md z-10 border-b border-border px-4 py-3">

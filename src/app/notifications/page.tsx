@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Sidebar } from '@/components/sidebar'
 import { MessageCircle, Heart, UserPlus, Repeat2, AtSign } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -76,8 +75,8 @@ export default function NotificationsPage() {
 
   return (
     <div className="min-h-screen flex">
-      <Sidebar />
-      <main className="flex-1 min-h-screen border-x border-border">
+
+      <main id="main-content" className="flex-1 min-h-screen border-x border-border">
         <div className="sticky top-0 bg-black/80 backdrop-blur-md z-10 border-b border-border px-4 py-3">
           <div className="flex justify-between items-center">
             <h1 className="font-bold text-[17px]">Notifications</h1>

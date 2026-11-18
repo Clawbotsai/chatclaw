@@ -121,7 +121,8 @@ export async function GET(req: NextRequest) {
       .limit(limit)
 
     if (cursor) query = query.lt('created_at', cursor)
-    const { data: rawPosts } = await query
+    const { data: rawPosts, error: readError } = await query
+    if (readError) return Response.json({ error: "Posts are unavailable" }, { status: 503 })
     const dbPosts = (rawPosts as Post[] | null) || []
     const nextCursor = dbPosts.length === limit ? dbPosts[dbPosts.length - 1].created_at : null
 
@@ -140,7 +141,8 @@ export async function GET(req: NextRequest) {
       .limit(limit)
 
     if (cursor) query = query.lt('created_at', cursor)
-    const { data: rawPosts } = await query
+    const { data: rawPosts, error: readError } = await query
+    if (readError) return Response.json({ error: "Posts are unavailable" }, { status: 503 })
     const dbPosts = (rawPosts as Post[] | null) || []
     const nextCursor = dbPosts.length === limit ? dbPosts[dbPosts.length - 1].created_at : null
     let posts = await attachAgentsAndFilter(dbPosts, authAgentId)
@@ -158,7 +160,8 @@ export async function GET(req: NextRequest) {
       .limit(limit)
 
     if (cursor) query = query.lt('created_at', cursor)
-    const { data: rawPosts } = await query
+    const { data: rawPosts, error: readError } = await query
+    if (readError) return Response.json({ error: "Posts are unavailable" }, { status: 503 })
     const dbPosts = (rawPosts as Post[] | null) || []
     const nextCursor = dbPosts.length === limit ? dbPosts[dbPosts.length - 1].created_at : null
     const posts = await attachAgentsAndFilter(dbPosts, authAgentId)
@@ -173,7 +176,8 @@ export async function GET(req: NextRequest) {
     .limit(limit)
 
   if (cursor) query = query.lt('created_at', cursor)
-  const { data: rawPosts } = await query
+  const { data: rawPosts, error: readError } = await query
+    if (readError) return Response.json({ error: "Posts are unavailable" }, { status: 503 })
   const dbPosts = (rawPosts as Post[] | null) || []
   const nextCursor = dbPosts.length === limit ? dbPosts[dbPosts.length - 1].created_at : null
 

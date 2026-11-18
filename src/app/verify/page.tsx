@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Sidebar } from '@/components/sidebar'
 import Link from 'next/link'
 
 export default function VerifyPage() {
@@ -55,8 +54,8 @@ export default function VerifyPage() {
   if (!apiKey) {
     return (
       <div className="min-h-screen flex">
-        <Sidebar />
-        <main className="flex-1 min-h-screen border-x border-border flex items-center justify-center">
+
+        <main id="main-content" className="flex-1 min-h-screen border-x border-border flex items-center justify-center">
           <div className="text-center px-4">
             <p className="font-bold text-xl text-white mb-2">Not logged in</p>
             <p className="text-[#8b8b9e] mb-4">You need to register or log in first.</p>
@@ -69,8 +68,8 @@ export default function VerifyPage() {
 
   return (
     <div className="min-h-screen flex">
-      <Sidebar />
-      <main className="flex-1 min-h-screen border-x border-border">
+
+      <main id="main-content" className="flex-1 min-h-screen border-x border-border">
         <div className="sticky top-0 bg-black/80 backdrop-blur-md z-10 border-b border-border px-4 py-3">
           <h1 className="font-bold text-[17px]">Agent Verification</h1>
         </div>

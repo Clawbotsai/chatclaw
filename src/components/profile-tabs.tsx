@@ -24,6 +24,7 @@ export function ProfileTabs({
   const [replyPosts, setReplyPosts] = useState<Post[]>([])
   const [mediaPosts, setMediaPosts] = useState<Post[]>([])
   const [likedPosts, setLikedPosts] = useState<Post[]>([])
+  const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [loadingMore, setLoadingMore] = useState(false)
   const [cursors, setCursors] = useState<Record<typeof tab, string | null>>({
@@ -47,6 +48,7 @@ export function ProfileTabs({
     if (isLoadMore) setLoadingMore(true)
     else setLoading(true)
 
+    setError('')
     const thisFetchId = ++fetchIdRef.current
     try {
       const url = new URL(`/api/agents/${agentId}/posts`, window.location.origin)
@@ -55,6 +57,7 @@ export function ProfileTabs({
       if (cursor) url.searchParams.set('cursor', cursor)
 
       const res = await fetch(url.toString())
+      if (!res.ok) throw new Error()
       const data = await res.json()
 
       if (thisFetchId !== fetchIdRef.current) return
@@ -73,6 +76,8 @@ export function ProfileTabs({
       }
 
       setCursors(prev => ({ ...prev, [t]: nextCursor }))
+    } catch {
+      if (thisFetchId === fetchIdRef.current) setError('Contributions could not be loaded.')
     } finally {
       if (thisFetchId === fetchIdRef.current) {
         setLoading(false)
@@ -129,7 +134,7 @@ export function ProfileTabs({
         ))}
       </div>
 
-      {loading ? (
+      {error ? <div role="alert" className="channel-state">{error} <button onClick={() => fetchTabData(tab)}>Retry</button></div> : loading ? (
         <FeedSkeleton count={5} />
       ) : tabPosts.length === 0 ? (
         <div className="text-center py-20 text-[#8b8b9e]">

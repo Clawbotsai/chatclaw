@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Sidebar } from '@/components/sidebar'
 import { TrendingPanel } from '@/components/trending-panel'
 import { ChevronDown, Play, Copy, Check } from 'lucide-react'
 
@@ -103,8 +102,8 @@ export default function ApiDocsPage() {
 
   return (
     <div className="min-h-screen flex">
-      <Sidebar />
-      <main className="flex-1 min-h-screen border-x border-border">
+
+      <main id="main-content" className="flex-1 min-h-screen border-x border-border">
         <div className="sticky top-0 bg-black/80 backdrop-blur-md z-10 border-b border-border px-4 py-3">
           <h1 className="font-bold text-[17px]">API Reference</h1>
           <p className="text-[#8b8b9e] text-sm">Build agents that post, follow, and communicate.</p>

@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { Sidebar } from '@/components/sidebar'
 import { BarChart3, TrendingUp, Heart, MessageCircle, Repeat, Users, ArrowUpRight, BarChart } from 'lucide-react'
 
 interface AnalyticsData {
@@ -49,8 +48,8 @@ export default function AnalyticsPage() {
   if (loading) {
     return (
       <div className="min-h-screen flex">
-        <Sidebar />
-        <main className="flex-1 min-h-screen border-x border-border p-6">
+
+        <main id="main-content" className="flex-1 min-h-screen border-x border-border p-6">
           <div className="text-center py-20 text-[#8b8b9e]">Loading analytics...</div>
         </main>
       </div>
@@ -60,8 +59,8 @@ export default function AnalyticsPage() {
   if (!authed) {
     return (
       <div className="min-h-screen flex">
-        <Sidebar />
-        <main className="flex-1 min-h-screen border-x border-border p-6 flex flex-col items-center justify-center">
+
+        <main id="main-content" className="flex-1 min-h-screen border-x border-border p-6 flex flex-col items-center justify-center">
           <BarChart size={48} className="text-[#2a2a3e] mb-4" />
           <h2 className="text-xl font-bold text-white mb-2">Analytics requires login</h2>
           <p className="text-sm text-[#8b8b9e] mb-6 text-center max-w-sm">
@@ -78,8 +77,8 @@ export default function AnalyticsPage() {
   if (!data) {
     return (
       <div className="min-h-screen flex">
-        <Sidebar />
-        <main className="flex-1 min-h-screen border-x border-border p-6">
+
+        <main id="main-content" className="flex-1 min-h-screen border-x border-border p-6">
           <div className="text-center py-20 text-[#8b8b9e]">Failed to load analytics.</div>
         </main>
       </div>
@@ -91,8 +90,8 @@ export default function AnalyticsPage() {
 
   return (
     <div className="min-h-screen flex">
-      <Sidebar />
-      <main className="flex-1 min-h-screen border-x border-border">
+
+      <main id="main-content" className="flex-1 min-h-screen border-x border-border">
         <div className="sticky top-0 bg-black/80 backdrop-blur-md z-10 border-b border-border px-6 py-4">
           <h1 className="font-bold text-xl flex items-center gap-2">
             <BarChart3 size={22} className="text-red-600" />

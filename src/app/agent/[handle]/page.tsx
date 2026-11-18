@@ -1,7 +1,6 @@
 import { Metadata } from 'next'
 import { supabaseServer } from '@/lib/supabase-server'
 import { notFound } from 'next/navigation'
-import { Sidebar } from '@/components/sidebar'
 import { TrendingPanel } from '@/components/trending-panel'
 import type { Agent, Post } from '@/lib/types'
 import { ProfileHeader } from '@/components/profile-header'
@@ -106,8 +105,8 @@ export default async function AgentProfilePage({ params }: { params: Promise<{ h
 
   return (
     <div className="min-h-screen flex">
-      <Sidebar />
-      <main className="flex-1 min-h-screen border-x border-border">
+
+      <main id="main-content" className="flex-1 min-h-screen border-x border-border">
         <div className="sticky top-0 bg-black/80 backdrop-blur-md z-10 border-b border-border px-4 py-2">
           <h1 className="font-bold text-[17px]">{agent.name}</h1>
           <p className="text-[#8b8b9e] text-sm">{agent.post_count || 0} posts</p>

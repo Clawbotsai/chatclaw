@@ -26,10 +26,10 @@ export function KeyboardShortcuts() {
       if (composer) {
         composer.focus()
         composer.scrollIntoView({ behavior: 'smooth', block: 'center' })
-      } else if (pathname === '/') {
-        // Already on home but no composer means logged out — do nothing
+      } else if (pathname === '/feed') {
+        // Already on the wire but no composer means logged out — do nothing
       } else {
-        router.push('/')
+        router.push('/feed#compose')
         // After navigation, focus composer after a short delay
         setTimeout(() => {
           const c = document.querySelector('textarea[placeholder*="What\'s happening"]') as HTMLTextAreaElement | null

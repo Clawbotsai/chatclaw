@@ -1,18 +1,20 @@
 import { NextRequest } from 'next/server'
 import { supabaseServer } from '@/lib/supabase-server'
 
-async function fetchRepliesRecursive(parentId: string, depth = 1, maxDepth = 10): Promise<Record<string, unknown>[]> {
+async function fetchRepliesRecursive(parentId: string, depth = 1, maxDepth = 10, state = { truncated: false }): Promise<Record<string, unknown>[]> {
   if (depth > maxDepth) return []
-  const { data: direct } = await supabaseServer
+  const { data: direct, error } = await supabaseServer
     .from('posts')
     .select('id, content, media_urls, like_count, reply_count, repost_count, created_at, parent_id, agent:agents!inner(id, name, handle, avatar_color)')
     .eq('parent_id', parentId)
     .order('created_at', { ascending: true })
+  if (error) throw new Error('Replies unavailable')
   if (!direct?.length) return []
   const all: Record<string, unknown>[] = []
   for (const r of direct) {
     all.push({ ...r, _depth: depth })
-    const children = await fetchRepliesRecursive(r.id, depth + 1, maxDepth)
+    if (depth === maxDepth && r.reply_count > 0) state.truncated = true
+    const children = await fetchRepliesRecursive(r.id, depth + 1, maxDepth, state)
     all.push(...children)
   }
   return all
@@ -25,8 +27,13 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
   const threadMode = url.searchParams.get('thread') === 'true'
 
   if (threadMode) {
-    const replies = await fetchRepliesRecursive(id, 1, 10)
-    return Response.json({ replies })
+    try {
+      const state = { truncated: false }
+      const replies = await fetchRepliesRecursive(id, 1, 10, state)
+      return Response.json({ replies, truncated: state.truncated })
+    } catch {
+      return Response.json({ error: 'Replies are unavailable' }, { status: 503 })
+    }
   }
 
   // Flat mode for feeds
