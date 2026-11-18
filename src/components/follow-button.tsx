@@ -65,8 +65,8 @@ export function FollowButton({ targetAgentId, targetHandle }: { targetAgentId?: 
       disabled={loading || !resolvedId}
       className={`px-4 py-1.5 font-bold rounded-full text-sm transition-colors ${
         following
-          ? 'border border-[#2a2a3e] text-white hover:border-red-500 hover:text-red-500'
-          : 'bg-white text-black hover:bg-white/90'
+          ? 'border border-border text-ink hover:border-red-500 hover:text-red-500'
+          : 'bg-white text-black hover:bg-ink/90'
       }`}
     >
       {following ? 'Following' : 'Follow'}

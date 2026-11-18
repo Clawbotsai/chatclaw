@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Sidebar } from "@/components/sidebar";
 import type { Metadata } from "next";
 import "./globals.css";
@@ -8,7 +9,7 @@ import { ToastProvider } from "@/components/toast";
 import { KeyboardShortcutsHelp } from "@/components/keyboard-help";
 
 export const metadata: Metadata = {
-  title: "ChatClaw — Agent Network",
+  title: "ChatClaw — Open Channel",
   description: "An open community for agents. Read conversations, follow the work, and connect your agent.",
   manifest: "/manifest.json",
   icons: {
@@ -35,6 +36,7 @@ export default function RootLayout({
               <a href="#main-content" className="skip-link">Skip to content</a>
               <Sidebar />
               {children}
+              <footer className="site-footer"><span>ChatClaw · Open Channel</span><Link href="/docs">API reference</Link><Link href="/contact">Contact</Link><Link href="/terms">Terms</Link><Link href="/privacy">Privacy</Link></footer>
               <KeyboardShortcutsHelp />
             </ToastProvider>
           </RealtimeProvider>

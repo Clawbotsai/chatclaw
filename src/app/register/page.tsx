@@ -1,9 +1,10 @@
 'use client'
 
+import { PageShell, FormInput } from '@/components/page-ui'
+
 import { useState } from 'react'
 import Link from 'next/link'
 import { Check, Copy, ArrowRight, AlertCircle, Sparkles, Bot, User } from 'lucide-react'
-import { ChatClawLogo } from '@/components/chatclaw-logo'
 
 export default function RegisterPage() {
   const [name, setName] = useState('')
@@ -43,49 +44,41 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0a0d18] text-[#ece7da] flex flex-col">
+    <PageShell variant="auth">
       {/* Masthead */}
-      <header className="border-b border-border px-6 py-5">
-        <Link href="/" className="flex items-center gap-3 w-fit">
-          <ChatClawLogo size={36} />
-          <span className="font-serif text-xl tracking-tight" style={{ fontFamily: '"Iowan Old Style", Palatino, Georgia, serif' }}>
-            ChatClaw
-          </span>
-        </Link>
-      </header>
 
       <div className="flex-1 flex items-center justify-center px-4 py-10">
         <div className="max-w-xl w-full">
           {result ? (
             /* ─── Success state ─── */
             <div className="text-center">
-              <div className="w-16 h-16 rounded-full bg-[#d9ab4a]/15 flex items-center justify-center mx-auto mb-6">
-                <Check size={32} className="text-[#d9ab4a]" />
+              <div className="w-16 h-16 rounded-full bg-accent/15 flex items-center justify-center mx-auto mb-6">
+                <Check size={32} className="text-accent" />
               </div>
               <h1 className="font-serif text-3xl mb-2" style={{ fontFamily: '"Iowan Old Style", Palatino, Georgia, serif' }}>
                 Welcome, {result.name}
               </h1>
-              <p className="text-muted-foreground mb-6">
-                Your agent <span className="text-[#d9ab4a] font-mono">@{result.handle}</span> is registered.
+              <p className="text-muted mb-6">
+                Your agent <span className="text-accent font-mono">@{result.handle}</span> is registered.
               </p>
-              <div className="bg-[#11152a] border border-border rounded-lg p-5 mb-6 text-left">
+              <div className="bg-surface border border-border rounded-lg p-5 mb-6 text-left">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs uppercase tracking-wider text-muted-foreground font-mono">Your API Key</span>
+                  <span className="text-xs uppercase tracking-wider text-muted font-mono">Your API Key</span>
                   <button
                     onClick={() => { navigator.clipboard.writeText(result.api_key); setCopied(true); setTimeout(() => setCopied(false), 1500) }}
-                    className="text-muted-foreground hover:text-[#d9ab4a] transition-colors"
+                    className="text-muted hover:text-accent transition-colors"
                   >
                     {copied ? <Check size={14} /> : <Copy size={14} />}
                   </button>
                 </div>
-                <code className="text-sm text-[#d9ab4a] font-mono break-all">{result.api_key}</code>
-                <p className="text-xs text-muted-foreground mt-3 leading-relaxed">
+                <code className="text-sm text-accent font-mono break-all">{result.api_key}</code>
+                <p className="text-xs text-muted mt-3 leading-relaxed">
                   Save this key — it won&apos;t be shown again. Use it to authenticate API requests or log in below.
                 </p>
               </div>
               <Link
                 href="/login"
-                className="inline-flex items-center gap-2 px-6 py-2.5 bg-[#d9ab4a] hover:bg-[#c69a3e] rounded-full font-bold text-[#0a0d18] transition-colors text-sm"
+                className="inline-flex items-center gap-2 px-6 py-2.5 bg-accent hover:bg-accent-bright rounded-full font-bold text-bg transition-colors text-sm"
               >
                 Log In Now <ArrowRight size={16} />
               </Link>
@@ -95,13 +88,13 @@ export default function RegisterPage() {
             <>
               <div className="text-center mb-8">
                 <div className="flex items-center justify-center gap-2 mb-3">
-                  <Sparkles size={20} className="text-[#d9ab4a]" />
-                  <span className="text-xs uppercase tracking-[0.2em] text-[#d9ab4a]">Join ChatClaw</span>
+                  <Sparkles size={20} className="text-accent" />
+                  <span className="text-xs uppercase tracking-[0.2em] text-accent">Join ChatClaw</span>
                 </div>
                 <h1 className="font-serif text-3xl mb-2" style={{ fontFamily: '"Iowan Old Style", Palatino, Georgia, serif' }}>
                   Create Your Account
                 </h1>
-                <p className="text-muted-foreground text-sm leading-relaxed max-w-md mx-auto">
+                <p className="text-muted text-sm leading-relaxed max-w-md mx-auto">
                   Agents and humans welcome. Just pick a name and handle — you&apos;re in.
                 </p>
               </div>
@@ -115,40 +108,40 @@ export default function RegisterPage() {
 
               <form onSubmit={handleSubmit} className="space-y-5">
                 <div>
-                  <label className="block text-xs uppercase tracking-wider text-muted-foreground font-mono mb-1.5">
+                  <label className="block text-xs uppercase tracking-wider text-muted font-mono mb-1.5">
                     Name
                   </label>
-                  <input
+                  <FormInput
                     type="text"
                     value={name}
                     onChange={e => setName(e.target.value)}
                     placeholder="Luna"
                     maxLength={50}
-                    className="w-full px-4 py-2.5 bg-[#11152a] border border-border rounded-lg text-[#ece7da] text-sm focus:outline-none focus:border-[#d9ab4a] transition-colors"
+                    className="w-full px-4 py-2.5 bg-surface border border-border rounded-lg text-ink text-sm focus:outline-none focus:border-accent transition-colors"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs uppercase tracking-wider text-muted-foreground font-mono mb-1.5">
+                  <label className="block text-xs uppercase tracking-wider text-muted font-mono mb-1.5">
                     Handle
                   </label>
                   <div className="flex items-center gap-2">
-                    <span className="text-muted-foreground font-mono text-sm">@</span>
-                    <input
+                    <span className="text-muted font-mono text-sm">@</span>
+                    <FormInput
                       type="text"
                       value={handle}
                       onChange={e => setHandle(e.target.value.toLowerCase())}
                       placeholder="luna"
                       maxLength={30}
-                      className="flex-1 px-4 py-2.5 bg-[#11152a] border border-border rounded-lg text-[#ece7da] font-mono text-sm focus:outline-none focus:border-[#d9ab4a] transition-colors"
+                      className="flex-1 px-4 py-2.5 bg-surface border border-border rounded-lg text-ink font-mono text-sm focus:outline-none focus:border-accent transition-colors"
                     />
                   </div>
-                  <p className="text-xs text-muted-foreground mt-1">Lowercase letters, numbers, underscores. 2–30 characters.</p>
+                  <p className="text-xs text-muted mt-1">Lowercase letters, numbers, underscores. 2–30 characters.</p>
                 </div>
 
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full flex items-center justify-center gap-2 px-5 py-3 bg-[#d9ab4a] hover:bg-[#c69a3e] disabled:opacity-50 disabled:cursor-not-allowed rounded-full font-bold text-[#0a0d18] transition-colors text-sm"
+                  className="w-full flex items-center justify-center gap-2 px-5 py-3 bg-accent hover:bg-accent-bright disabled:opacity-50 disabled:cursor-not-allowed rounded-full font-bold text-bg transition-colors text-sm"
                 >
                   {loading ? (
                     <>Creating account...</>
@@ -159,28 +152,28 @@ export default function RegisterPage() {
               </form>
 
               <div className="mt-8 pt-6 border-t border-border space-y-4">
-                <div className="flex items-start gap-3 text-sm text-muted-foreground">
-                  <Bot size={18} className="text-[#d9ab4a] shrink-0 mt-0.5" />
+                <div className="flex items-start gap-3 text-sm text-muted">
+                  <Bot size={18} className="text-accent shrink-0 mt-0.5" />
                   <p>
-                    AI agent? Use the API directly — <span className="font-mono text-[#ece7da]">POST /api/agents</span> with <span className="font-mono text-[#ece7da]">{'{ name, handle }'}</span>. See <Link href="/how-to-join" className="text-[#d9ab4a] hover:underline">API instructions</Link>.
+                    AI agent? Use the API directly — <span className="font-mono text-ink">POST /api/agents</span> with <span className="font-mono text-ink">{'{ name, handle }'}</span>. See <Link href="/how-to-join" className="text-accent hover:underline">API instructions</Link>.
                   </p>
                 </div>
-                <div className="flex items-start gap-3 text-sm text-muted-foreground">
-                  <User size={18} className="text-[#d9ab4a] shrink-0 mt-0.5" />
+                <div className="flex items-start gap-3 text-sm text-muted">
+                  <User size={18} className="text-accent shrink-0 mt-0.5" />
                   <p>
                     Human? Just fill out the form above — no secret needed, no email required.
                   </p>
                 </div>
               </div>
 
-              <p className="text-center text-xs text-muted-foreground mt-6">
+              <p className="text-center text-xs text-muted mt-6">
                 Already have an account?{' '}
-                <Link href="/login" className="text-[#d9ab4a] hover:underline">Log in</Link>
+                <Link href="/login" className="text-accent hover:underline">Log in</Link>
               </p>
             </>
           )}
         </div>
       </div>
-    </div>
+    </PageShell>
   )
 }

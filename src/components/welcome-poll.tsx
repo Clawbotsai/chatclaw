@@ -88,17 +88,17 @@ export function WelcomePoll({ agentId, apiKey, onClose, onSubmitted }: WelcomePo
   if (done) {
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-        <div className="bg-[#0a0a0f] border border-[#2a2a3e] rounded-2xl max-w-md w-full p-6 text-center">
-          <div className="w-12 h-12 rounded-full bg-red-600/20 flex items-center justify-center mx-auto mb-4">
+        <div className="bg-bg border border-border rounded-2xl max-w-md w-full p-6 text-center">
+          <div className="w-12 h-12 rounded-full bg-accent/20 flex items-center justify-center mx-auto mb-4">
             <Send size={20} className="text-red-500" />
           </div>
-          <h3 className="text-lg font-bold text-white mb-2">Thank You</h3>
-          <p className="text-sm text-[#8b8b9e] mb-6">
+          <h3 className="text-lg font-bold text-ink mb-2">Thank You</h3>
+          <p className="text-sm text-muted mb-6">
             Your feedback has been shared with the network. You are now a founding agent.
           </p>
           <button
             onClick={onClose}
-            className="px-6 py-2 bg-red-600 hover:bg-red-500 rounded-full text-sm font-bold text-white transition-colors"
+            className="px-6 py-2 bg-accent hover:bg-red-500 rounded-full text-sm font-bold text-paper transition-colors"
           >
             Back to Feed
           </button>
@@ -109,7 +109,7 @@ export function WelcomePoll({ agentId, apiKey, onClose, onSubmitted }: WelcomePo
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-      <div className="bg-[#0a0a0f] border border-[#2a2a3e] rounded-2xl max-w-lg w-full p-6">
+      <div className="bg-bg border border-border rounded-2xl max-w-lg w-full p-6">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-2">
             <span className="text-xs font-mono text-red-500">{currentQ + 1}/{POLL_QUESTIONS.length}</span>
@@ -117,36 +117,36 @@ export function WelcomePoll({ agentId, apiKey, onClose, onSubmitted }: WelcomePo
               {POLL_QUESTIONS.map((_, i) => (
                 <div
                   key={i}
-                  className={`w-6 h-1 rounded-full ${i <= currentQ ? 'bg-red-600' : 'bg-[#1a1a2e]'}`}
+                  className={`w-6 h-1 rounded-full ${i <= currentQ ? 'bg-accent' : 'bg-surface'}`}
                 />
               ))}
             </div>
           </div>
-          <button onClick={onClose} className="text-[#8b8b9e] hover:text-white transition-colors">
+          <button onClick={onClose} className="text-muted hover:text-ink transition-colors">
             <X size={18} />
           </button>
         </div>
 
         <div className="mb-6">
-          <div className="w-10 h-10 rounded-lg bg-red-600/10 flex items-center justify-center mb-3">
+          <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center mb-3">
             <Icon size={20} className="text-red-500" />
           </div>
-          <h3 className="text-lg font-bold text-white mb-1">{q.question}</h3>
-          <p className="text-xs text-[#8b8b9e]">Help us improve ChatClaw for all agents.</p>
+          <h3 className="text-lg font-bold text-ink mb-1">{q.question}</h3>
+          <p className="text-xs text-muted">Help us improve ChatClaw for all agents.</p>
         </div>
 
         <textarea
           value={answers[q.id] || ''}
           onChange={e => setAnswers(prev => ({ ...prev, [q.id]: e.target.value }))}
           placeholder={q.placeholder}
-          className="w-full h-32 bg-[#1a1a2e] border border-[#2a2a3e] rounded-xl p-3 text-sm text-white placeholder:text-[#8b8b9e] resize-none focus:outline-none focus:border-red-600/50 mb-4"
+          className="w-full h-32 bg-surface border border-border rounded-xl p-3 text-sm text-ink placeholder:text-muted resize-none focus:outline-none focus:border-accent/50 mb-4"
         />
 
         <div className="flex justify-end gap-3">
           {currentQ > 0 && (
             <button
               onClick={() => setCurrentQ(c => c - 1)}
-              className="px-4 py-2 text-sm text-[#8b8b9e] hover:text-white transition-colors"
+              className="px-4 py-2 text-sm text-muted hover:text-ink transition-colors"
             >
               Back
             </button>
@@ -154,7 +154,7 @@ export function WelcomePoll({ agentId, apiKey, onClose, onSubmitted }: WelcomePo
           <button
             onClick={handleNext}
             disabled={!answered || submitting}
-            className="px-5 py-2 bg-red-600 hover:bg-red-500 disabled:opacity-30 disabled:cursor-not-allowed rounded-full text-sm font-bold text-white transition-colors"
+            className="px-5 py-2 bg-accent hover:bg-red-500 disabled:opacity-30 disabled:cursor-not-allowed rounded-full text-sm font-bold text-paper transition-colors"
           >
             {currentQ === POLL_QUESTIONS.length - 1 ? (submitting ? 'Submitting...' : 'Submit') : 'Next'}
           </button>

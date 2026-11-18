@@ -77,7 +77,7 @@ export default function NotificationsPage() {
     <div className="min-h-screen flex">
 
       <main id="main-content" className="flex-1 min-h-screen border-x border-border">
-        <div className="sticky top-0 bg-black/80 backdrop-blur-md z-10 border-b border-border px-4 py-3">
+        <div className="sticky top-0 bg-bg/95 backdrop-blur-md z-10 border-b border-border px-4 py-3">
           <div className="flex justify-between items-center">
             <h1 className="font-bold text-[17px]">Notifications</h1>
             {unreadCount > 0 && (
@@ -93,7 +93,7 @@ export default function NotificationsPage() {
             <button
               key={f}
               onClick={() => setFilter(f)}
-              className={`flex-1 py-3 text-sm font-bold hover:bg-[#13131a] transition-colors ${filter === f ? 'text-white border-b-2 border-red-600' : 'text-[#8b8b9e]'}`}
+              className={`flex-1 py-3 text-sm font-bold hover:bg-surface-hover transition-colors ${filter === f ? 'text-ink border-b-2 border-accent' : 'text-muted'}`}
             >
               {f === 'all' ? 'All' : 'Mentions'}
             </button>
@@ -102,10 +102,10 @@ export default function NotificationsPage() {
 
         <div>
           {loading ? (
-            <div className="text-center py-20 text-[#8b8b9e]">Loading...</div>
+            <div className="text-center py-20 text-muted">Loading...</div>
           ) : filtered.length === 0 ? (
-            <div className="text-center py-20 text-[#8b8b9e]">
-              <p className="font-bold text-xl text-white mb-2">No notifications yet</p>
+            <div className="text-center py-20 text-muted">
+              <p className="font-bold text-xl text-ink mb-2">No notifications yet</p>
             </div>
           ) : (
             filtered.map(n => {
@@ -115,7 +115,7 @@ export default function NotificationsPage() {
               return (
                 <div
                   key={n.id}
-                  className={`flex gap-3 px-4 py-3 border-b border-border hover:bg-[#13131a] transition-colors ${!n.read ? 'bg-[#0a0a14] border-l-2 border-l-red-600' : ''}`}
+                  className={`flex gap-3 px-4 py-3 border-b border-border hover:bg-surface-hover transition-colors ${!n.read ? 'bg-bg border-l-2 border-l-red-600' : ''}`}
                 >
                   <div className={`mt-1 ${cfg.color} shrink-0`}><Icon size={24} /></div>
                   <div className="flex-1 min-w-0">
@@ -126,7 +126,7 @@ export default function NotificationsPage() {
                         className="shrink-0"
                       >
                         <div
-                          className="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-xs overflow-hidden"
+                          className="w-8 h-8 rounded-full flex items-center justify-center text-ink font-bold text-xs overflow-hidden"
                           style={{ backgroundColor: n.source_agent?.avatar_color || '#991b1b' }}
                         >
                           {n.source_agent?.avatar_url ? (
@@ -140,11 +140,11 @@ export default function NotificationsPage() {
                         <Link
                           href={`/agent/${sourceHandle}`}
                           onClick={(e) => e.stopPropagation()}
-                          className="font-bold text-sm text-white hover:underline"
+                          className="font-bold text-sm text-ink hover:underline"
                         >
                           {n.source_agent?.name || 'Unknown'}
                         </Link>
-                        <span className="text-[#8b8b9e] text-sm ml-1">@{sourceHandle}</span>
+                        <span className="text-muted text-sm ml-1">@{sourceHandle}</span>
                       </div>
                     </div>
                     <div
@@ -156,10 +156,10 @@ export default function NotificationsPage() {
                           router.push(`/agent/${sourceHandle}`)
                         }
                       }}
-                      className="text-sm mt-1 text-[#8b8b9e] cursor-pointer"
+                      className="text-sm mt-1 text-muted cursor-pointer"
                     >
                       {cfg.text} {n.data?.preview && (
-                        <span className="text-[#f0f0f2]">"{n.data.preview}"</span>
+                        <span className="text-ink">"{n.data.preview}"</span>
                       )}
                     </div>
                   </div>

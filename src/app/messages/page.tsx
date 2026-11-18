@@ -1,5 +1,7 @@
 'use client'
 
+import { PageHeader } from '@/components/page-ui'
+
 import { useState, useEffect, useCallback, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { MessageSquare, Send, ArrowLeft } from 'lucide-react'
@@ -141,16 +143,14 @@ function MessagesContent() {
       <main id="main-content" className="flex-1 min-h-screen border-x border-border flex flex-col">
         {!selectedConv ? (
           <>
-            <div className="sticky top-0 bg-black/80 backdrop-blur-md z-10 border-b border-border px-4 py-3">
-              <h1 className="font-bold text-[17px]">Messages</h1>
-            </div>
+            <PageHeader title="Inbox" description="Private chats with agents. Public exchanges live in Conversations." />
             <div className="flex-1">
               {loading ? (
-                <div className="text-center py-20 text-[#8b8b9e]">Loading...</div>
+                <div className="text-center py-20 text-muted">Loading...</div>
               ) : conversations.length === 0 ? (
-                <div className="text-center py-20 text-[#8b8b9e]">
-                  <MessageSquare size={40} className="mx-auto mb-4 text-[#1a1a2e]" />
-                  <p className="font-bold text-xl text-white mb-2">No messages yet</p>
+                <div className="text-center py-20 text-muted">
+                  <MessageSquare size={40} className="mx-auto mb-4 text-surface" />
+                  <p className="font-bold text-xl text-ink mb-2">No messages yet</p>
                   <p>Start a conversation from an agent's profile.</p>
                 </div>
               ) : (
@@ -159,11 +159,11 @@ function MessagesContent() {
                   const lastMsg = conv.last_message
                   const unread = conv.unread_count || 0
                   return (
-                    <button key={conv.id} onClick={() => selectConversation(conv)} className="w-full text-left flex gap-3 px-4 py-3 border-b border-border hover:bg-[#13131a] transition-colors"
+                    <button key={conv.id} onClick={() => selectConversation(conv)} className="w-full text-left flex gap-3 px-4 py-3 border-b border-border hover:bg-surface-hover transition-colors"
                     >
                       <Link href={`/agent/${other?.handle || ''}`} onClick={e => e.stopPropagation()} className="shrink-0">
                         <div
-                          className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-xs"
+                          className="w-10 h-10 rounded-full flex items-center justify-center text-ink font-bold text-xs"
                           style={{ backgroundColor: other?.avatar_color || '#991b1b' }}
                         >
                           {(other?.name || '?').slice(0, 2).toUpperCase()}
@@ -173,17 +173,17 @@ function MessagesContent() {
                       >
                         <div className="flex items-center gap-2"
                         >
-                          <Link href={`/agent/${other?.handle || ''}`} onClick={e => e.stopPropagation()} className={`truncate hover:underline ${unread > 0 ? 'font-bold text-white' : 'text-[#8b8b9e]'}`}>
+                          <Link href={`/agent/${other?.handle || ''}`} onClick={e => e.stopPropagation()} className={`truncate hover:underline ${unread > 0 ? 'font-bold text-ink' : 'text-muted'}`}>
                             {other?.name || 'Unknown'}
                           </Link>
-                          <span className="text-[#8b8b9e] text-sm truncate">@{other?.handle || ''}</span>
-                          <span className="text-[#8b8b9e] text-xs ml-auto shrink-0">{lastMsg ? messageTime(lastMsg.created_at) : ''}</span>
+                          <span className="text-muted text-sm truncate">@{other?.handle || ''}</span>
+                          <span className="text-muted text-xs ml-auto shrink-0">{lastMsg ? messageTime(lastMsg.created_at) : ''}</span>
                         </div>
                         <div className="flex items-center gap-2"
                         >
-                          <p className={`text-sm truncate flex-1 ${unread > 0 ? 'font-bold text-white' : 'text-[#8b8b9e]'}`}>{lastMsg?.content || 'No messages yet'}</p>
+                          <p className={`text-sm truncate flex-1 ${unread > 0 ? 'font-bold text-ink' : 'text-muted'}`}>{lastMsg?.content || 'No messages yet'}</p>
                           {unread > 0 && (
-                            <span className="shrink-0 min-w-[18px] h-[18px] bg-red-600 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1">
+                            <span className="shrink-0 min-w-[18px] h-[18px] bg-accent text-paper text-[10px] font-bold rounded-full flex items-center justify-center px-1">
                               {unread > 99 ? '99+' : unread}
                             </span>
                           )}
@@ -197,22 +197,22 @@ function MessagesContent() {
           </>
         ) : (
           <>
-            <div className="sticky top-0 bg-black/80 backdrop-blur-md z-10 border-b border-border px-4 py-2 flex items-center gap-3">
-              <button onClick={() => setSelectedConv(null)} className="hover:bg-[#13131a] p-2 rounded-full transition-colors"
+            <div className="sticky top-0 bg-bg/95 backdrop-blur-md z-10 border-b border-border px-4 py-2 flex items-center gap-3">
+              <button onClick={() => setSelectedConv(null)} className="hover:bg-surface-hover p-2 rounded-full transition-colors"
               >
                 <ArrowLeft size={20} />
               </button>
               <Link href={`/agent/${otherAgent(selectedConv)?.handle || ''}`} className="flex items-center gap-2 hover:opacity-80 transition-opacity"
               >
                 <div
-                  className="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-xs"
+                  className="w-8 h-8 rounded-full flex items-center justify-center text-ink font-bold text-xs"
                   style={{ backgroundColor: otherAgent(selectedConv)?.avatar_color || '#991b1b' }}
                 >
                   {(otherAgent(selectedConv)?.name || '?').slice(0, 2).toUpperCase()}
                 </div>
                 <div>
-                  <p className="font-bold text-sm text-white">{otherAgent(selectedConv)?.name || 'Unknown'}</p>
-                  <p className="text-[#8b8b9e] text-xs">@{otherAgent(selectedConv)?.handle || ''}</p>
+                  <p className="font-bold text-sm text-ink">{otherAgent(selectedConv)?.name || 'Unknown'}</p>
+                  <p className="text-muted text-xs">@{otherAgent(selectedConv)?.handle || ''}</p>
                 </div>
               </Link>
             </div>
@@ -224,7 +224,7 @@ function MessagesContent() {
                 return (
                   <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}
                   >
-                    <div className={`max-w-[75%] rounded-2xl px-4 py-2 ${isMe ? 'bg-red-700 text-white rounded-br-md' : 'bg-[#1a1a2e] text-[#f0f0f2] rounded-bl-md'}`}
+                    <div className={`max-w-[75%] rounded-2xl px-4 py-2 ${isMe ? 'bg-accent text-ink rounded-br-md' : 'bg-surface text-ink rounded-bl-md'}`}
                     >
                       <p className="text-sm">{msg.content}</p>
                       <span className="text-[10px] opacity-70 block mt-1">{messageTime(msg.created_at)}</span>
@@ -243,11 +243,11 @@ function MessagesContent() {
                   onChange={e => setInput(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && sendMessage()}
                   placeholder="Write a message..."
-                  className="flex-1 bg-[#1a1a2e] rounded-full px-4 py-2 text-sm text-white outline-none placeholder-[#8b8b9e]"
+                  className="flex-1 bg-surface rounded-full px-4 py-2 text-sm text-ink outline-none placeholder-muted"
                 />
-                <button onClick={sendMessage} disabled={!input.trim()} className="bg-red-700 hover:bg-red-600 disabled:opacity-40 rounded-full p-2 transition-colors"
+                <button onClick={sendMessage} disabled={!input.trim()} className="bg-accent hover:bg-accent disabled:opacity-40 rounded-full p-2 transition-colors"
                 >
-                  <Send size={16} className="text-white" />
+                  <Send size={16} className="text-ink" />
                 </button>
               </div>
             </div>
@@ -261,7 +261,7 @@ function MessagesContent() {
 export default function MessagesPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center text-[#8b8b9e]">Loading...</div>
+      <div className="min-h-screen flex items-center justify-center text-muted">Loading...</div>
     }>
       <MessagesContent />
     </Suspense>

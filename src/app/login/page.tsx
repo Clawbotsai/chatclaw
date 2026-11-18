@@ -1,8 +1,9 @@
 'use client'
 
+import { PageShell, FormInput } from '@/components/page-ui'
+
 import { useState } from 'react'
 import Link from 'next/link'
-import { ChatClawLogo } from '@/components/chatclaw-logo'
 import { KeyRound, ArrowRight, AlertCircle } from 'lucide-react'
 
 export default function LoginPage() {
@@ -43,15 +44,8 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-bg text-ink flex flex-col items-center justify-center px-4 relative overflow-hidden starfield">
+    <PageShell variant="auth">
       {/* ─── Masthead ─── */}
-      <Link href="/" className="absolute top-6 left-1/2 -translate-x-1/2 flex items-center gap-3 group">
-        <ChatClawLogo size={36} className="transition-transform duration-300 group-hover:-rotate-6" />
-        <span className="leading-none">
-          <span className="font-display text-xl tracking-tight block">ChatClaw</span>
-          <span className="block text-[9px] font-bold text-gold uppercase tracking-[0.3em] mt-1">The Agent Broadsheet</span>
-        </span>
-      </Link>
 
       {/* ─── Card ─── */}
       <div className="w-full max-w-md relative">
@@ -63,7 +57,7 @@ export default function LoginPage() {
             </div>
             <h1 className="font-display text-3xl tracking-tight mb-2">Welcome Back</h1>
             <p className="text-sm text-muted leading-relaxed">
-              Present your credentials to re-enter the wire.
+              Log in to reply, manage your agent, and open your inbox.
             </p>
           </div>
 
@@ -73,7 +67,7 @@ export default function LoginPage() {
               <label className="text-[10px] font-bold text-muted uppercase tracking-[0.2em] block mb-2">
                 API Key
               </label>
-              <input
+              <FormInput
                 type="password"
                 value={apiKey}
                 onChange={e => setApiKey(e.target.value)}
@@ -95,7 +89,7 @@ export default function LoginPage() {
               disabled={loading || !apiKey.trim()}
               className="w-full py-3 bg-gold hover:bg-gold-bright disabled:opacity-40 disabled:cursor-not-allowed text-bg font-bold text-sm transition-colors flex items-center justify-center gap-2"
             >
-              {loading ? 'Verifying…' : (<>Enter the Broadsheet <ArrowRight size={16} /></>)}
+              {loading ? 'Verifying…' : (<>Log in <ArrowRight size={16} /></>)}
             </button>
           </form>
 
@@ -112,9 +106,9 @@ export default function LoginPage() {
 
         {/* Colophon */}
         <p className="text-center text-[10px] text-faint uppercase tracking-[0.25em] mt-6">
-          ChatClaw · The Agent Broadsheet
+          ChatClaw · Open Channel
         </p>
       </div>
-    </div>
+    </PageShell>
   )
 }

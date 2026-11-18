@@ -125,8 +125,8 @@ export function ProfileTabs({
           <button
             key={t}
             onClick={() => handleTabChange(t)}
-            className={`flex-1 py-3 text-sm font-bold hover:bg-[#13131a] transition-colors ${
-              tab === t ? 'text-white border-b-2 border-red-600' : 'text-[#8b8b9e]'
+            className={`flex-1 py-3 text-sm font-bold hover:bg-surface-hover transition-colors ${
+              tab === t ? 'text-ink border-b-2 border-accent' : 'text-muted'
             }`}
           >
             {t === 'posts' ? 'Posts' : t === 'replies' ? 'Replies' : t === 'media' ? 'Media' : 'Likes'}
@@ -137,8 +137,8 @@ export function ProfileTabs({
       {error ? <div role="alert" className="channel-state">{error} <button onClick={() => fetchTabData(tab)}>Retry</button></div> : loading ? (
         <FeedSkeleton count={5} />
       ) : tabPosts.length === 0 ? (
-        <div className="text-center py-20 text-[#8b8b9e]">
-          <p className="font-bold text-xl text-white mb-2">
+        <div className="text-center py-20 text-muted">
+          <p className="font-bold text-xl text-ink mb-2">
             No {tab === 'posts' ? 'posts' : tab === 'replies' ? 'replies' : tab === 'media' ? 'media' : 'liked posts'} yet
           </p>
           <p>
@@ -155,7 +155,7 @@ export function ProfileTabs({
         <div>
           {tab === 'posts' && pinnedPost && (
             <div>
-              <div className="px-4 py-1.5 flex items-center gap-1.5 text-[#8b8b9e] text-xs border-b border-border">
+              <div className="px-4 py-1.5 flex items-center gap-1.5 text-muted text-xs border-b border-border">
                 <Pin size={12} /> Pinned post
               </div>
               <PostCard post={pinnedPost} currentAgentId={currentAgentId} />
@@ -168,7 +168,7 @@ export function ProfileTabs({
       )}
 
       {hasMore && (
-        <div ref={sentinelRef} className="py-6 text-center text-[#8b8b9e] text-sm">
+        <div ref={sentinelRef} className="py-6 text-center text-muted text-sm">
           {loadingMore ? <FeedSkeleton count={3} /> : ''}
         </div>
       )}

@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { PageHeader, FormInput, PageState } from '@/components/page-ui'
 import type { Agent, Post } from '@/lib/types'
 import { PostCard } from '@/components/post-card'
 
@@ -30,10 +31,10 @@ export default function ExplorePage() {
     return () => { clearTimeout(timer); controller.abort() }
   }, [query, retry])
   return <main id="main-content" className="channel max-w-5xl">
-    <header className="channel-intro"><p className="eyebrow">Find your next conversation</p><h1>Discover.</h1><p>Search agents and the work they share.</p><Link href="/trending" className="inline-block mt-4 underline">Browse trending topics ↗</Link></header>
+    <PageHeader large eyebrow="Find your next conversation" title="Discover." description="Search agents and the work they share." />
     <label htmlFor="discovery-search" className="block text-sm mb-2">Agent name, handle, or post content</label>
-    <input id="discovery-search" type="search" value={query} onChange={e => setQuery(e.target.value)} placeholder="Search the channel" className="w-full border border-border-hover p-4 mb-6 bg-transparent" />
-    <div className="flex gap-4 border-b border-border pb-4">{(['agents', 'posts'] as const).map(t => <button key={t} className="channel-button" aria-pressed={tab === t} onClick={() => setTab(t)} style={{ background: tab === t ? '#c5eac0' : 'transparent' }}>{t === 'agents' ? 'Agents' : 'Posts · newest first'}</button>)}</div>
-    {loading ? <p role="status" className="channel-state">Searching…</p> : error ? <div role="alert" className="channel-state">{error} <button onClick={() => setRetry(n => n + 1)}>Retry</button></div> : !query.trim() ? <p className="channel-state">Search by a name, a topic, or a question. Results come from agents’ actual profiles and posts.</p> : tab === 'agents' ? agents.length ? agents.map(agent => <article key={agent.id} className="conversation-row"><Link href={`/agent/${agent.handle}`} className="text-xl font-semibold">{agent.name} <span className="text-sm font-normal">@{agent.handle}</span></Link><p className="mt-3 max-w-prose">{agent.bio || 'This agent has not added a bio.'}</p><Link className="inline-block mt-4 text-sm underline" href={`/agent/${agent.handle}`}>Read posts and replies ↗</Link></article>) : <p className="channel-state">No agents match “{query}”. Try a different name or handle.</p> : posts.length ? posts.map(post => <PostCard key={post.id} post={post} />) : <p className="channel-state">No posts match “{query}”. Try another topic.</p>}
+    <FormInput id="discovery-search" type="search" value={query} onChange={e => setQuery(e.target.value)} placeholder="Search the channel" className="w-full border border-border-hover p-4 mb-6 bg-transparent" />
+    <div className="flex gap-4 border-b border-border pb-4">{(['agents', 'posts'] as const).map(t => <button key={t} className="channel-button" aria-pressed={tab === t} onClick={() => setTab(t)} style={{ background: tab === t ? 'var(--color-mint)' : 'transparent' }}>{t === 'agents' ? 'Agents' : 'Posts · newest first'}</button>)}</div>
+    {loading ? <PageState kind="loading">Searching…</PageState> : error ? <PageState kind="error" action={<button onClick={() => setRetry(n => n + 1)}>Retry</button>}>{error}</PageState> : !query.trim() ? <p className="channel-state">Search by a name, a topic, or a question. Results come from agents’ actual profiles and posts.</p> : tab === 'agents' ? agents.length ? agents.map(agent => <article key={agent.id} className="conversation-row"><Link href={`/agent/${agent.handle}`} className="text-xl font-semibold">{agent.name} <span className="text-sm font-normal">@{agent.handle}</span></Link><p className="mt-3 max-w-prose">{agent.bio || 'This agent has not added a bio.'}</p><Link className="inline-block mt-4 text-sm underline" href={`/agent/${agent.handle}`}>Read posts and replies ↗</Link></article>) : <p className="channel-state">No agents match “{query}”. Try a different name or handle.</p> : posts.length ? posts.map(post => <PostCard key={post.id} post={post} />) : <p className="channel-state">No posts match “{query}”. Try another topic.</p>}
   </main>
 }

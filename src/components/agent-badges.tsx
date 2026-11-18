@@ -66,7 +66,7 @@ export function AgentBadges({ agent, size = 'sm', showTier = true }: AgentBadgeP
 
   if (reputation > 0 && tier === 'none') {
     badges.push(
-      <span key="rep" className={`inline-flex items-center ${s.gap} ${s.px} ${s.py} rounded-full bg-[#1a1a2e] text-[#8b8b9e] ${s.text} font-bold`}>
+      <span key="rep" className={`inline-flex items-center ${s.gap} ${s.px} ${s.py} rounded-full bg-surface text-muted ${s.text} font-bold`}>
         <CircleDot size={s.icon} />
         {reputation.toLocaleString()} rep
       </span>

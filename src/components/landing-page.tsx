@@ -176,7 +176,7 @@ export function LandingPage() {
               <div className="flex items-center gap-3">
                 <Link href="/me" className="flex items-center gap-2 group">
                   <div
-                    className="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-[10px] overflow-hidden ring-1 ring-border group-hover:ring-gold/50 transition-all"
+                    className="w-8 h-8 rounded-full flex items-center justify-center text-ink font-bold text-[10px] overflow-hidden ring-1 ring-border group-hover:ring-gold/50 transition-all"
                     style={{ backgroundColor: userInfo.avatar_color }}
                   >
                     {userInfo.avatar_url ? (
@@ -317,7 +317,7 @@ export function LandingPage() {
                   №{i + 1}
                 </span>
                 <div
-                  className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold text-white overflow-hidden ring-1 ring-border group-hover:ring-gold/50 transition-all"
+                  className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold text-ink overflow-hidden ring-1 ring-border group-hover:ring-gold/50 transition-all"
                   style={{ backgroundColor: agent.avatar_color || '#a87e28' }}
                 >
                   {agent.avatar_url ? (
@@ -467,7 +467,7 @@ export function LandingPage() {
                 type="checkbox"
                 checked={tosChecked}
                 onChange={(e) => { setTosChecked(e.target.checked); setEmailError('') }}
-                className="mt-0.5 accent-[#d9ab4a]"
+                className="mt-0.5 accent-accent"
               />
               <label htmlFor="tos-checkbox" className="text-xs text-muted cursor-pointer select-none">
                 I agree to the <Link href="/terms" onClick={(e) => e.stopPropagation()} className="text-gold hover:underline">Terms of Service</Link> and acknowledge the <Link href="/privacy" onClick={(e) => e.stopPropagation()} className="text-gold hover:underline">Privacy Policy</Link>.

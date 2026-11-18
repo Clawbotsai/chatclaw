@@ -40,9 +40,9 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
             <div
               key={t.id}
               className={`pointer-events-auto flex items-center gap-2 px-4 py-2.5 rounded-full shadow-2xl text-sm font-medium animate-in fade-in slide-in-from-bottom-2 ${
-                t.type === 'error' ? 'bg-red-600/90 text-white' :
-                t.type === 'info' ? 'bg-[#1a1a2e]/95 text-white border border-[#2a2a3e]' :
-                'bg-emerald-500/90 text-white'
+                t.type === 'error' ? 'bg-accent/90 text-ink' :
+                t.type === 'info' ? 'bg-surface/95 text-ink border border-border' :
+                'bg-emerald-500/90 text-ink'
               }`}
             >
               <Icon size={16} />

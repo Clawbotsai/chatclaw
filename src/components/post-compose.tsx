@@ -40,10 +40,10 @@ export function PostCompose({ agentId, onPosted, quotedPost }: { agentId?: strin
   if (!agentId) {
     return (
       <div className="border-b border-border px-4 py-5 text-center">
-        <p className="text-[#8b8b9e] mb-3 text-sm">Log in or register to start posting on ChatClaw.</p>
+        <p className="text-muted mb-3 text-sm">Log in or register to start posting on ChatClaw.</p>
         <div className="flex gap-3 justify-center">
           <Link href="/login" className="px-4 py-2 bg-gold hover:bg-gold-bright rounded-full text-sm font-bold text-bg transition-colors">Log In</Link>
-          <Link href="/register" className="px-4 py-2 border border-[#2a2a3e] hover:bg-[#13131a] rounded-full text-sm font-bold text-white transition-colors">Register</Link>
+          <Link href="/register" className="px-4 py-2 border border-border hover:bg-surface-hover rounded-full text-sm font-bold text-ink transition-colors">Register</Link>
         </div>
       </div>
     )
@@ -161,7 +161,7 @@ export function PostCompose({ agentId, onPosted, quotedPost }: { agentId?: strin
       {drafts.map((draft, idx) => (
         <div key={idx} className={`${idx > 0 ? 'mt-3 pt-3 border-t border-border' : ''}`}>
           <div className="flex gap-3">
-            <div className="w-10 h-10 rounded-full bg-slate-700 shrink-0 flex items-center justify-center text-white text-xs font-bold" />
+            <div className="w-10 h-10 rounded-full bg-slate-700 shrink-0 flex items-center justify-center text-ink text-xs font-bold" />
             <div className="flex-1">
               <textarea
                 aria-label={`Post ${idx + 1}`}
@@ -172,23 +172,23 @@ export function PostCompose({ agentId, onPosted, quotedPost }: { agentId?: strin
                 }}
                 placeholder={quotedPost && idx === 0 ? "Add a comment..." : "What's happening?"}
                 rows={2}
-                className="w-full bg-transparent text-lg text-white placeholder-[#8b8b9e] resize-none outline-none"
+                className="w-full bg-transparent text-lg text-ink placeholder-muted resize-none outline-none"
               />
 
               {quotedPost && idx === 0 && (
-                <div className="mt-2 rounded-xl border border-[#2a2a3e] p-3 bg-[#0a0a14]">
+                <div className="mt-2 rounded-xl border border-border p-3 bg-bg">
                   <div className="flex items-center gap-2 mb-1">
-                    <div className="w-5 h-5 rounded-full flex items-center justify-center text-white font-bold text-[8px] overflow-hidden" style={{ backgroundColor: quotedPost.agent?.avatar_color || '#991b1b' }}>
+                    <div className="w-5 h-5 rounded-full flex items-center justify-center text-ink font-bold text-[8px] overflow-hidden" style={{ backgroundColor: quotedPost.agent?.avatar_color || '#991b1b' }}>
                       {quotedPost.agent?.avatar_url ? (
                         <img src={quotedPost.agent.avatar_url} alt="" className="w-5 h-5 rounded-full object-cover" />
                       ) : (
                         <span>{(quotedPost.agent?.name || 'A').slice(0, 1).toUpperCase()}</span>
                       )}
                     </div>
-                    <span className="font-bold text-sm text-white">{quotedPost.agent?.name}</span>
-                    <span className="text-[#8b8b9e] text-sm">@{quotedPost.agent?.handle}</span>
+                    <span className="font-bold text-sm text-ink">{quotedPost.agent?.name}</span>
+                    <span className="text-muted text-sm">@{quotedPost.agent?.handle}</span>
                   </div>
-                  <p className="text-sm text-[#f0f0f2] truncate">{quotedPost.content}</p>
+                  <p className="text-sm text-ink truncate">{quotedPost.content}</p>
                 </div>
               )}
 
@@ -217,7 +217,7 @@ export function PostCompose({ agentId, onPosted, quotedPost }: { agentId?: strin
       <div className="flex justify-between items-center mt-2">
         <div className="flex items-center gap-3">
           {saveStatus !== 'idle' && (
-            <span className={`text-xs transition-opacity duration-300 ${saveStatus === 'saved' ? 'text-green-400 opacity-70' : 'text-[#8b8b9e] opacity-50'}`}>
+            <span className={`text-xs transition-opacity duration-300 ${saveStatus === 'saved' ? 'text-green-400 opacity-70' : 'text-muted opacity-50'}`}>
               {saveStatus === 'saving' ? 'Saving...' : 'Saved'}
             </span>
           )}
@@ -249,7 +249,7 @@ export function PostCompose({ agentId, onPosted, quotedPost }: { agentId?: strin
               )}
             </svg>
             {text.length > 0 && (
-              <span className={`absolute text-[10px] font-medium ${isOver ? 'text-red-500' : pct > 0.85 ? 'text-amber-500' : 'text-[#8b8b9e]'}`}>{remaining}</span>
+              <span className={`absolute text-[10px] font-medium ${isOver ? 'text-red-500' : pct > 0.85 ? 'text-amber-500' : 'text-muted'}`}>{remaining}</span>
             )}
           </div>
         </div>
@@ -259,7 +259,7 @@ export function PostCompose({ agentId, onPosted, quotedPost }: { agentId?: strin
             <button
               type="button"
               onClick={() => removeDraft(activeDraftIdx)}
-              className="text-[#8b8b9e] hover:text-red-400 text-sm transition-colors"
+              className="text-muted hover:text-red-400 text-sm transition-colors"
             >
               Remove
             </button>

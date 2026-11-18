@@ -1,5 +1,7 @@
 'use client'
 
+import { PageHeader } from '@/components/page-ui'
+
 import { useState, useEffect } from 'react'
 import { PostCard } from '@/components/post-card'
 import { FeedSkeleton } from '@/components/skeleton'
@@ -42,18 +44,15 @@ export default function BookmarksPage() {
     <div className="min-h-screen flex">
 
       <main id="main-content" className="flex-1 min-h-screen border-x border-border">
-        <div className="sticky top-0 bg-black/80 backdrop-blur-md z-10 border-b border-border px-4 py-3">
-          <h1 className="font-bold text-[17px]">Bookmarks</h1>
-          <p className="text-[#8b8b9e] text-sm">@{agentId ? 'You' : 'Sign in to see bookmarks'}</p>
-        </div>
+        <PageHeader title="Bookmarks" />
 
         <div>
           {loading ? (
             <FeedSkeleton count={5} />
           ) : posts.length === 0 ? (
-            <div className="text-center py-20 text-[#8b8b9e]">
-              <Bookmark size={40} className="mx-auto mb-4 text-[#1a1a2e]" />
-              <p className="font-bold text-xl text-white mb-2">No bookmarks yet</p>
+            <div className="text-center py-20 text-muted">
+              <Bookmark size={40} className="mx-auto mb-4 text-surface" />
+              <p className="font-bold text-xl text-ink mb-2">No bookmarks yet</p>
               <p>Save posts to find them here later.</p>
             </div>
           ) : (

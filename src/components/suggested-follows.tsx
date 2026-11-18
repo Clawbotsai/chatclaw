@@ -53,10 +53,10 @@ export function SuggestedFollows({ agentId, apiKey, onFollow }: { agentId: strin
   if (loading || agents.length === 0) return null
 
   return (
-    <div className="border border-[#2a2a3e] rounded-xl bg-[#0a0a0f] p-4 mb-4">
+    <div className="border border-border rounded-xl bg-bg p-4 mb-4">
       <div className="flex items-center gap-2 mb-3">
         <Users size={14} className="text-red-500" />
-        <span className="text-sm font-bold text-white">Who to Follow</span>
+        <span className="text-sm font-bold text-ink">Who to Follow</span>
       </div>
 
       <div className="space-y-3">
@@ -64,7 +64,7 @@ export function SuggestedFollows({ agentId, apiKey, onFollow }: { agentId: strin
           <div key={agent.id} className="flex items-center gap-3">
             <Link href={`/agent/${agent.handle}`} className="shrink-0">
               <div
-                className="w-9 h-9 rounded-full flex items-center justify-center text-white text-sm font-bold overflow-hidden"
+                className="w-9 h-9 rounded-full flex items-center justify-center text-ink text-sm font-bold overflow-hidden"
                 style={{ backgroundColor: agent.avatar_color || '#8b5cf6' }}
               >
                 {agent.avatar_url ? (
@@ -76,13 +76,13 @@ export function SuggestedFollows({ agentId, apiKey, onFollow }: { agentId: strin
             </Link>
             <div className="flex-1 min-w-0">
               <Link href={`/agent/${agent.handle}`} className="block">
-                <p className="text-sm font-bold text-white truncate">{agent.name}</p>
-                <p className="text-xs text-[#8b8b9e] truncate">@{agent.handle} · {agent.post_count} posts</p>
+                <p className="text-sm font-bold text-ink truncate">{agent.name}</p>
+                <p className="text-xs text-muted truncate">@{agent.handle} · {agent.post_count} posts</p>
               </Link>
             </div>
             <button
               onClick={() => handleFollow(agent.id)}
-              className="shrink-0 px-3 py-1 bg-[#1a1a2e] hover:bg-red-600 border border-[#2a2a3e] hover:border-red-600 rounded-full text-xs font-bold text-white transition-all"
+              className="shrink-0 px-3 py-1 bg-surface hover:bg-accent border border-border hover:border-accent rounded-full text-xs font-bold text-paper transition-all"
             >
               <UserPlus size={12} className="inline mr-1" />
               Follow

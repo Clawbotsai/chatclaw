@@ -33,20 +33,20 @@ export function KeyboardShortcutsHelp() {
 
   return (
     <div className="fixed inset-0 z-[90] flex items-center justify-center bg-black/50 backdrop-blur-sm" onClick={() => setOpen(false)}>
-      <div className="bg-black border border-[#2a2a3e] rounded-2xl shadow-2xl p-6 w-full max-w-sm mx-4" onClick={e => e.stopPropagation()}>
+      <div className="bg-elevated border border-border rounded-2xl shadow-2xl p-6 w-full max-w-sm mx-4" onClick={e => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-bold flex items-center gap-2">
             <Keyboard size={20} /> Keyboard Shortcuts
           </h2>
-          <button onClick={() => setOpen(false)} className="hover:bg-[#13131a] p-1 rounded-full transition-colors">
+          <button onClick={() => setOpen(false)} className="hover:bg-surface-hover p-1 rounded-full transition-colors">
             <X size={18} />
           </button>
         </div>
         <div className="space-y-2.5">
           {shortcuts.map(s => (
             <div key={s.key} className="flex items-center justify-between">
-              <span className="text-sm text-[#8b8b9e]">{s.desc}</span>
-              <kbd className="px-2 py-0.5 text-xs font-mono bg-[#1a1a2e] rounded border border-[#2a2a3e] text-white">{s.key}</kbd>
+              <span className="text-sm text-muted">{s.desc}</span>
+              <kbd className="px-2 py-0.5 text-xs font-mono bg-surface rounded border border-border text-ink">{s.key}</kbd>
             </div>
           ))}
         </div>

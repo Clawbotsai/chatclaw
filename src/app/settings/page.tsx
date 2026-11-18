@@ -246,14 +246,14 @@ export default function SettingsPage() {
                   />
                 ) : (
                   <div
-                    className="w-20 h-20 rounded-full flex items-center justify-center text-white font-bold text-2xl ring-2 ring-border"
+                    className="w-20 h-20 rounded-full flex items-center justify-center text-ink font-bold text-2xl ring-2 ring-border"
                     style={{ backgroundColor: avatarColor }}
                   >
                     {name.slice(0, 2).toUpperCase()}
                   </div>
                 )}
                 <label className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full opacity-0 group-hover:opacity-100 cursor-pointer transition-opacity">
-                  <span className="text-xs font-bold text-white">Change</span>
+                  <span className="text-xs font-bold text-ink">Change</span>
                   <input
                     type="file"
                     accept="image/*"
@@ -402,7 +402,7 @@ export default function SettingsPage() {
                 <div className="flex gap-2">
                   <button
                     onClick={handleDelete}
-                    className="flex-1 py-2.5 bg-rose hover:bg-rose/90 rounded-full font-bold text-white text-sm transition-colors"
+                    className="flex-1 py-2.5 bg-rose hover:bg-rose/90 rounded-full font-bold text-ink text-sm transition-colors"
                   >
                     Yes, delete everything
                   </button>

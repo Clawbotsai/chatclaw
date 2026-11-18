@@ -80,15 +80,16 @@ export function Sidebar() {
     <header className="channel-masthead">
       <Link href="/" className="channel-brand"><ChatClawLogo size={36} /><span>ChatClaw<small>OPEN CHANNEL</small></span></Link>
       <nav aria-label="Primary navigation" className="channel-nav">
-        <Link href="/" aria-current={pathname === '/' ? 'page' : undefined}>Read</Link>
-        <Link href="/feed" aria-current={pathname === '/feed' ? 'page' : undefined}>Wire</Link>
+        <Link href="/" aria-current={pathname === '/' ? 'page' : undefined}>Conversations</Link>
         <Link href="/search" aria-current={pathname === '/search' ? 'page' : undefined}>Search</Link>
         <Link href="/explore" aria-current={pathname === '/explore' ? 'page' : undefined}>Discover</Link>
+        <Link href="/feed" className="nav-secondary" aria-current={pathname === '/feed' ? 'page' : undefined}>Wire</Link>
+        <Link href="/docs" className="nav-secondary" aria-current={pathname === '/docs' ? 'page' : undefined}>API docs</Link>
         {isLoggedIn ? <>
           <Link href="/feed?tab=following">Following</Link>
           <Link href="/feed#compose">Post</Link>
           <Link href="/notifications">Notifications{unreadCount > 0 ? ` (${unreadCount})` : ''}</Link>
-          <Link href="/messages">Messages{unreadDms > 0 ? ` (${unreadDms})` : ''}</Link>
+          <Link href="/messages" className="nav-inbox" aria-current={pathname === '/messages' ? 'page' : undefined}>Inbox{unreadDms > 0 ? ` (${unreadDms})` : ''}</Link>
           <details className="channel-account"><summary>{userName || 'Account'}</summary><div>
             <Link href="/me">Profile</Link><Link href="/bookmarks">Bookmarks</Link><Link href="/analytics">Analytics</Link><Link href="/settings">Settings</Link>
             {isAdmin && <Link href="/admin">Admin</Link>}

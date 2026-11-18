@@ -166,7 +166,7 @@ export function HomeFeed() {
                 <div className="flex items-center gap-2">
                   <Link href="/me" className="flex items-center gap-2 group">
                     <div
-                      className="w-7 h-7 rounded-full flex items-center justify-center text-white font-bold text-[9px] overflow-hidden ring-1 ring-border group-hover:ring-gold/50 transition-all"
+                      className="w-7 h-7 rounded-full flex items-center justify-center text-ink font-bold text-[9px] overflow-hidden ring-1 ring-border group-hover:ring-gold/50 transition-all"
                       style={{ backgroundColor: userAvatarColor }}
                     >
                       {userAvatarUrl ? (

@@ -30,22 +30,22 @@ export function PromptTemplates({ onUse }: { onUse?: (text: string) => void }) {
     return (
       <button
         onClick={() => setExpanded(true)}
-        className="w-full flex items-center gap-2 px-3 py-2 border border-[#2a2a3e] rounded-lg hover:bg-[#13131a] transition-colors mb-4"
+        className="w-full flex items-center gap-2 px-3 py-2 border border-border rounded-lg hover:bg-surface-hover transition-colors mb-4"
       >
-        <Wand2 size={14} className="text-[#8b8b9e]" />
-        <span className="text-sm text-[#8b8b9e]">Need ideas? Try a prompt template</span>
+        <Wand2 size={14} className="text-muted" />
+        <span className="text-sm text-muted">Need ideas? Try a prompt template</span>
       </button>
     )
   }
 
   return (
-    <div className="border border-[#2a2a3e] rounded-xl bg-[#0a0a0f] p-4 mb-4">
+    <div className="border border-border rounded-xl bg-bg p-4 mb-4">
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
           <Wand2 size={14} className="text-red-500" />
-          <span className="text-sm font-bold text-white">Prompt Templates</span>
+          <span className="text-sm font-bold text-ink">Prompt Templates</span>
         </div>
-        <button onClick={() => setExpanded(false)} className="text-xs text-[#8b8b9e] hover:text-white">
+        <button onClick={() => setExpanded(false)} className="text-xs text-muted hover:text-ink">
           Hide
         </button>
       </div>
@@ -55,17 +55,17 @@ export function PromptTemplates({ onUse }: { onUse?: (text: string) => void }) {
           <button
             key={prompt.id}
             onClick={() => handleCopy(prompt)}
-            className="w-full text-left px-3 py-2.5 rounded-lg bg-[#1a1a2e] hover:bg-[#252536] border border-[#2a2a3e] hover:border-red-600/30 transition-all group"
+            className="w-full text-left px-3 py-2.5 rounded-lg bg-surface hover:bg-surface-hover border border-border hover:border-accent/30 transition-all group"
           >
             <div className="flex items-center justify-between mb-1">
-              <span className="text-xs font-bold text-white">{prompt.title}</span>
+              <span className="text-xs font-bold text-ink">{prompt.title}</span>
               {copied === prompt.id ? (
                 <Check size={12} className="text-green-400" />
               ) : (
-                <Copy size={12} className="text-[#8b8b9e] opacity-0 group-hover:opacity-100" />
+                <Copy size={12} className="text-muted opacity-0 group-hover:opacity-100" />
               )}
             </div>
-            <p className="text-xs text-[#8b8b9e] line-clamp-2">{prompt.text}</p>
+            <p className="text-xs text-muted line-clamp-2">{prompt.text}</p>
           </button>
         ))}
       </div>

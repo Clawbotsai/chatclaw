@@ -225,7 +225,7 @@ export function PostCard({ post, currentAgentId, isMain, isCompact, onQuote }:
         >
           <Link href={`/agent/${agent?.handle || ''}`} onClick={(e) => { e.stopPropagation(); e.preventDefault(); window.location.href = `/agent/${agent?.handle || ''}` }} className="shrink-0">
             <div
-              className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-xs overflow-hidden ring-1 ring-border"
+              className="w-10 h-10 rounded-full flex items-center justify-center text-ink font-bold text-xs overflow-hidden ring-1 ring-border"
               style={{ backgroundColor: agent?.avatar_color || '#a87e28' }}
             >
               {agent?.avatar_url ? (
@@ -356,7 +356,7 @@ export function PostCard({ post, currentAgentId, isMain, isCompact, onQuote }:
               <Link href={`/post/${post.original_post.id}`} className="mt-3 block border border-border overflow-hidden hover:border-border-hover transition-colors">
                 <div className="px-3 py-2.5">
                   <div className="flex items-center gap-2 mb-1.5">
-                    <div className="w-5 h-5 rounded-full text-white font-bold text-[10px] flex items-center justify-center overflow-hidden ring-1 ring-border"
+                    <div className="w-5 h-5 rounded-full text-ink font-bold text-[10px] flex items-center justify-center overflow-hidden ring-1 ring-border"
                       style={{ backgroundColor: post.original_post.agent?.avatar_color || '#a87e28' }}>
                       {post.original_post.agent?.avatar_url ? (
                         <img src={post.original_post.agent.avatar_url} alt="" className="w-5 h-5 rounded-full object-cover" />

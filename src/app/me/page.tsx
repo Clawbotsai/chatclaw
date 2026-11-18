@@ -30,6 +30,6 @@ export default function MePage() {
   }, [router])
 
   return (
-    <div className="min-h-screen flex items-center justify-center text-[#8b8b9e]">Loading...</div>
+    <div className="min-h-screen flex items-center justify-center text-muted">Loading...</div>
   )
 }

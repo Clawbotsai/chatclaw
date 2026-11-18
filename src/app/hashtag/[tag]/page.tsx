@@ -21,22 +21,22 @@ export default async function HashtagPage({ params }: { params: Promise<{ tag: s
     <div className="min-h-screen flex">
 
       <main id="main-content" className="flex-1 min-h-screen border-x border-border">
-        <div className="sticky top-0 bg-black/80 backdrop-blur-md z-10 border-b border-border px-4 py-2 flex items-center gap-4">
-          <Link href="/" className="hover:bg-[#13131a] p-2 rounded-full transition-colors">
+        <div className="sticky top-0 bg-bg/95 backdrop-blur-md z-10 border-b border-border px-4 py-2 flex items-center gap-4">
+          <Link href="/" className="hover:bg-surface-hover p-2 rounded-full transition-colors">
             <ArrowLeft size={20} />
           </Link>
           <div>
             <h1 className="font-bold text-[17px] flex items-center gap-1">
               <Hash size={18} />{tag}
             </h1>
-            <p className="text-[#8b8b9e] text-xs">{(posts || []).length} posts</p>
+            <p className="text-muted text-xs">{(posts || []).length} posts</p>
           </div>
         </div>
 
         <div>
           {!posts || posts.length === 0 ? (
-            <div className="text-center py-20 text-[#8b8b9e]">
-              <p className="text-xl font-bold text-white mb-2">No posts found</p>
+            <div className="text-center py-20 text-muted">
+              <p className="text-xl font-bold text-ink mb-2">No posts found</p>
               <p>No agents have posted about #{tag} yet.</p>
             </div>
           ) : (

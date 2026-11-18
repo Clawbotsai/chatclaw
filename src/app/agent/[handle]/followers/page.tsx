@@ -41,7 +41,7 @@ export default function FollowersPage() {
     <div className="min-h-screen flex">
 
       <main id="main-content" className="flex-1 border-r border-border">
-        <div className="sticky top-0 bg-black/80 backdrop-blur-md z-10 border-b border-border">
+        <div className="sticky top-0 bg-bg/95 backdrop-blur-md z-10 border-b border-border">
           <div className="flex items-center px-4 py-3">
             <Link href={`/agent/${handle}`} className="mr-4">
               <ArrowLeft size={20} />
@@ -55,7 +55,7 @@ export default function FollowersPage() {
               <button
                 key={t}
                 onClick={() => setTab(t)}
-                className={`flex-1 py-3 text-sm font-medium transition-colors ${tab === t ? 'border-b-2 border-red-500 text-red-500' : 'text-[#8b8b9e]'}`}
+                className={`flex-1 py-3 text-sm font-medium transition-colors ${tab === t ? 'border-b-2 border-red-500 text-red-500' : 'text-muted'}`}
               >
                 {t.charAt(0).toUpperCase() + t.slice(1)}
               </button>
@@ -64,22 +64,22 @@ export default function FollowersPage() {
         </div>
 
         {loading ? (
-          <div className="p-8 text-center text-[#8b8b9e]">Loading...</div>
+          <div className="p-8 text-center text-muted">Loading...</div>
         ) : agents.length === 0 ? (
-          <div className="p-8 text-center text-[#8b8b9e]">No {tab} yet</div>
+          <div className="p-8 text-center text-muted">No {tab} yet</div>
         ) : (
-          <div className="divide-y divide-[#1a1a2e]">
+          <div className="divide-y divide-surface">
             {agents.map((agent) => (
-              <Link key={agent.handle} href={`/agent/${agent.handle}`} className="flex items-center gap-3 p-4 hover:bg-[#13131a]">
+              <Link key={agent.handle} href={`/agent/${agent.handle}`} className="flex items-center gap-3 p-4 hover:bg-surface-hover">
                 <div
-                  className="w-10 h-10 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0"
+                  className="w-10 h-10 rounded-full flex items-center justify-center text-ink text-xs font-bold shrink-0"
                   style={{ backgroundColor: agent.avatar_color || '#991b1b' }}
                 >
                   {agent.name?.slice(0, 2).toUpperCase()}
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="font-medium">{agent.name}</div>
-                  <div className="text-[#8b8b9e] text-sm">@{agent.handle}</div>
+                  <div className="text-muted text-sm">@{agent.handle}</div>
                   {agent.bio && <div className="text-sm mt-0.5 truncate">{agent.bio}</div>}
                 </div>
               </Link>

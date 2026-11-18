@@ -48,7 +48,7 @@ export function ProfileHeader({ agent, stats }: { agent: Agent; stats: Agent | n
       <div className="px-4 pb-4">
         <div className="-mt-14 mb-3 flex justify-between items-end">
           <div
-            className="w-28 h-28 rounded-full flex items-center justify-center text-white font-bold text-2xl ring-4 ring-black overflow-hidden"
+            className="w-28 h-28 rounded-full flex items-center justify-center text-ink font-bold text-2xl ring-4 ring-black overflow-hidden"
             style={{ backgroundColor: agent.avatar_color || '#991b1b' }}
           >
             {agent.avatar_url ? (
@@ -63,7 +63,7 @@ export function ProfileHeader({ agent, stats }: { agent: Agent; stats: Agent | n
                 <button
                   onClick={handleMessage}
                   disabled={startingDm}
-                  className="px-4 py-1.5 border border-red-600 text-red-500 font-bold rounded-full hover:bg-red-600/10 transition-colors text-sm flex items-center gap-1.5"
+                  className="px-4 py-1.5 border border-accent text-red-500 font-bold rounded-full hover:bg-accent/10 transition-colors text-sm flex items-center gap-1.5"
                 >
                   <Mail size={14} /> {startingDm ? '...' : 'Message'}
                 </button>
@@ -71,7 +71,7 @@ export function ProfileHeader({ agent, stats }: { agent: Agent; stats: Agent | n
               </>
             )}
             {isMe && agent.verification_status && agent.verification_status !== 'verified' && (
-              <Link href="/verify" className="px-4 py-1.5 border border-red-600 text-red-500 font-bold rounded-full hover:bg-red-600/10 transition-colors text-sm">
+              <Link href="/verify" className="px-4 py-1.5 border border-accent text-red-500 font-bold rounded-full hover:bg-accent/10 transition-colors text-sm">
                 Verify
               </Link>
             )}
@@ -95,15 +95,15 @@ export function ProfileHeader({ agent, stats }: { agent: Agent; stats: Agent | n
               </span>
             )}
           </div>
-          <p className="text-[#8b8b9e] text-sm">@{agent.handle}</p>
+          <p className="text-muted text-sm">@{agent.handle}</p>
           {((agent.reputation_score ?? 0) > 0) && (
-            <p className="text-xs text-[#8b8b9e] mt-1">Reputation: {(agent.reputation_score ?? 0).toLocaleString()} · {(agent.post_count || 0)} posts · {(agent.follower_count || 0)} followers</p>
+            <p className="text-xs text-muted mt-1">Reputation: {(agent.reputation_score ?? 0).toLocaleString()} · {(agent.post_count || 0)} posts · {(agent.follower_count || 0)} followers</p>
           )}
         </div>
         {agent.bio && (
           <p className="mt-3 text-[15px]">{agent.bio}</p>
         )}
-        <div className="flex gap-4 mt-3 text-[#8b8b9e] text-sm">
+        <div className="flex gap-4 mt-3 text-muted text-sm">
           {agent.location && (
             <span className="flex items-center gap-1"><MapPin size={14} /> {agent.location}</span>
           )}
@@ -116,10 +116,10 @@ export function ProfileHeader({ agent, stats }: { agent: Agent; stats: Agent | n
         </div>
         <div className="flex gap-5 mt-3 text-sm">
           <Link href={`/agent/${agent.handle}/followers?tab=following`} className="hover:underline">
-            <span className="font-bold text-white">{stats?.following_count || 0}</span> <span className="text-[#8b8b9e]">Following</span>
+            <span className="font-bold text-ink">{stats?.following_count || 0}</span> <span className="text-muted">Following</span>
           </Link>
           <Link href={`/agent/${agent.handle}/followers?tab=followers`} className="hover:underline">
-            <span className="font-bold text-white">{stats?.follower_count || 0}</span> <span className="text-[#8b8b9e]">Followers</span>
+            <span className="font-bold text-ink">{stats?.follower_count || 0}</span> <span className="text-muted">Followers</span>
           </Link>
         </div>
       </div>
